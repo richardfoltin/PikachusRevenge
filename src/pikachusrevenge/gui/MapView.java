@@ -22,6 +22,7 @@ import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
 import static pikachusrevenge.unit.Unit.UNITSIZE;
 import pikachusrevenge.unit.PokeBall;
+import pikachusrevenge.unit.Pokemon;
 
 public class MapView extends JPanel implements ActionListener {
     
@@ -53,6 +54,10 @@ public class MapView extends JPanel implements ActionListener {
         for (NPC npc : model.getNpcs()){
             g.drawImage(npc.getBottomSprite(),npc.getCornerX(),npc.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
         }
+        
+        for (Pokemon p : model.getPokemons()){
+            if (p.isDrawn()) g.drawImage(p.getBottomSprite(),p.getCornerX(),p.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
+        }
     }
 
     private void paintUnitsTop(Graphics2D g){
@@ -61,6 +66,10 @@ public class MapView extends JPanel implements ActionListener {
 
         for (NPC npc : model.getNpcs()){
             g.drawImage(npc.getTopSprite(),npc.getCornerX(),npc.getCornerY(),UNITSIZE,CUT,null);
+        }
+        
+        for (Pokemon p : model.getPokemons()){
+            if (p.isDrawn()) g.drawImage(p.getTopSprite(),p.getCornerX(),p.getCornerY(),UNITSIZE,CUT,null);
         }
     } 
     

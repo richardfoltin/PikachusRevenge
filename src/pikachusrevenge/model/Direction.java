@@ -3,6 +3,7 @@ package pikachusrevenge.model;
 import static java.lang.Math.floor;
 import static java.lang.Math.signum;
 import java.util.Arrays;
+import java.util.Random;
 
 public enum Direction {
     UPLEFT(-1,-1),
@@ -40,5 +41,12 @@ public enum Direction {
             case 3 : return getDirection(0,signum(dy));
             default: return Direction.STOP;
         }
+    }
+    
+    public static Direction randomMove() {
+        int rand = new Random().nextInt(9);
+        Direction d = Arrays.asList(Direction.values()).get(rand);
+        if (d == Direction.STOP) d = randomMove();
+        return d;
     }
 }

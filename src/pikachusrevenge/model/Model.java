@@ -5,6 +5,7 @@ import java.awt.geom.PathIterator;
 import static java.lang.Math.floor;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JLabel;
 import org.mapeditor.core.Map;
 import org.mapeditor.core.MapLayer;
 import org.mapeditor.core.MapObject;
@@ -13,29 +14,35 @@ import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 import static pikachusrevenge.LevelWindow.GRIDSIZE;
+import pikachusrevenge.gui.StatsPanel;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.PokeBall;
+import pikachusrevenge.unit.Pokemon;
 
 public class Model {
     
     private List<MapLayer> layers;
     private ArrayList<NPC> npcs;
+    private ArrayList<Pokemon> pokemons;
     private Map map;
+    private StatsPanel stats;
     private Player player;
     private ArrayList<PokeBall> thrownBalls;
-    private int ballCount;
+    private int ballcount;
     public final Rectangle MAP_RECTANGLE;
     
-    public Model (Map map){
+    public Model (Map map, StatsPanel stats){
         this.layers = map.getLayers();
         this.npcs = new ArrayList<>();
         this.thrownBalls = new ArrayList<>();
+        this.pokemons = new ArrayList<>();
         this.map = map;
+        this.stats = stats;
         MAP_RECTANGLE = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);
         
         addUnits();
-        countBalls();
+        countPokemons();
     }
     
     public boolean canMoveTo(Rectangle target){
@@ -119,6 +126,11 @@ public class Model {
                         Tile t = ((TileLayer)l).getTileAt(x,y);
                         if (hasProperty(t,"Ball")) {
                             ((TileLayer)l).setTileAt(x, y, null);
+                            for (Pokemon p : pokemons) {
+                                if (p.getTileX() == x && p.getTileY() == y) {
+                                    p.found();
+                                }
+                            }
                             return true;
                         }
                     } 
@@ -144,18 +156,27 @@ public class Model {
         return (int)floor((coord) / GRIDSIZE);
     }
     
+    public static double tileCenterFromTileCoord(int mapCoord){
+        return (double)mapCoord * GRIDSIZE + GRIDSIZE/2;
+    }
+    
     public void playerMoveTowards(Direction d){
         player.moveToDirection(d);
     }
     
-    private void countBalls() {
-        ballCount = 0;
+    private void countPokemons() {
         for (MapLayer l : layers){
             if (l instanceof TileLayer){
                 for (int i = 0; i < map.getWidth(); ++i) {
                     for (int j = 0; j < map.getHeight(); ++j){
                         Tile t = ((TileLayer)l).getTileAt(i, j);
-                        if (hasProperty(t,"Ball")) ballCount++;                  
+                        if (hasProperty(t,"Ball")) {
+                            ballcount++;
+                            JLabel label = stats.addBall();
+                            Pokemon p = new Pokemon(i,j,this,0);
+                            p.setLabel(label);
+                            pokemons.add(p);
+                        }                  
                     }
                 }
             }
@@ -189,9 +210,11 @@ public class Model {
     }
     
     public ArrayList<NPC> getNpcs() {return npcs;}
+    public ArrayList<Pokemon> getPokemons() {return pokemons;}
     public ArrayList<PokeBall> getThrownBalls() {return thrownBalls;}
-    public int getBallCount() {return ballCount;}
+    public int getBallCount() {return ballcount;}
     public Player getPlayer() {return player;}
+    public StatsPanel getStats() {return stats;}
 
 
 }

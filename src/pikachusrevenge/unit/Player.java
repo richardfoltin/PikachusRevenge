@@ -14,13 +14,14 @@ public class Player extends Unit {
     public Player(double x, double y, Model model){
         super(model);
         
-        this.lives = 1;
+        this.lives = 3;
+        addLives();
         this.balls = 0;
         this.speed = 5.0;
         this.name = "Pikachu";
         
         setStartingPostion(x, y);
-        setImg("025.png");
+        setImg("pokemons/025.png");
         
         this.direction = Direction.STOP;
         this.startDirection = Direction.STOP;
@@ -33,8 +34,10 @@ public class Player extends Unit {
     
     public void caught() {
         lives--;
+        model.getStats().removeLife();
         System.out.println("Ball hit! " + lives);
         if (lives  <= 0) {
+            lives = 0;
             model.gameOver();
         } else {
             restartFromStratingPoint();
@@ -73,5 +76,10 @@ public class Player extends Unit {
         }
     }
     
+    public void addLives() {
+        for (int i = 0; i < lives; ++i){
+            model.getStats().addLife();
+        }
+    }
     
 }

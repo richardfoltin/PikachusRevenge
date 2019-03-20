@@ -4,21 +4,23 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/Player.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/MapView.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/test/pikachusrevenge/JUnitTest.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/model/Position.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/model/Model.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/model/Direction.java</file>
+            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/MapView.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/NPC.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/model/KeyPressHandler.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/PokeBall.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/resources/Resource.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/Animation.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/PikachusRevenge.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/resources/object_ball.png</file>
+            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/org/mapeditor/view/OrthogonalRenderer.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/MovingSprite.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/Unit.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/Frame.java</file>
+            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/Frame.java</file>
+            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/StatsPanel.java</file>
+            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/Animation.java</file>
             <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/LevelWindow.java</file>
         </group>
     </open-files>
