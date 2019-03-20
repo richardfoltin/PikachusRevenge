@@ -35,9 +35,9 @@ public class NPC extends Unit {
         super(model);
         this.level = level;
         
+        loadLevelProperties();
         loadRoute(obj.getShape());
         loadWait(obj);
-        loadLevelProperties();
         
         this.attentionTimer = new Timer(ATTENTION_SPEED, this);
     }
@@ -127,9 +127,9 @@ public class NPC extends Unit {
             case 1 : 
                 this.speed = 2; 
                 this.throwDistance = 300;
-                this.throwSpeed = 15;
+                this.throwSpeed = 12;
                 this.name = "Noob NPC";
-                setImg("NPC.png");
+                setImg("trchar035.png");
                 break;
         }
         

@@ -44,7 +44,7 @@ public class MapView extends JPanel implements ActionListener {
         g.drawImage(player.getImg(),(int)player.getX()-Player.UNITSIZE/2,(int)player.getY()-Player.UNITSIZE/2,Player.UNITSIZE,Player.UNITSIZE,null);
         
         for (PokeBall ball : model.getThrownBalls()){
-            g.drawImage(ball.getImg(), (int)ball.getX()-NPC.UNITSIZE/2, (int)ball.getY()-NPC.UNITSIZE/2,NPC.UNITSIZE,NPC.UNITSIZE,null);
+            g.drawImage(ball.getImg(), (int)ball.getX()-PokeBall.BALLSIZE/2, (int)ball.getY()-PokeBall.BALLSIZE/2,PokeBall.BALLSIZE,PokeBall.BALLSIZE,null);
         }
         
         for (NPC npc : model.getNpcs()){

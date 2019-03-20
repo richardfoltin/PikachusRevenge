@@ -17,15 +17,15 @@ public class Player extends Unit {
         this.name = "Pikachu";
         
         setStartingPostion(x, y);
-        setImg("Player.png");
+        setImg("025.png");
         
-        this.direction = Direction.RIGHT;
-        this.startDirection = Direction.RIGHT;
+        this.direction = Direction.STOP;
+        this.startDirection = Direction.STOP;
     }
     
     public void moveToDirection(Direction d){
         this.nextDirection = d;
-        //this.loadNextPosition();
+        this.loadNextPosition();
     }
     
     public void caught() {

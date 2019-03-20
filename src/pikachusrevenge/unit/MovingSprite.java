@@ -3,6 +3,7 @@ package pikachusrevenge.unit;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.swing.Timer;
 import pikachusrevenge.model.Direction;
@@ -16,13 +17,14 @@ public class MovingSprite implements ActionListener {
     protected Position pos;
     protected Position startPosition;
     protected Direction direction;
+    protected boolean animated;
     private Position nextPosition;
     protected Direction nextDirection;
     protected double speed;
     protected double collisionRadius;
     private Timer moveTimer;
     private final int MOVE_SPEED = 40;
-    private Image img;
+    private BufferedImage img;
     protected final Model model;
     
     public MovingSprite(Model model){
@@ -33,11 +35,12 @@ public class MovingSprite implements ActionListener {
         this.direction = Direction.STOP;
         this.model = model;     
         this.collisionRadius = 8;   
+        this.animated = true;
         this.moveTimer = new Timer(MOVE_SPEED, this);
     }
     
     protected void setImg(String filePath){
-        try {this.img = Resource.loadImage(filePath);} 
+        try {this.img = Resource.loadBufferedImage(filePath);} 
         catch (IOException e) {System.err.println("Can't load file: " + filePath);} 
     }
     
@@ -79,7 +82,7 @@ public class MovingSprite implements ActionListener {
     
     public double getX() {return pos.x;}
     public double getY() {return pos.y;}
-    public Image getImg() {return img;}
+    public BufferedImage getImg() {return img;}
     public double getCollisionRadius() {return collisionRadius;}
     public Position getPosition() {return pos;}
     
