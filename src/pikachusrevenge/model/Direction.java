@@ -2,11 +2,7 @@ package pikachusrevenge.model;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.signum;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public enum Direction {
     UPLEFT(-1,-1),
@@ -21,17 +17,16 @@ public enum Direction {
     
     public final double x;
     public final double y;
-    private static List<Direction> pressedKeys = new ArrayList<Direction>();;
 
-    private static Direction getDirection(double x, double y){
-        int id = ((int)x+1) + ((int)y+1)*3; // linux chown trükk
-        Direction d = Arrays.asList(Direction.values()).get(id);
-        return d;
-    }
-    
     Direction(double x, double y){
         this.x = x;
         this.y = y;
+    }
+    
+    public static Direction getDirection(double x, double y){
+        int id = ((int)x+1) + ((int)y+1)*3; // linux chown trükk
+        Direction d = Arrays.asList(Direction.values()).get(id);
+        return d;
     }
     
     public static Direction getDirection(Position from, Position to){
@@ -46,41 +41,4 @@ public enum Direction {
             default: return Direction.STOP;
         }
     }
-     
-    public static boolean addKeypress(Direction d){
-        if (!pressedKeys.contains(d)) {
-            if (pressedKeys.size() == 2) {
-                //System.out.println("CHANGE : " + pressedKeys.get(0) + " -> " + d);
-                pressedKeys.remove(0);
-                pressedKeys.add(d);
-            } else {
-                //System.out.println("ADD : " + d);
-                pressedKeys.add(d);
-            }
-            return true;       
-        }
-        return false;
-    }
-    
-    public static boolean removeKeypress(Direction d){
-        //System.out.println("REMOVE : " + d);
-        if (pressedKeys.contains(d)) {
-            pressedKeys.remove(d);
-            return true;
-        } 
-        return false;     
-    }
-    
-    public static Direction getKeyDirection(){
-        double x = 0;
-        double y = 0;
-        for (Direction d : pressedKeys) {
-            x += d.x;
-            y += d.y;
-        }
-        Direction d = getDirection(signum(x),signum(y));
-        //System.out.println("DIRECTION : " + d);
-        return d;
-    }
-    
 }

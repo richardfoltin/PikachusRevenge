@@ -11,6 +11,7 @@ import javax.swing.WindowConstants;
 import org.mapeditor.core.Map;
 import org.mapeditor.io.TMXMapReader;
 import pikachusrevenge.model.Direction;
+import pikachusrevenge.model.KeyPressHandler;
 import pikachusrevenge.model.Model;
 
 public class LevelWindow {
@@ -53,7 +54,7 @@ public class LevelWindow {
                 //refreshGameStatLabel();
                 
                 Direction d = fromKey(ke.getKeyCode());
-                if (Direction.addKeypress(d)) model.playerMoveTowards(Direction.getKeyDirection());
+                if (KeyPressHandler.addKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
             }
             
             @Override
@@ -61,7 +62,7 @@ public class LevelWindow {
                 //System.out.println(String.format("Key Released : %s",new SimpleDateFormat("mm:ss.SSS").format(new Date())));
                 
                 Direction d = fromKey(ke.getKeyCode());
-                if (Direction.removeKeypress(d)) model.playerMoveTowards(Direction.getKeyDirection());
+                if (KeyPressHandler.removeKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
             }
             
             public Direction fromKey(int keyCode){
@@ -80,7 +81,7 @@ public class LevelWindow {
             }
         });
         
-        model.startNpcs();
+        model.startMoving();
     }
     
     private String fileFromId(int id){

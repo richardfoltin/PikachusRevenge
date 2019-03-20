@@ -1,23 +1,37 @@
 package pikachusrevenge.unit;
 
-import java.awt.Image;
-import java.io.IOException;
-import pikachusrevenge.resources.Resource;
+import pikachusrevenge.model.Direction;
+import pikachusrevenge.model.Model;
+import pikachusrevenge.model.Position;
 
-public class PokeBall {
+public class PokeBall extends MovingSprite {
     
-    private Image img;
+    private NPC owner;
+    private Position targetPosition;
+    
+    public PokeBall(double x, double y, double speed, Model model, NPC owner) {
+        super(model);
+     
+        this.owner = owner;
+        this.speed = speed;
+        setImg("NPC.png");
+        setStartingPostion(x, y);
+        
+        this.targetPosition = new Position(model.getPlayer().getPosition());
+        this.nextDirection = Direction.getDirection(pos,targetPosition);
+    }
 
-    public PokeBall() {
-        try {
-            this.img = Resource.loadImage("NPC.png");
-        } catch (IOException e) {
-            System.err.println("Can't load pokeball");
+    @Override
+    protected void loadNextPosition() {
+        if (targetPosition.distanceFrom(pos) <= speed) {
+            model.ballReachedPlayer(this);
+            stopMoving();
+        } else {
+            this.nextDirection = Direction.getDirection(pos,targetPosition);
+            super.loadNextPosition();
         }
     }
-
-    public Image getImg() {
-        return img;
-    }
+    
+    public NPC getOwner() {return owner;}
     
 }

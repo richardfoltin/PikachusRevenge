@@ -42,13 +42,14 @@ public class MapView extends JPanel implements ActionListener {
     private void paintUnits(Graphics2D g){
         Player player = model.getPlayer();
         g.drawImage(player.getImg(),(int)player.getX()-Player.UNITSIZE/2,(int)player.getY()-Player.UNITSIZE/2,Player.UNITSIZE,Player.UNITSIZE,null);
+        
+        for (PokeBall ball : model.getThrownBalls()){
+            g.drawImage(ball.getImg(), (int)ball.getX()-NPC.UNITSIZE/2, (int)ball.getY()-NPC.UNITSIZE/2,NPC.UNITSIZE,NPC.UNITSIZE,null);
+        }
+        
         for (NPC npc : model.getNpcs()){
             g.drawImage(npc.getImg(), (int)npc.getX()-NPC.UNITSIZE/2, (int)npc.getY()-NPC.UNITSIZE/2,NPC.UNITSIZE,NPC.UNITSIZE,null);
         }
-    }
-    
-    public void addPokeBall(PokeBall ball) {
-        
     }
     
     @Override

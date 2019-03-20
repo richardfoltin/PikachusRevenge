@@ -20,47 +20,43 @@ import pikachusrevenge.model.Model;
 public class NPC extends Unit {
     
     private final int level;
-    private final int id;
+    private double throwDistance;
+    private double throwSpeed;
+    
     private List<Position> route;
     private List<Double> routeWait;
     private ListIterator<Position> routeIterator;
     private Position targetPosition;
     private boolean forward = true;
-    private double routePointCollision;
     private Timer attentionTimer;
-    private double throwDistance;
-    private final int ATTENTIONSPEED = 40;
-    private final int DISTANCEMULTIPLIER = 40;
+    private final int ATTENTION_SPEED = 40;
     
-    public NPC(MapObject obj, int level, int id, double speed, Model model){
-        super(0,0,"NPC.png",model);
+    public NPC(MapObject obj, int level, Model model){
+        super(model);
+        this.level = level;
         
         loadRoute(obj.getShape());
         loadWait(obj);
-        this.speed = speed;
-        this.level = level;
-        this.throwDistance = (double)this.level * DISTANCEMULTIPLIER;
-        this.id = id;
-        this.name = "NPC";
-        this.collisionRadius = 8;
-        this.routePointCollision = speed * 2;
-        this.attentionTimer = new Timer(ATTENTIONSPEED, this);
+        loadLevelProperties();
+        
+        this.attentionTimer = new Timer(ATTENTION_SPEED, this);
     }
     
-    public void start() {
-        startMovingTowards(nextDirection);
+    @Override
+    public void startMoving() {
+        super.startMoving();
         attentionTimer.start();
     }
     
     @Override
-    protected boolean loadNextPosition(Direction d) {
-        if (targetPosition.distanceFrom(pos) < routePointCollision) {
+    protected void loadNextPosition() {
+        if (targetPosition.distanceFrom(pos) <= speed) {
             double wait = routeWait.get(route.indexOf(targetPosition));
             //if (wait != 0) pauseMoving((long)wait);
-            targetPosition = nextPosition();
+            targetPosition = nextTarget();
         }
-        nextDirection = Direction.getDirection(pos,targetPosition);
-        return super.loadNextPosition(nextDirection);
+        this.nextDirection = Direction.getDirection(pos,targetPosition);
+        super.loadNextPosition();
     }
     
     private void loadRoute(Shape shape){
@@ -76,10 +72,13 @@ public class NPC extends Unit {
         }
         
         this.routeIterator = route.listIterator();
-        if (routeIterator.hasNext()) this.pos = new Position(routeIterator.next());
+        if (routeIterator.hasNext()) {
+            Position pos = routeIterator.next();
+            setStartingPostion(pos.x, pos.y);
+        }
         if (routeIterator.hasNext()) this.targetPosition = routeIterator.next();
-        this.startPosition = new Position(pos);
-        this.nextDirection = Direction.getDirection(pos,targetPosition);
+        
+        loadNextPosition();
     }
     
     private void loadWait(MapObject obj){
@@ -92,7 +91,7 @@ public class NPC extends Unit {
         }
     }
     
-    private Position nextPosition() {
+    private Position nextTarget() {
         if ((!routeIterator.hasNext() && forward) || (!routeIterator.hasPrevious() && !forward)) {
             forward = !forward;
         }
@@ -102,7 +101,8 @@ public class NPC extends Unit {
     }
     
     private void throwBall() {
-        
+        System.out.println("Ball thrown");
+        model.ballThrow(pos, throwSpeed, this);
     }
     
     @Override
@@ -112,13 +112,27 @@ public class NPC extends Unit {
             Position playerPostion = model.getPlayer().getPosition();
             double distance = playerPostion.distanceFrom(pos);
             Direction playerDirection = Direction.getDirection(pos, playerPostion);
-            if (playerDirection == nextDirection) {
-                System.out.println(String.format("Player is in LOS : %s (%.0f)",playerDirection.name(),distance));
-                if (distance < throwDistance) {
+            if (playerDirection == direction) {
+                //System.out.println(String.format("Player is in LOS : %s (%.0f)",playerDirection.name(),distance));
+                if (distance < throwDistance && model.canThrow(this)) {
                     throwBall();
                 }
             }
         }
+    }
+    
+    private void loadLevelProperties() {
+        switch (level) {
+            default:
+            case 1 : 
+                this.speed = 2; 
+                this.throwDistance = 300;
+                this.throwSpeed = 15;
+                this.name = "Noob NPC";
+                setImg("NPC.png");
+                break;
+        }
+        
     }
 
 }

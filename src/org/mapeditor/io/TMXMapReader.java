@@ -99,6 +99,9 @@ public class TMXMapReader {
     public final TMXMapReaderSettings settings = new TMXMapReaderSettings();
     private final HashMap<String, TileSet> cachedTilesets = new HashMap<>();
 
+    private static JAXBContext tileContext;
+    private static JAXBContext animatedTileContext;
+    
     public static final class TMXMapReaderSettings {
 
         public boolean reuseCachedTilesets = false;
@@ -153,9 +156,6 @@ public class TMXMapReader {
             return def;
         }
     }
-    
-    private JAXBContext tileContext;
-    private JAXBContext animatedTileContext;
 
     private <T> T unmarshalClass(Node node, Class<T> type) throws JAXBException {
         JAXBContext context;

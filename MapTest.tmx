@@ -223,9 +223,7 @@
   </object>
   <object id="7" name="NPC" type="Route" x="616" y="665">
    <properties>
-    <property name="ID" type="int" value="1"/>
     <property name="Level" type="int" value="1"/>
-    <property name="Speed" type="float" value="5"/>
     <property name="Wait2" type="float" value="5"/>
     <property name="Wait6" type="float" value="5"/>
    </properties>

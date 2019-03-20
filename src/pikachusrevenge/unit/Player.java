@@ -6,14 +6,36 @@ import pikachusrevenge.model.Model;
 public class Player extends Unit {
     
     private int balls;
+    private int lives;
     
-    public Player(double startX, double startY, Model model){
-        super(startX,startY,"Player.png",model);
+    public Player(double x, double y, Model model){
+        super(model);
         
+        this.lives = 3;
         this.balls = 0;
-        this.collisionRadius = 8;
         this.speed = 5.0;
         this.name = "Pikachu";
+        
+        setStartingPostion(x, y);
+        setImg("Player.png");
+        
+        this.direction = Direction.RIGHT;
+        this.startDirection = Direction.RIGHT;
+    }
+    
+    public void moveToDirection(Direction d){
+        this.nextDirection = d;
+        //this.loadNextPosition();
+    }
+    
+    public void caught() {
+        lives--;
+        System.out.println("Ball hit! " + lives);
+        if (lives  <= 0) {
+            model.gameOver();
+        } else {
+            restartFromStratingPoint();
+        }
     }
     
     private void pickUpBalls() {
@@ -33,11 +55,12 @@ public class Player extends Unit {
     }
        
     @Override
-    protected boolean loadNextPosition(Direction d) {
+    protected void loadNextPosition() {
         pickUpBalls();
-        return super.loadNextPosition(d);
+        if (model.canMoveTo(this, pos.x , pos.y, nextDirection)){
+            super.loadNextPosition();
+        } else {
+            nextDirection = Direction.STOP;
+        }
     }
-    
-    
- 
 }

@@ -11,6 +11,7 @@ import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 import static pikachusrevenge.LevelWindow.GRIDSIZE;
+import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.PokeBall;
@@ -22,6 +23,7 @@ public class Model {
     private ArrayList<NPC> npcs;
     private Map map;
     private Player player;
+    private ArrayList<PokeBall> thrownBalls;
     private int ballCount;
     public final int MAPWIDTH;
     public final int MAPHEIGHT;
@@ -29,6 +31,7 @@ public class Model {
     public Model (Map map){
         this.layers = map.getLayers();
         this.npcs = new ArrayList<>();
+        this.thrownBalls = new ArrayList<>();
         this.map = map;
         MAPWIDTH = map.getWidth() * GRIDSIZE;
         MAPHEIGHT = map.getHeight() * GRIDSIZE;
@@ -37,7 +40,7 @@ public class Model {
         countBalls();
     }
     
-    public boolean canMoveTo(Unit unit, double x, double y, Direction d){
+    public boolean canMoveTo(MovingSprite unit, double x, double y, Direction d){
         if (x > MAPWIDTH || x < 0) return false;
         if (y > MAPHEIGHT || y < 0) return false;
         
@@ -91,10 +94,24 @@ public class Model {
         } 
     }
     
-    public void startNpcs() {
-        for (NPC npc : npcs) {
-            npc.start();
-        }
+    public void ballThrow(Position from, double speed, NPC owner){
+        PokeBall ball = new PokeBall(from.x, from.y, speed, this, owner);
+        thrownBalls.add(ball);
+        ball.startMoving();
+    }
+    
+    public void ballReachedPlayer(PokeBall ball) {
+        thrownBalls.remove(ball);
+        player.caught();
+    }
+    
+    public void gameOver(){
+        System.out.println("Game over");
+    }
+    
+    public void startMoving() {
+        for (NPC npc : npcs) npc.startMoving();
+        player.startMoving();
     }
     
     public boolean isBallAt(double x, double y){
@@ -126,7 +143,7 @@ public class Model {
     }
     
     public void playerMoveTowards(Direction d){
-        player.startMovingTowards(d);
+        player.moveToDirection(d);
     }
     
     private void countBalls() {
@@ -153,10 +170,8 @@ public class Model {
                     }else if (o.getName().equals("NPC")) {
                         Properties prop = o.getProperties();
                         
-                        int id = Integer.parseInt(prop.getProperty("ID", "0"));
-                        int level = Integer.parseInt(prop.getProperty("Level", "0"));
-                        double speed = Double.parseDouble(prop.getProperty("Speed", "0.0"));
-                        NPC npc = new NPC(o, level, id, speed, this);
+                        int level = Integer.parseInt(prop.getProperty("Level", "1"));
+                        NPC npc = new NPC(o, level, this);
                         npcs.add(npc);
                     }
                 }
@@ -164,7 +179,18 @@ public class Model {
         }
     }
     
+    public boolean canThrow(NPC npc){
+        if (thrownBalls.size() == 0) return true;
+        for (PokeBall b : thrownBalls) {
+            if (b.getOwner() == npc) return false;
+        }
+        return true;
+    }
+    
     public ArrayList<NPC> getNpcs() {return npcs;}
+    public ArrayList<PokeBall> getThrownBalls() {return thrownBalls;}
     public int getBallCount() {return ballCount;}
     public Player getPlayer() {return player;}
+
+
 }
