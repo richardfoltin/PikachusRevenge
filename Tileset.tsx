@@ -1168,7 +1168,7 @@
  </tile>
  <tile id="1725">
   <properties>
-   <property name="Collision" type="bool" value="false"/>
+   <property name="Collision" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="1771" terrain=",,,10">

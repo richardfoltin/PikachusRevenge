@@ -14,7 +14,7 @@ public class Player extends Unit {
     public Player(double x, double y, Model model){
         super(model);
         
-        this.lives = 3;
+        this.lives = 1;
         this.balls = 0;
         this.speed = 5.0;
         this.name = "Pikachu";

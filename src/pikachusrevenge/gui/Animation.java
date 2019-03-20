@@ -22,7 +22,7 @@ public class Animation {
         this.stopped = true;
 
         for (int i = 0; i < frames.length; i++) {
-            addFrame(frames[i], frameDelay);
+            this.frames.add(new Frame(frames[i], frameDelay));
         }
 
         this.frameCount = 0;
@@ -34,30 +34,19 @@ public class Animation {
     }
 
     public void start() {
-        if (!stopped) {
-            return;
-        }
-
-        if (frames.size() == 0) {
-            return;
-        }
-
+        if (!stopped) return;
+        if (frames.size() == 0) return;
         stopped = false;
     }
 
     public void stop() {
-        if (frames.size() == 0) {
-            return;
-        }
+        if (frames.size() == 0) return;
         if (currentFrame != 2) currentFrame = 0;
         stopped = true;
     }
 
     public void restart() {
-        if (frames.size() == 0) {
-            return;
-        }
-
+        if (frames.size() == 0) return;
         stopped = false;
         currentFrame = 0;
     }
@@ -68,18 +57,8 @@ public class Animation {
         this.currentFrame = 0;
     }
 
-    private void addFrame(BufferedImage frame, int duration) {
-        if (duration <= 0) {
-            System.err.println("Invalid duration: " + duration);
-            throw new RuntimeException("Invalid duration: " + duration);
-        }
-
-        frames.add(new Frame(frame, duration));
-        currentFrame = 0;
-    }
-
-    public BufferedImage getSprite() {
-        return frames.get(currentFrame).getFrame();
+    public Frame getFrame() {
+        return frames.get(currentFrame);
     }
 
     public void update() {

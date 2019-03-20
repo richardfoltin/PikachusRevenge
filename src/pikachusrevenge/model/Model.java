@@ -13,11 +13,9 @@ import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 import static pikachusrevenge.LevelWindow.GRIDSIZE;
-import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.PokeBall;
-import pikachusrevenge.unit.Unit;
 
 public class Model {
     
@@ -57,10 +55,7 @@ public class Model {
         return true;
     }
     
-    private boolean collisionOnTileAt(int tileX, int tileY) {
-                
-        //System.out.println("Checking : " + newEdgeX + "," + newEdgeY );
-        
+    private boolean collisionOnTileAt(int tileX, int tileY) {                 
         boolean water = false;
         boolean collision = false;
         boolean bridge = false;
@@ -166,7 +161,6 @@ public class Model {
             }
         }
     }
-    
     
     private void addUnits() {
         for (MapLayer l : layers){

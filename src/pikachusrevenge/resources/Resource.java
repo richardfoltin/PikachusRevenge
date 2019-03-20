@@ -6,10 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import javax.imageio.ImageIO;
+import static pikachusrevenge.unit.Unit.UNITSIZE;
 
 public class Resource {
-    
-    private static final int TILE_SIZE = 64;
     
     public static InputStream loadResource(String resName){
         return Resource.class.getResourceAsStream(resName);
@@ -26,7 +25,7 @@ public class Resource {
     }
     
     public static BufferedImage getSprite(BufferedImage spriteSheet, int xGrid, int yGrid) {
-        return spriteSheet.getSubimage(xGrid * TILE_SIZE, yGrid * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        return spriteSheet.getSubimage(xGrid * UNITSIZE, yGrid * UNITSIZE, UNITSIZE, UNITSIZE);
     }
     
 }

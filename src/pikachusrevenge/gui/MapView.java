@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import org.mapeditor.core.Map;
@@ -15,9 +16,11 @@ import org.mapeditor.core.MapLayer;
 import org.mapeditor.core.TileLayer;
 import org.mapeditor.view.MapRenderer;
 import org.mapeditor.view.OrthogonalRenderer;
+import static pikachusrevenge.gui.Frame.CUT;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
+import static pikachusrevenge.unit.Unit.UNITSIZE;
 import pikachusrevenge.unit.PokeBall;
 
 public class MapView extends JPanel implements ActionListener {
@@ -39,18 +42,27 @@ public class MapView extends JPanel implements ActionListener {
         setOpaque(true);
     }
 
-    private void paintUnits(Graphics2D g){
+    private void paintUnitsBottom(Graphics2D g){
         Player player = model.getPlayer();
-        g.drawImage(player.getImg(),player.getCornerX(),player.getCornerY(),Player.UNITSIZE,Player.UNITSIZE,null);
+        g.drawImage(player.getBottomSprite(),player.getCornerX(),player.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
         
         for (PokeBall ball : model.getThrownBalls()){
             g.drawImage(ball.getImg(),ball.getCornerX(),ball.getCornerY(),PokeBall.BALLSIZE,PokeBall.BALLSIZE,null);
         }
         
         for (NPC npc : model.getNpcs()){
-            g.drawImage(npc.getImg(),npc.getCornerX(),npc.getCornerY(),NPC.UNITSIZE,NPC.UNITSIZE,null);
+            g.drawImage(npc.getBottomSprite(),npc.getCornerX(),npc.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
         }
     }
+
+    private void paintUnitsTop(Graphics2D g){
+        Player player = model.getPlayer();
+        g.drawImage(player.getTopSprite(),player.getCornerX(),player.getCornerY(),UNITSIZE,CUT,null);        
+
+        for (NPC npc : model.getNpcs()){
+            g.drawImage(npc.getTopSprite(),npc.getCornerX(),npc.getCornerY(),UNITSIZE,CUT,null);
+        }
+    } 
     
     @Override
     public void paintComponent(Graphics g) {
@@ -62,13 +74,11 @@ public class MapView extends JPanel implements ActionListener {
         g2d.fill(clip);
 
         for (MapLayer layer : map.getLayers()) {
-            if (layer.getName().equals("Above")) {
-                paintUnits(g2d);
-            }    
+            if (layer.getName().equals("Above")) paintUnitsBottom(g2d);   
             if (layer instanceof TileLayer) renderer.paintTileLayer(g2d, (TileLayer) layer);
-            //else if (layer instanceof ObjectGroup) renderer.paintObjectGroup(g2d, (ObjectGroup) layer);
-            
+            //else if (layer instanceof ObjectGroup) renderer.paintObjectGroup(g2d, (ObjectGroup) layer);      
         }
+        paintUnitsTop(g2d);  
     }
 
     @Override

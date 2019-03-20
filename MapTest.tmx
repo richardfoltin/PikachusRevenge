@@ -218,7 +218,7 @@
 </data>
  </layer>
  <objectgroup id="8" name="Objects">
-  <object id="4" name="Enter" type="Player" x="23" y="568">
+  <object id="4" name="Enter" type="Player" x="23" y="556">
    <point/>
   </object>
   <object id="7" name="NPC" type="Route" x="616" y="665">
