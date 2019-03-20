@@ -1,4 +1,4 @@
-package pikachusrevenge.unit;
+package pikachusrevenge.gui;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -7,15 +7,15 @@ import java.util.List;
 
 public class Animation {
 
-    private int frameCount;                 // Counts ticks for change
-    private int frameDelay;                 // frame delay 1-12 (You will have to play around with this)
-    private int currentFrame;               // animations current frame
-    private int animationDirection;         // animation direction (i.e counting forward or backward)
-    private int totalFrames;                // total amount of frames for your animation
+    private int frameCount;
+    private int frameDelay;
+    private int currentFrame;
+    private int animationDirection;
+    private int totalFrames; 
 
-    private boolean stopped;                // has animations stopped
+    private boolean stopped;
 
-    private List<Frame> frames = new ArrayList<Frame>();    // Arraylist of frames 
+    private List<Frame> frames = new ArrayList<Frame>();
 
     public Animation(BufferedImage[] frames, int frameDelay) {
         this.frameDelay = frameDelay;
@@ -49,7 +49,7 @@ public class Animation {
         if (frames.size() == 0) {
             return;
         }
-        currentFrame = 0;
+        if (currentFrame != 2) currentFrame = 0;
         stopped = true;
     }
 

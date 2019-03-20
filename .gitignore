@@ -20,6 +20,7 @@ $RECYCLE.BIN/
 
 *.class
 /build
+/dist
 
 # =========================
 # Operating System Files

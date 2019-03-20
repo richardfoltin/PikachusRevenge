@@ -549,6 +549,11 @@
    <property name="Stairs" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="935">
+  <properties>
+   <property name="Stairs" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="939">
   <properties>
    <property name="Collision" type="bool" value="true"/>

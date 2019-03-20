@@ -218,14 +218,14 @@
 </data>
  </layer>
  <objectgroup id="8" name="Objects">
-  <object id="4" name="Enter" type="Player" x="8" y="568">
+  <object id="4" name="Enter" type="Player" x="23" y="568">
    <point/>
   </object>
   <object id="7" name="NPC" type="Route" x="616" y="665">
    <properties>
     <property name="Level" type="int" value="1"/>
-    <property name="Wait2" type="float" value="5"/>
-    <property name="Wait6" type="float" value="5"/>
+    <property name="Wait2" type="int" value="100"/>
+    <property name="Wait5" type="int" value="50"/>
    </properties>
    <polyline points="0,0 -1,-450 -273,-449 67,-451 66,-617 18,-617"/>
   </object>

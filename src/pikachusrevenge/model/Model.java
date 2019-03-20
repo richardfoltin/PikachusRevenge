@@ -1,5 +1,7 @@
 package pikachusrevenge.model;
 
+import java.awt.Rectangle;
+import java.awt.geom.PathIterator;
 import static java.lang.Math.floor;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,41 +27,48 @@ public class Model {
     private Player player;
     private ArrayList<PokeBall> thrownBalls;
     private int ballCount;
-    public final int MAPWIDTH;
-    public final int MAPHEIGHT;
+    public final Rectangle MAP_RECTANGLE;
     
     public Model (Map map){
         this.layers = map.getLayers();
         this.npcs = new ArrayList<>();
         this.thrownBalls = new ArrayList<>();
         this.map = map;
-        MAPWIDTH = map.getWidth() * GRIDSIZE;
-        MAPHEIGHT = map.getHeight() * GRIDSIZE;
+        MAP_RECTANGLE = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);
         
         addUnits();
         countBalls();
     }
     
-    public boolean canMoveTo(MovingSprite unit, double x, double y, Direction d){
-        if (x > MAPWIDTH || x < 0) return false;
-        if (y > MAPHEIGHT || y < 0) return false;
+    public boolean canMoveTo(Rectangle target){
+        if (!MAP_RECTANGLE.contains(target)) return false;
         
-        // négyzetnek tekintve
-        int newEdgeX = tileCoordFromMapCoord(x + unit.getCollisionRadius() * d.x);
-        int newEdgeY = tileCoordFromMapCoord(y + unit.getCollisionRadius() * d.y);
-           
-        if (newEdgeX >= map.getWidth() || x < 0) return false;
-        if (newEdgeY >= map.getHeight() || y < 0) return false;
+        PathIterator pi = target.getPathIterator(null);
         
+        while (!pi.isDone()) {
+            double[] coords = new double[2];
+            int type = pi.currentSegment(coords);
+            if (type!= PathIterator.SEG_CLOSE) {
+                if (collisionOnTileAt(tileCoordFromMapCoord(coords[0]), tileCoordFromMapCoord(coords[1]))) return false;
+            }
+            pi.next();
+        }
+        
+        return true;
+    }
+    
+    private boolean collisionOnTileAt(int tileX, int tileY) {
+                
         //System.out.println("Checking : " + newEdgeX + "," + newEdgeY );
         
         boolean water = false;
         boolean collision = false;
         boolean bridge = false;
         boolean stairs = false;
+        
         for (MapLayer l : layers){
             if (l instanceof TileLayer){
-                Tile t = ((TileLayer)l).getTileAt(newEdgeX, newEdgeY);
+                Tile t = ((TileLayer)l).getTileAt(tileX, tileY);
                 if (t != null) {
                     Properties prop = t.getProperties();
                     if (!prop.isEmpty()) {
@@ -72,26 +81,12 @@ public class Model {
             } 
         }
         
+        
         if (bridge) water = false;
         if (stairs) collision = false;
-        if (water || collision) return false;
         
-        return true;
-    }
-    
-    public void removeTile(double x, double y) {
-        int tileX = tileCoordFromMapCoord(x);
-        int tileY = tileCoordFromMapCoord(y);  
-        
-        for (MapLayer l : layers){
-            if (l instanceof TileLayer){
-                Tile t = ((TileLayer)l).getTileAt(tileX, tileY);
-                if (hasProperty(t,"Ball")) {
-                    ((TileLayer)l).setTileAt(tileX, tileY, null);
-                    break;
-                }
-            } 
-        } 
+        if (water || collision) return true;
+        else return false;
     }
     
     public void ballThrow(Position from, double speed, NPC owner){
@@ -114,17 +109,29 @@ public class Model {
         player.startMoving();
     }
     
-    public boolean isBallAt(double x, double y){
-        int tileX = tileCoordFromMapCoord(x);
-        int tileY = tileCoordFromMapCoord(y);  
+    public boolean checkBallAt(Rectangle target){
         
-        for (MapLayer l : layers){
-            if (l instanceof TileLayer){
-                Tile t = ((TileLayer)l).getTileAt(tileX, tileY);
-                if (hasProperty(t,"Ball")) return true;
-            } 
-        }
+        PathIterator pi = target.getPathIterator(null);
         
+         while (!pi.isDone()) {
+            double[] coords = new double[2];
+            int type = pi.currentSegment(coords);
+            if (type!= PathIterator.SEG_CLOSE) {
+                int x = tileCoordFromMapCoord(coords[0]);
+                int y = tileCoordFromMapCoord(coords[1]);
+                for (MapLayer l : layers){
+                    if (l instanceof TileLayer){
+                        Tile t = ((TileLayer)l).getTileAt(x,y);
+                        if (hasProperty(t,"Ball")) {
+                            ((TileLayer)l).setTileAt(x, y, null);
+                            return true;
+                        }
+                    } 
+                }
+            }
+            pi.next();
+        }  
+         
         return false;
     }
     

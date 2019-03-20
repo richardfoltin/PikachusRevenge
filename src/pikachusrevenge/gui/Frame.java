@@ -1,4 +1,4 @@
-package pikachusrevenge.unit;
+package pikachusrevenge.gui;
 
 import java.awt.image.BufferedImage;
 

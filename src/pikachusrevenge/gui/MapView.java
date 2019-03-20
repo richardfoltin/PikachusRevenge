@@ -1,4 +1,4 @@
-package pikachusrevenge;
+package pikachusrevenge.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -41,14 +41,14 @@ public class MapView extends JPanel implements ActionListener {
 
     private void paintUnits(Graphics2D g){
         Player player = model.getPlayer();
-        g.drawImage(player.getImg(),(int)player.getX()-Player.UNITSIZE/2,(int)player.getY()-Player.UNITSIZE/2,Player.UNITSIZE,Player.UNITSIZE,null);
+        g.drawImage(player.getImg(),player.getCornerX(),player.getCornerY(),Player.UNITSIZE,Player.UNITSIZE,null);
         
         for (PokeBall ball : model.getThrownBalls()){
-            g.drawImage(ball.getImg(), (int)ball.getX()-PokeBall.BALLSIZE/2, (int)ball.getY()-PokeBall.BALLSIZE/2,PokeBall.BALLSIZE,PokeBall.BALLSIZE,null);
+            g.drawImage(ball.getImg(),ball.getCornerX(),ball.getCornerY(),PokeBall.BALLSIZE,PokeBall.BALLSIZE,null);
         }
         
         for (NPC npc : model.getNpcs()){
-            g.drawImage(npc.getImg(), (int)npc.getX()-NPC.UNITSIZE/2, (int)npc.getY()-NPC.UNITSIZE/2,NPC.UNITSIZE,NPC.UNITSIZE,null);
+            g.drawImage(npc.getImg(),npc.getCornerX(),npc.getCornerY(),NPC.UNITSIZE,NPC.UNITSIZE,null);
         }
     }
     

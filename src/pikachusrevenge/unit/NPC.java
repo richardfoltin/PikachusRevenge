@@ -22,18 +22,24 @@ public class NPC extends Unit {
     private final int level;
     private double throwDistance;
     private double throwSpeed;
+    private boolean waiting;
+    private int waitCount;
+    private int waitUntil;
     
     private List<Position> route;
-    private List<Double> routeWait;
+    private List<Integer> routeWait;
     private ListIterator<Position> routeIterator;
     private Position targetPosition;
     private boolean forward = true;
     private Timer attentionTimer;
+    
     private final int ATTENTION_SPEED = 40;
+    private final int THROW_WAIT = 50;
     
     public NPC(MapObject obj, int level, Model model){
         super(model);
         this.level = level;
+        this.waiting = false;
         
         loadLevelProperties();
         loadRoute(obj.getShape());
@@ -42,20 +48,30 @@ public class NPC extends Unit {
         this.attentionTimer = new Timer(ATTENTION_SPEED, this);
     }
     
-    @Override
-    public void startMoving() {
-        super.startMoving();
-        attentionTimer.start();
+    private void throwBall() {
+        System.out.println("Ball thrown");
+        model.ballThrow(pos, throwSpeed, this);
     }
     
     @Override
     protected void loadNextPosition() {
-        if (targetPosition.distanceFrom(pos) <= speed) {
-            double wait = routeWait.get(route.indexOf(targetPosition));
-            //if (wait != 0) pauseMoving((long)wait);
-            targetPosition = nextTarget();
+        if (waiting) {
+            waitCount++;
+            if (waitCount == waitUntil) {
+                this.nextDirection = this.direction;
+                this.direction = direction.STOP;
+                waiting = false;
+            } else {
+                this.nextDirection = Direction.STOP;
+            }
+        } else {
+            if (targetPosition.distanceFrom(pos) <= speed) {
+                int waitingHere = routeWait.get(route.indexOf(targetPosition));
+                if (waitingHere != 0) startWait(waitingHere);
+                targetPosition = nextTarget();
+            }
+            if (!waiting) this.nextDirection = Direction.getDirection(pos,targetPosition);
         }
-        this.nextDirection = Direction.getDirection(pos,targetPosition);
         super.loadNextPosition();
     }
     
@@ -65,9 +81,13 @@ public class NPC extends Unit {
         
         while (!pi.isDone()) {
             double[] coords = new double[2];
-            pi.currentSegment(coords);
-            Position position = new Position(coords);
-            if (!(position.x == 0 && position.y == 0)) route.add(position);
+            int type = pi.currentSegment(coords);
+            
+            if (type!= PathIterator.SEG_CLOSE) {
+                coords[1] -= (double)UNITSIZE * 0.4; // route should be at feet, not in center
+                Position position = new Position(coords);
+                if (!(position.x == 0 && position.y == 0)) route.add(position);
+            }
             pi.next();
         }
         
@@ -87,9 +107,15 @@ public class NPC extends Unit {
         
         for (int i = 0; i < route.size(); ++i){
             String waitStr = prop.getProperty("Wait" + i, "0");
-            routeWait.add(Double.parseDouble(waitStr));
+            routeWait.add(Integer.parseInt(waitStr));
         }
     }
+    
+    private void startWait(int count) {
+        waiting = true;
+        waitCount = 0;
+        waitUntil = count;
+    }   
     
     private Position nextTarget() {
         if ((!routeIterator.hasNext() && forward) || (!routeIterator.hasPrevious() && !forward)) {
@@ -98,11 +124,6 @@ public class NPC extends Unit {
         
         if (forward) return routeIterator.next();
         else return routeIterator.previous();
-    }
-    
-    private void throwBall() {
-        System.out.println("Ball thrown");
-        model.ballThrow(pos, throwSpeed, this);
     }
     
     @Override
@@ -115,10 +136,17 @@ public class NPC extends Unit {
             if (playerDirection == direction) {
                 //System.out.println(String.format("Player is in LOS : %s (%.0f)",playerDirection.name(),distance));
                 if (distance < throwDistance && model.canThrow(this)) {
+                    startWait(THROW_WAIT);
                     throwBall();
                 }
             }
         }
+    }
+    
+    @Override
+    public void startMoving() {
+        super.startMoving();
+        attentionTimer.start();
     }
     
     private void loadLevelProperties() {
@@ -127,7 +155,7 @@ public class NPC extends Unit {
             case 1 : 
                 this.speed = 2; 
                 this.throwDistance = 300;
-                this.throwSpeed = 12;
+                this.throwSpeed = 10;
                 this.name = "Noob NPC";
                 setImg("trchar035.png");
                 break;

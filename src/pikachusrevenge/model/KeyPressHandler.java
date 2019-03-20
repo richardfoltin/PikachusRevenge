@@ -1,5 +1,6 @@
 package pikachusrevenge.model;
 
+import java.awt.event.KeyEvent;
 import static java.lang.Math.signum;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,5 +43,21 @@ public  class KeyPressHandler {
         Direction d = Direction.getDirection(signum(x),signum(y));
         //System.out.println("DIRECTION : " + d);
         return d;
+    }
+    
+                
+    public static Direction directionFromKeyCode(int keyCode){
+        switch (keyCode){
+            case KeyEvent.VK_LEFT :
+            case KeyEvent.VK_A :  return Direction.LEFT; 
+            case KeyEvent.VK_RIGHT: 
+            case KeyEvent.VK_D :  return Direction.RIGHT;
+            case KeyEvent.VK_UP:    
+            case KeyEvent.VK_W :  return Direction.UP;
+            case KeyEvent.VK_DOWN:  
+            case KeyEvent.VK_S :  return Direction.DOWN;
+            default : return Direction.STOP;
+            //case KeyEvent.VK_ESCAPE: game.loadGame(game.getGameID());
+        }
     }
 }

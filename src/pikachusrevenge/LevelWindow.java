@@ -1,5 +1,6 @@
 package pikachusrevenge;
 
+import pikachusrevenge.gui.MapView;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -32,7 +33,7 @@ public class LevelWindow {
 
         System.out.println(map.toString() + " loaded");
         
-        Model model = new Model(map);
+        model = new Model(map);
         MapView mainPanel = new MapView(map,model);
         mainPanel.setBorder(null);
 
@@ -51,9 +52,8 @@ public class LevelWindow {
                 
                 //super.keyPressed(ke); 
                 //if (!game.isLevelLoaded()) return;
-                //refreshGameStatLabel();
                 
-                Direction d = fromKey(ke.getKeyCode());
+                Direction d = KeyPressHandler.directionFromKeyCode(ke.getKeyCode());
                 if (KeyPressHandler.addKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
             }
             
@@ -61,24 +61,10 @@ public class LevelWindow {
             public void keyReleased(KeyEvent ke) {
                 //System.out.println(String.format("Key Released : %s",new SimpleDateFormat("mm:ss.SSS").format(new Date())));
                 
-                Direction d = fromKey(ke.getKeyCode());
+                Direction d = KeyPressHandler.directionFromKeyCode(ke.getKeyCode());
                 if (KeyPressHandler.removeKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
             }
-            
-            public Direction fromKey(int keyCode){
-                switch (keyCode){
-                    case KeyEvent.VK_LEFT :
-                    case KeyEvent.VK_A :  return Direction.LEFT; 
-                    case KeyEvent.VK_RIGHT: 
-                    case KeyEvent.VK_D :  return Direction.RIGHT;
-                    case KeyEvent.VK_UP:    
-                    case KeyEvent.VK_W :  return Direction.UP;
-                    case KeyEvent.VK_DOWN:  
-                    case KeyEvent.VK_S :  return Direction.DOWN;
-                    default : return Direction.STOP;
-                    //case KeyEvent.VK_ESCAPE: game.loadGame(game.getGameID());
-                }
-            }
+
         });
         
         model.startMoving();

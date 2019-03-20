@@ -34,6 +34,10 @@ public class Position {
     public double distanceFrom(Position d){
         return Math.sqrt(Math.pow(d.y - this.y,2) + Math.pow(d.x - this.x,2));
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Position{" + "x=" + x + ", y=" + y + '}';
+    }
+
 }
