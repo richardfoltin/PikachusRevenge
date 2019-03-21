@@ -20,7 +20,7 @@ public class Player extends Unit {
         this.name = "Pikachu";
         
         setStartingPostion(x, y);
-        setImg("pokemons/025.png");
+        setImg("pokemons\\025.png");
         
         this.direction = Direction.STOP;
         this.startDirection = Direction.STOP;

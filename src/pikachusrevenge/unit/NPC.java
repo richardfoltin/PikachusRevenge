@@ -5,12 +5,8 @@ import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.Timer;
 import org.mapeditor.core.MapObject;
 import org.mapeditor.core.Properties;
@@ -31,7 +27,7 @@ public class NPC extends Unit {
     private ListIterator<Position> routeIterator;
     private Position targetPosition;
     private boolean forward = true;
-    private Timer attentionTimer;
+    private final Timer attentionTimer;
     
     private final int ATTENTION_SPEED = 40;
     private final int THROW_WAIT = 50;

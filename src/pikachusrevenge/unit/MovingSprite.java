@@ -18,10 +18,10 @@ public class MovingSprite implements ActionListener {
     protected Position startPosition;
     protected Direction direction;
     protected boolean animated;
-    private Position nextPosition;
+    protected Position nextPosition;
     protected Direction nextDirection;
     protected double speed;
-    private Timer moveTimer;
+    private final Timer moveTimer;
     private BufferedImage img;
     protected int imageSize;
     protected final Model model;

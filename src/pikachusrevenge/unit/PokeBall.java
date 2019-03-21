@@ -6,7 +6,7 @@ import pikachusrevenge.model.Position;
 
 public class PokeBall extends MovingSprite {
     
-    private NPC owner;
+    private final NPC owner;
     private Position targetPosition;
     
     public final static int BALLSIZE = 16;
@@ -27,12 +27,13 @@ public class PokeBall extends MovingSprite {
     @Override
     protected void loadNextPosition() {
         targetPosition = model.getPlayer().getPosition(); // homing ball
-        if (targetPosition.distanceFrom(pos) <= speed) {
+        double distance = targetPosition.distanceFrom(pos);
+        if (distance <= speed) {
             model.ballReachedPlayer(this);
             stopMoving();
         } else {
-            this.nextDirection = Direction.getDirection(pos,targetPosition);
-            super.loadNextPosition();
+            nextPosition.x = pos.x + ((targetPosition.x - pos.x) / (distance / speed));
+            nextPosition.y = pos.y + ((targetPosition.y - pos.y) / (distance / speed));
         }
     }
     

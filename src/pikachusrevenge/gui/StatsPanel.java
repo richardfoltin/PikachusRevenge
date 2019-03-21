@@ -1,10 +1,8 @@
 package pikachusrevenge.gui;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +14,11 @@ import pikachusrevenge.resources.Resource;
 
 public class StatsPanel extends JPanel {
 
-    private JPanel livesPane;
-    private JPanel pokemonPane;
-    private JLabel timerLabel;
-    private List<JLabel> lives;
-    private List<JLabel> pokemons;
+    private final JPanel livesPane;
+    private final JPanel pokemonPane;
+    private final JLabel timerLabel;
+    private final List<JLabel> lives;
+    private final List<JLabel> pokemons;
     
     public StatsPanel(int width) {
   

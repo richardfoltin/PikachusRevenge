@@ -1,38 +1,38 @@
 package pikachusrevenge;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import pikachusrevenge.gui.MapView;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import org.mapeditor.core.Map;
 import org.mapeditor.io.TMXMapReader;
+import pikachusrevenge.gui.GameMenu;
 import pikachusrevenge.gui.StatsPanel;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.KeyPressHandler;
 import pikachusrevenge.model.Model;
+import pikachusrevenge.resources.Resource;
 
 public class LevelWindow {
     
     private Map map;
-    private Model model;
+    private final Model model;
+    private final JFrame appFrame;
+    private final StatsPanel statsPanel;
+    
     public static final int GRIDSIZE = 16;
-    private JFrame appFrame;
-    private StatsPanel statsPanel;
     
     public LevelWindow(int id){
         
         appFrame = new JFrame("Pikachu's Revenge");
         appFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        
+        loadIcon("pokemons\\icon025.png");
+
         loadMap(id);    
         statsPanel = new StatsPanel(map.getWidth() * GRIDSIZE);
         
@@ -40,32 +40,14 @@ public class LevelWindow {
         MapView mainPanel = new MapView(map,model);
         mainPanel.setBorder(null);
         
-        
         appFrame.setLayout(new BorderLayout());
         //appFrame.setContentPane(mainPanel);
         appFrame.add(statsPanel, BorderLayout.NORTH);
         appFrame.add(mainPanel, BorderLayout.SOUTH);
         
-        appFrame.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent ke) {              
-                //System.out.println(String.format("Key Pressed : %s",new SimpleDateFormat("mm:ss.SSS").format(new Date())));        
-                //super.keyPressed(ke); 
-                //if (!game.isLevelLoaded()) return;
-                
-                Direction d = KeyPressHandler.directionFromKeyCode(ke.getKeyCode());
-                if (KeyPressHandler.addKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
-            }
-            
-            @Override
-            public void keyReleased(KeyEvent ke) {
-                //System.out.println(String.format("Key Released : %s",new SimpleDateFormat("mm:ss.SSS").format(new Date())));
-                
-                Direction d = KeyPressHandler.directionFromKeyCode(ke.getKeyCode());
-                if (KeyPressHandler.removeKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
-            }
-
-        });
+        appFrame.setJMenuBar(new GameMenu());
+        
+        appFrame.addKeyListener(getKeyAdapter(model));
 
         //appFrame.setLocationRelativeTo(null);
         appFrame.pack();
@@ -85,6 +67,16 @@ public class LevelWindow {
         System.out.println(map.toString() + " loaded");
     }
     
+    private void loadIcon(String filePath){
+        try {
+            BufferedImage image = Resource.loadBufferedImage(filePath);
+            image = Resource.getSprite(image, 0, 0);
+            appFrame.setIconImage(image);
+        } catch (IOException ex) {
+            System.err.println("Can't load file");
+        }     
+    }
+    
     private String fileFromId(int id){    
         String mapName = "";
         
@@ -100,6 +92,29 @@ public class LevelWindow {
         int y = (Toolkit.getDefaultToolkit().getScreenSize().height - window.getHeight()-100) / 2;  
   
         window.setLocation(x, y);  
+    }
+    
+    private KeyAdapter getKeyAdapter(Model model) {
+        return new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent ke) {              
+                //System.out.println(String.format("Key Pressed : %s",new SimpleDateFormat("mm:ss.SSS").format(new Date())));        
+                //super.keyPressed(ke); 
+                //if (!game.isLevelLoaded()) return;
+                
+                Direction d = KeyPressHandler.directionFromKeyCode(ke.getKeyCode());
+                if (KeyPressHandler.addKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
+            }
+            
+            @Override
+            public void keyReleased(KeyEvent ke) {
+                //System.out.println(String.format("Key Released : %s",new SimpleDateFormat("mm:ss.SSS").format(new Date())));
+                
+                Direction d = KeyPressHandler.directionFromKeyCode(ke.getKeyCode());
+                if (KeyPressHandler.removeKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
+            }
+
+        };
     }
 
  }

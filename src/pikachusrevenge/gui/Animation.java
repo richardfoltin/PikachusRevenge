@@ -10,8 +10,8 @@ public class Animation {
     private int frameCount;
     private int frameDelay;
     private int currentFrame;
-    private int animationDirection;
-    private int totalFrames; 
+    private final int animationDirection;
+    private final int totalFrames; 
 
     private boolean stopped;
 

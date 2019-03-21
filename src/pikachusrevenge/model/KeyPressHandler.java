@@ -1,5 +1,6 @@
 package pikachusrevenge.model;
 
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import static java.lang.Math.signum;
 import java.util.ArrayList;
@@ -60,4 +61,5 @@ public  class KeyPressHandler {
             //case KeyEvent.VK_ESCAPE: game.loadGame(game.getGameID());
         }
     }
+    
 }

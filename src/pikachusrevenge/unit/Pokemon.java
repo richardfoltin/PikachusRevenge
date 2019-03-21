@@ -1,6 +1,5 @@
 package pikachusrevenge.unit;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -13,13 +12,13 @@ import pikachusrevenge.resources.Resource;
 
 public class Pokemon extends Unit {
     
-    private int id;
-    private int tileX;
-    private int tileY;
+    private final int id;
+    private final int tileX;
+    private final int tileY;
     private boolean found;
     private JLabel label;
     private int movingCounter;
-    private int movingCounterMax;
+    private final int movingCounterMax;
     
     public Pokemon(int tileX, int tileY, Model model, int id) {
         super(model);
@@ -33,7 +32,7 @@ public class Pokemon extends Unit {
         this.id = (id <= 0) ? new Random().nextInt(150) + 1 : id;
         
         setStartingPostion(Model.tileCenterFromTileCoord(tileX), Model.tileCenterFromTileCoord(tileY));
-        setImg(String.format("pokemons/%03d.png",this.id));
+        setImg(String.format("pokemons\\%03d.png",this.id));
         
         this.direction = Direction.STOP;
     }
@@ -51,7 +50,7 @@ public class Pokemon extends Unit {
     
     private void revealLabel(){
         BufferedImage image = null;
-        try {image = Resource.loadBufferedImage(String.format("pokemons/icon%03d.png",this.id));} 
+        try {image = Resource.loadBufferedImage(String.format("pokemons\\icon%03d.png",this.id));} 
         catch (IOException e) {System.err.println("Can't load file");} 
         image = Resource.getSprite(image, 0, 0);
         image = Resource.getScaledImage(image, 30, 30);
@@ -67,6 +66,7 @@ public class Pokemon extends Unit {
                 movingCounter++;
             } else {
                 nextDirection = Direction.STOP;
+                stopMoving();
             }   
         }
     }

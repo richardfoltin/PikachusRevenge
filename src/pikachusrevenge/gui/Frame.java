@@ -7,8 +7,8 @@ import static pikachusrevenge.LevelWindow.GRIDSIZE;
 
 public class Frame {
 
-    private BufferedImage topFrame;
-    private BufferedImage bottomFrame;
+    private final BufferedImage topFrame;
+    private final BufferedImage bottomFrame;
     private int duration;
     public static int CUT = UNITSIZE/2 + (Unit.C_BOX_OFFSET_Y - Unit.C_BOX_HEIGHT/2) - GRIDSIZE;
 

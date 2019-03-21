@@ -22,13 +22,13 @@ import pikachusrevenge.unit.Pokemon;
 
 public class Model {
     
-    private List<MapLayer> layers;
-    private ArrayList<NPC> npcs;
-    private ArrayList<Pokemon> pokemons;
-    private Map map;
-    private StatsPanel stats;
+    private final List<MapLayer> layers;
+    private final ArrayList<NPC> npcs;
+    private final ArrayList<Pokemon> pokemons;
+    private final Map map;
+    private final StatsPanel stats;
     private Player player;
-    private ArrayList<PokeBall> thrownBalls;
+    private final ArrayList<PokeBall> thrownBalls;
     private int ballcount;
     public final Rectangle MAP_RECTANGLE;
     

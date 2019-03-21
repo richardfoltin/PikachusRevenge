@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import org.mapeditor.core.Map;
