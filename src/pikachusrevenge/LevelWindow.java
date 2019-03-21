@@ -85,11 +85,14 @@ public class LevelWindow {
         System.out.println(map.toString() + " loaded");
     }
     
-    private String fileFromId(int id){
+    private String fileFromId(int id){    
+        String mapName = "";
+        
         switch (id) {
-            case 1 : return "MapTest.tmx";
-            default: return "";
+            case 1 : mapName = "MapTest"; break;
         }
+        
+        return "src\\pikachusrevenge\\resources\\level\\" + mapName + ".tmx";
     }
     
     protected void centerWindow(JFrame window) {

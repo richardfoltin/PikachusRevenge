@@ -1,7 +1,6 @@
 package pikachusrevenge.unit;
 
 import java.awt.Rectangle;
-import org.mapeditor.core.Tile;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
