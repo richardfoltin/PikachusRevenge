@@ -27,9 +27,7 @@ public class NPC extends Unit {
     private ListIterator<Position> routeIterator;
     private Position targetPosition;
     private boolean forward = true;
-    private final Timer attentionTimer;
     
-    private final int ATTENTION_SPEED = 40;
     private final int THROW_WAIT = 50;
     
     public NPC(MapObject obj, int level, Model model){
@@ -40,8 +38,6 @@ public class NPC extends Unit {
         loadLevelProperties();
         loadRoute(obj.getShape());
         loadWait(obj);
-        
-        this.attentionTimer = new Timer(ATTENTION_SPEED, this);
     }
     
     private void throwBall() {
@@ -123,26 +119,18 @@ public class NPC extends Unit {
     }
     
     @Override
-    public void actionPerformed(ActionEvent e) {
-        super.actionPerformed(e);
-        if (e.getSource() == attentionTimer){
-            Position playerPostion = model.getPlayer().getPosition();
-            double distance = playerPostion.distanceFrom(pos);
-            Direction playerDirection = Direction.getDirection(pos, playerPostion);
-            if (playerDirection == direction) {
-                //System.out.println(String.format("Player is in LOS : %s (%.0f)",playerDirection.name(),distance));
-                if (distance < throwDistance && model.canThrow(this)) {
-                    startWait(THROW_WAIT);
-                    throwBall();
-                }
+    public void loop() {
+        super.loop();
+        Position playerPostion = model.getPlayer().getPosition();
+        double distance = playerPostion.distanceFrom(pos);
+        Direction playerDirection = Direction.getDirection(pos, playerPostion);
+        if (playerDirection == direction) {
+            //System.out.println(String.format("Player is in LOS : %s (%.0f)",playerDirection.name(),distance));
+            if (distance < throwDistance && model.canThrow(this)) {
+                startWait(THROW_WAIT);
+                throwBall();
             }
         }
-    }
-    
-    @Override
-    public void startMoving() {
-        super.startMoving();
-        attentionTimer.start();
     }
     
     private void loadLevelProperties() {

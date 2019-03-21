@@ -11,7 +11,6 @@ import pikachusrevenge.resources.Resource;
 public class Unit extends MovingSprite {
 
     protected String name;
-    protected Direction startDirection;
     
     private Animation[] walk;
     private Animation animation;
@@ -50,26 +49,24 @@ public class Unit extends MovingSprite {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == super.getMoveTimer()){        
-            if (nextDirection != direction) {
-                if (nextDirection == Direction.STOP && animation != null) animation.stop();
-                switch (nextDirection) {
-                    case UP : animation = walk[3]; break;
-                    case LEFT :
-                    case UPLEFT :
-                    case DOWNLEFT : animation = walk[1]; break;
-                    case DOWN : animation = walk[0]; break;
-                    case RIGHT :
-                    case DOWNRIGHT :
-                    case UPRIGHT : animation = walk[2]; break;
-                }
-                if (nextDirection != Direction.STOP && animation != null) animation.start();
-            } else {
-                animation.update();
+    public void loop() {     
+        if (nextDirection != direction) {
+            if (nextDirection == Direction.STOP && animation != null) animation.stop();
+            switch (nextDirection) {
+                case UP : animation = walk[3]; break;
+                case LEFT :
+                case UPLEFT :
+                case DOWNLEFT : animation = walk[1]; break;
+                case DOWN : animation = walk[0]; break;
+                case RIGHT :
+                case DOWNRIGHT :
+                case UPRIGHT : animation = walk[2]; break;
             }
+            if (nextDirection != Direction.STOP && animation != null) animation.start();
+        } else {
+            animation.update();
         }
-        super.actionPerformed(e);
+        super.loop();
     }
 
     public BufferedImage getTopSprite() {
@@ -81,13 +78,13 @@ public class Unit extends MovingSprite {
     }
     
     public void restartFromStratingPoint() {
-        stopMoving();
         this.pos.x = startPosition.x;
         this.pos.y = startPosition.y;
         this.nextDirection = Direction.STOP;
-        this.direction = startDirection;
+        this.direction = Direction.STOP;
         super.loadNextPosition();
-        startMoving();
+        animation = walk[0];
+        animation.stop();
     }
     
     public String getName() {return name;}

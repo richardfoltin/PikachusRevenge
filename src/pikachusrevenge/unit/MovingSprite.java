@@ -12,7 +12,7 @@ import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
 
 
-public class MovingSprite implements ActionListener {
+public class MovingSprite {
     
     protected Position pos;
     protected Position startPosition;
@@ -21,7 +21,6 @@ public class MovingSprite implements ActionListener {
     protected Position nextPosition;
     protected Direction nextDirection;
     protected double speed;
-    private final Timer moveTimer;
     private BufferedImage img;
     protected int imageSize;
     protected final Model model;
@@ -29,8 +28,7 @@ public class MovingSprite implements ActionListener {
     protected Rectangle nextCollisionBox;
     protected int cOffsetX;
     protected int cOffsetY;
-  
-    private final static int MOVE_SPEED = 40;  
+    private boolean moving;
     
     public MovingSprite(Model model){
         this.pos = new Position(0,0);
@@ -42,7 +40,7 @@ public class MovingSprite implements ActionListener {
         this.direction = Direction.STOP;
         this.model = model;     
         this.animated = true;
-        this.moveTimer = new Timer(MOVE_SPEED, this);
+        this.moving = false;
     }
     
     protected void setImg(String filePath){
@@ -69,26 +67,23 @@ public class MovingSprite implements ActionListener {
         box.setLocation((int)(pos.x + cOffsetX - box.width/2), (int)(pos.y + cOffsetY - box.height/2));
     }
     
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == moveTimer){
-            //System.out.println(String.format("Move (%.0f,%.0f): %s",nextPosition.x,nextPosition.y,new SimpleDateFormat("mm:ss.SSS").format(new Date())));   
-            if (nextDirection != Direction.STOP) {
-                pos.x = nextPosition.x;
-                pos.y = nextPosition.y;
-                collisionBox.setLocation((int)nextCollisionBox.getX(),(int)nextCollisionBox.getY());
-                direction = nextDirection;
-            }
-            loadNextPosition();
+    public void loop() {
+        //System.out.println(String.format("Move (%.0f,%.0f): %s",nextPosition.x,nextPosition.y,new SimpleDateFormat("mm:ss.SSS").format(new Date())));   
+        if (nextDirection != Direction.STOP) {
+            pos.x = nextPosition.x;
+            pos.y = nextPosition.y;
+            collisionBox.setLocation((int)nextCollisionBox.getX(),(int)nextCollisionBox.getY());
+            direction = nextDirection;
         }
+        loadNextPosition();
     }
     
     public void startMoving() {
-        moveTimer.start();
+        moving = true;
     }
     
     public void stopMoving() {
-        moveTimer.stop();
+        moving = false;
     }
     
     public double getX() {return pos.x;}
@@ -97,7 +92,7 @@ public class MovingSprite implements ActionListener {
     public int getCornerY() {return (int)pos.y - imageSize/2;}
     public BufferedImage getImg() {return img;}
     public Position getPosition() {return pos;}
-    public Timer getMoveTimer() {return moveTimer;}
+    public boolean isMoving() {return moving;}
     
     
 }

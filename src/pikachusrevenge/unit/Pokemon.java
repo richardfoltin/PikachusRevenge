@@ -59,8 +59,8 @@ public class Pokemon extends Unit {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        super.actionPerformed(e);
+    public void loop() {
+        super.loop();
         if (nextDirection != Direction.STOP) {
             if (movingCounter < movingCounterMax) {
                 movingCounter++;

@@ -1,6 +1,7 @@
 package pikachusrevenge.unit;
 
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
@@ -23,7 +24,6 @@ public class Player extends Unit {
         setImg("pokemons\\025.png");
         
         this.direction = Direction.STOP;
-        this.startDirection = Direction.STOP;
     }
     
     public void moveToDirection(Direction d){
@@ -67,7 +67,7 @@ public class Player extends Unit {
             moveCollisionBoxTo(targetRectangle,targetPosition);
             if (model.canMoveTo(targetRectangle)){
                 //System.out.println(String.format("Move to: %s (%.0f,%.0f) -> (%.0f,%.0f)",nextDirection.name(),collisionBox.getX(),collisionBox.getY(),targetRectangle.getX(),targetRectangle.getY()));
-                super.loadNextPosition();            
+                super.loadNextPosition();      
             } else {
                 //System.out.println(String.format("Stop at: %s (%.0f,%.0f) -> (%.0f,%.0f)",nextDirection.name(),collisionBox.getX(),collisionBox.getY(),targetRectangle.getX(),targetRectangle.getY()));
                 nextDirection = Direction.STOP;

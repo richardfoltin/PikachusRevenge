@@ -1,11 +1,14 @@
 package pikachusrevenge.model;
 
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.PathIterator;
 import static java.lang.Math.floor;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
+import javax.swing.Timer;
 import org.mapeditor.core.Map;
 import org.mapeditor.core.MapLayer;
 import org.mapeditor.core.MapObject;
@@ -13,33 +16,43 @@ import org.mapeditor.core.ObjectGroup;
 import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
+import pikachusrevenge.LevelWindow;
 import static pikachusrevenge.LevelWindow.GRIDSIZE;
 import pikachusrevenge.gui.StatsPanel;
+import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.PokeBall;
 import pikachusrevenge.unit.Pokemon;
 
-public class Model {
+public class Model implements ActionListener {
     
     private final List<MapLayer> layers;
     private final ArrayList<NPC> npcs;
     private final ArrayList<Pokemon> pokemons;
     private final Map map;
     private final StatsPanel stats;
+    private LevelWindow mainPanel;
     private Player player;
     private final ArrayList<PokeBall> thrownBalls;
+    private final ArrayList<MovingSprite> cleanUp;
     private int ballcount;
+    private final Timer timer;
     public final Rectangle MAP_RECTANGLE;
+
+    private final static int MAIN_LOOP = 40;  
     
-    public Model (Map map, StatsPanel stats){
+    public Model (Map map, StatsPanel stats, LevelWindow mainPanel){
         this.layers = map.getLayers();
         this.npcs = new ArrayList<>();
         this.thrownBalls = new ArrayList<>();
         this.pokemons = new ArrayList<>();
+        this.cleanUp = new ArrayList<>();
+        this.mainPanel = mainPanel;
         this.map = map;
         this.stats = stats;
         MAP_RECTANGLE = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);
+        this.timer = new Timer(MAIN_LOOP, this);
         
         addUnits();
         countPokemons();
@@ -98,7 +111,7 @@ public class Model {
     }
     
     public void ballReachedPlayer(PokeBall ball) {
-        thrownBalls.remove(ball);
+        cleanUp.add(ball);
         player.caught();
     }
     
@@ -106,7 +119,8 @@ public class Model {
         System.out.println("Game over");
     }
     
-    public void startMoving() {
+    public void startGame() {
+        timer.start();
         for (NPC npc : npcs) npc.startMoving();
         player.startMoving();
     }
@@ -200,7 +214,32 @@ public class Model {
             }
         }
     }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == timer){
+            if (player.isMoving()) player.loop();
+            for (NPC npc : npcs) if (npc.isMoving()) npc.loop();
+            for (Pokemon p : pokemons) if (p.isMoving()) p.loop();
+            for (PokeBall pb : thrownBalls) if (pb.isMoving()) pb.loop();
+            cleanUp();
+            mainPanel.getMapView().repaint();
+            movePanelTo(player.getPosition());
+        }
+    }    
     
+    private void cleanUp() {
+        for (MovingSprite m : cleanUp) {
+            if (m instanceof PokeBall) thrownBalls.remove(m);
+            else if (m instanceof NPC) npcs.remove(m);
+        }
+        cleanUp.clear();
+    }
+    
+    public void movePanelTo(Position position){
+        mainPanel.scrollTo(position);
+    }
+
     public boolean canThrow(NPC npc){
         if (thrownBalls.size() == 0) return true;
         for (PokeBall b : thrownBalls) {

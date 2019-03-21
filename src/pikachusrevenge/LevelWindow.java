@@ -1,6 +1,9 @@
 package pikachusrevenge;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
 import pikachusrevenge.gui.MapView;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
@@ -8,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 import javax.swing.WindowConstants;
 import org.mapeditor.core.Map;
 import org.mapeditor.io.TMXMapReader;
@@ -16,6 +21,7 @@ import pikachusrevenge.gui.StatsPanel;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.KeyPressHandler;
 import pikachusrevenge.model.Model;
+import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
 
 public class LevelWindow {
@@ -23,9 +29,14 @@ public class LevelWindow {
     private Map map;
     private final Model model;
     private final JFrame appFrame;
+    private final JScrollPane mainPanel;
     private final StatsPanel statsPanel;
-    
+    private final MapView mapView;
+      
     public static final int GRIDSIZE = 16;
+    public static final int WINDOW_WIDTH = 450;
+    public static final int WINDOW_HEIGHT = 350;
+    
     
     public LevelWindow(int id){
         
@@ -34,11 +45,15 @@ public class LevelWindow {
         loadIcon("pokemons\\icon025.png");
 
         loadMap(id);    
-        statsPanel = new StatsPanel(map.getWidth() * GRIDSIZE);
+        statsPanel = new StatsPanel(WINDOW_WIDTH);
         
-        model = new Model(map,statsPanel);
-        MapView mainPanel = new MapView(map,model);
+        model = new Model(map,statsPanel,this);
+        mapView = new MapView(map,model);
+        mainPanel = new JScrollPane(mapView);
         mainPanel.setBorder(null);
+        mainPanel.setPreferredSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT));
+        mainPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        mainPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         
         appFrame.setLayout(new BorderLayout());
         //appFrame.setContentPane(mainPanel);
@@ -52,8 +67,9 @@ public class LevelWindow {
         //appFrame.setLocationRelativeTo(null);
         appFrame.pack();
         centerWindow(appFrame);
+        scrollTo(model.getPlayer().getPosition());
         appFrame.setVisible(true);
-        model.startMoving();
+        model.startGame();
     }
     
     private void loadMap(int id) {              
@@ -94,6 +110,19 @@ public class LevelWindow {
         window.setLocation(x, y);  
     }
     
+    public void scrollTo(Position position){
+        JViewport visible = mainPanel.getViewport();
+        int scrollX = scrollPostion(position.x, WINDOW_WIDTH, model.MAP_RECTANGLE.width);
+        int scrollY = scrollPostion(position.y, WINDOW_HEIGHT, model.MAP_RECTANGLE.height);
+        visible.setViewPosition(new Point(scrollX,scrollY));
+    }
+    
+    private int scrollPostion(double coord, int visibleSize, int mapSize){
+        if (coord < visibleSize/2) return 0;
+        else if (coord > mapSize - visibleSize/2) return mapSize - visibleSize;
+        else return (int)coord - visibleSize/2;
+    }
+    
     private KeyAdapter getKeyAdapter(Model model) {
         return new KeyAdapter() {
             @Override
@@ -116,5 +145,7 @@ public class LevelWindow {
 
         };
     }
+
+    public MapView getMapView() {return mapView;}
 
  }
