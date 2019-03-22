@@ -2,12 +2,10 @@ package pikachusrevenge.unit;
 
 import pikachusrevenge.model.Position;
 import java.awt.Shape;
-import java.awt.event.ActionEvent;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import javax.swing.Timer;
 import org.mapeditor.core.MapObject;
 import org.mapeditor.core.Properties;
 import pikachusrevenge.model.Direction;
@@ -124,8 +122,8 @@ public class NPC extends Unit {
         Position playerPostion = model.getPlayer().getPosition();
         double distance = playerPostion.distanceFrom(pos);
         Direction playerDirection = Direction.getDirection(pos, playerPostion);
-        if (playerDirection == direction) {
-            //System.out.println(String.format("Player is in LOS : %s (%.0f)",playerDirection.name(),distance));
+        if (Direction.isInLineOfSight(direction, playerDirection)) {
+            System.out.println(String.format("Player is in LOS : %s - %s (%.0f)",direction,playerDirection.name(),distance));
             if (distance < throwDistance && model.canThrow(this)) {
                 startWait(THROW_WAIT);
                 throwBall();
@@ -138,7 +136,7 @@ public class NPC extends Unit {
             default:
             case 1 : 
                 this.speed = 2; 
-                this.throwDistance = 300;
+                this.throwDistance = 200; // 200 - easy, 300 - very hard
                 this.throwSpeed = 10;
                 this.name = "Noob NPC";
                 setImg("trchar035.png");

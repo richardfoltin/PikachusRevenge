@@ -1,7 +1,6 @@
 package pikachusrevenge.unit;
 
 import pikachusrevenge.gui.Animation;
-import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
@@ -12,7 +11,7 @@ public class Unit extends MovingSprite {
 
     protected String name;
     
-    private Animation[] walk;
+    private final Animation[] walk;
     private Animation animation;
         
     public final static int UNITSIZE = 64;

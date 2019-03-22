@@ -36,7 +36,7 @@ public class Model implements ActionListener {
     private Player player;
     private final ArrayList<PokeBall> thrownBalls;
     private final ArrayList<MovingSprite> cleanUp;
-    private int ballcount;
+    private int ballCount;
     private final Timer timer;
     public final Rectangle MAP_RECTANGLE;
 
@@ -62,46 +62,18 @@ public class Model implements ActionListener {
         if (!MAP_RECTANGLE.contains(target)) return false;
         
         PathIterator pi = target.getPathIterator(null);
+        ArrayList<Collision> collisions = new ArrayList<>();
         
         while (!pi.isDone()) {
             double[] coords = new double[2];
             int type = pi.currentSegment(coords);
             if (type!= PathIterator.SEG_CLOSE) {
-                if (collisionOnTileAt(tileCoordFromMapCoord(coords[0]), tileCoordFromMapCoord(coords[1]))) return false;
+                collisions.add(Collision.collisionOnTileAt(layers,tileCoordFromMapCoord(coords[0]), tileCoordFromMapCoord(coords[1]))) ;
             }
             pi.next();
         }
         
-        return true;
-    }
-    
-    private boolean collisionOnTileAt(int tileX, int tileY) {                 
-        boolean water = false;
-        boolean collision = false;
-        boolean bridge = false;
-        boolean stairs = false;
-        
-        for (MapLayer l : layers){
-            if (l instanceof TileLayer){
-                Tile t = ((TileLayer)l).getTileAt(tileX, tileY);
-                if (t != null) {
-                    Properties prop = t.getProperties();
-                    if (!prop.isEmpty()) {
-                        water = water || Boolean.parseBoolean(prop.getProperty("Water", "false"));
-                        collision = collision || Boolean.parseBoolean(prop.getProperty("Collision", "false"));
-                        bridge = bridge || Boolean.parseBoolean(prop.getProperty("Bridge", "false"));
-                        stairs = stairs || Boolean.parseBoolean(prop.getProperty("Stairs", "false"));
-                    }
-                }
-            } 
-        }
-        
-        
-        if (bridge) water = false;
-        if (stairs) collision = false;
-        
-        if (water || collision) return true;
-        else return false;
+        return Collision.canMoveToCollisions(collisions);
     }
     
     public void ballThrow(Position from, double speed, NPC owner){
@@ -112,7 +84,16 @@ public class Model implements ActionListener {
     
     public void ballReachedPlayer(PokeBall ball) {
         cleanUp.add(ball);
+        for (Pokemon p : pokemons) p.stopMoving();
         player.caught();
+        writeInfo(String.format("%s caught you!",ball.getOwner().getName()));
+    }
+
+    public void playerInteraction(){
+        if (player.isAtSign()){
+            if (canMoveToNextLevel()) writeInfo("Moving to next level...");
+            else writeInfo("Can't move to next level yet!");
+        }
     }
     
     public void gameOver(){
@@ -156,6 +137,16 @@ public class Model implements ActionListener {
         return false;
     }
     
+    public boolean checkSign(Position pos) {
+        for (MapLayer l : layers){
+            if (l instanceof TileLayer){
+                Tile t = ((TileLayer)l).getTileAt(tileCoordFromMapCoord(pos.x),tileCoordFromMapCoord(pos.y));
+                if (hasProperty(t,"Sign")) return true;
+            } 
+        } 
+        return false;
+    }
+    
     private static boolean hasProperty(Tile t, String property) {
         if (t != null) {
             Properties prop = t.getProperties();
@@ -178,6 +169,10 @@ public class Model implements ActionListener {
         player.moveToDirection(d);
     }
     
+    private void writeInfo(String str){
+        mainPanel.getFooter().write(str);
+    }
+    
     private void countPokemons() {
         for (MapLayer l : layers){
             if (l instanceof TileLayer){
@@ -185,7 +180,7 @@ public class Model implements ActionListener {
                     for (int j = 0; j < map.getHeight(); ++j){
                         Tile t = ((TileLayer)l).getTileAt(i, j);
                         if (hasProperty(t,"Ball")) {
-                            ballcount++;
+                            ballCount++;
                             JLabel label = stats.addBall();
                             Pokemon p = new Pokemon(i,j,this,0);
                             p.setLabel(label);
@@ -223,6 +218,7 @@ public class Model implements ActionListener {
             for (Pokemon p : pokemons) if (p.isMoving()) p.loop();
             for (PokeBall pb : thrownBalls) if (pb.isMoving()) pb.loop();
             cleanUp();
+            mainPanel.getFooter().loop();
             mainPanel.getMapView().repaint();
             movePanelTo(player.getPosition());
         }
@@ -232,6 +228,7 @@ public class Model implements ActionListener {
         for (MovingSprite m : cleanUp) {
             if (m instanceof PokeBall) thrownBalls.remove(m);
             else if (m instanceof NPC) npcs.remove(m);
+            else if (m instanceof Pokemon) pokemons.remove(m);
         }
         cleanUp.clear();
     }
@@ -248,10 +245,15 @@ public class Model implements ActionListener {
         return true;
     }
     
+    public boolean canMoveToNextLevel() {
+        if (player.getBalls() == ballCount) return true;
+        return false;
+    }
+    
     public ArrayList<NPC> getNpcs() {return npcs;}
     public ArrayList<Pokemon> getPokemons() {return pokemons;}
     public ArrayList<PokeBall> getThrownBalls() {return thrownBalls;}
-    public int getBallCount() {return ballcount;}
+    public int getBallCount() {return ballCount;}
     public Player getPlayer() {return player;}
     public StatsPanel getStats() {return stats;}
 

@@ -1,6 +1,5 @@
 package pikachusrevenge.unit;
 
-import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
@@ -65,10 +64,15 @@ public class Pokemon extends Unit {
             if (movingCounter < movingCounterMax) {
                 movingCounter++;
             } else {
-                nextDirection = Direction.STOP;
                 stopMoving();
             }   
         }
+    }
+    
+    @Override
+    public void stopMoving() {
+        nextDirection = Direction.STOP;
+        super.stopMoving();
     }
 
     public int getId() {return id;}

@@ -1,6 +1,7 @@
 package pikachusrevenge;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -11,11 +12,14 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.WindowConstants;
 import org.mapeditor.core.Map;
 import org.mapeditor.io.TMXMapReader;
+import pikachusrevenge.gui.FooterLabel;
 import pikachusrevenge.gui.GameMenu;
 import pikachusrevenge.gui.StatsPanel;
 import pikachusrevenge.model.Direction;
@@ -31,6 +35,7 @@ public class LevelWindow {
     private final JFrame appFrame;
     private final JScrollPane mainPanel;
     private final StatsPanel statsPanel;
+    private final FooterLabel footer;
     private final MapView mapView;
       
     public static final int GRIDSIZE = 16;
@@ -55,10 +60,16 @@ public class LevelWindow {
         mainPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         mainPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         
+        JPanel footerPanel = new JPanel();
+        footerPanel.setPreferredSize(new Dimension(WINDOW_WIDTH,25));
+        footer = new FooterLabel(model);
+        footerPanel.add(footer);
+        
         appFrame.setLayout(new BorderLayout());
         //appFrame.setContentPane(mainPanel);
         appFrame.add(statsPanel, BorderLayout.NORTH);
-        appFrame.add(mainPanel, BorderLayout.SOUTH);
+        appFrame.add(mainPanel, BorderLayout.CENTER);
+        appFrame.add(footerPanel, BorderLayout.SOUTH);
         
         appFrame.setJMenuBar(new GameMenu());
         
@@ -126,26 +137,20 @@ public class LevelWindow {
     private KeyAdapter getKeyAdapter(Model model) {
         return new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent ke) {              
-                //System.out.println(String.format("Key Pressed : %s",new SimpleDateFormat("mm:ss.SSS").format(new Date())));        
-                //super.keyPressed(ke); 
-                //if (!game.isLevelLoaded()) return;
-                
-                Direction d = KeyPressHandler.directionFromKeyCode(ke.getKeyCode());
-                if (KeyPressHandler.addKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
+            public void keyPressed(KeyEvent ke) {
+                KeyPressHandler.keyPressed(model, ke.getKeyCode());
             }
             
             @Override
             public void keyReleased(KeyEvent ke) {
-                //System.out.println(String.format("Key Released : %s",new SimpleDateFormat("mm:ss.SSS").format(new Date())));
-                
-                Direction d = KeyPressHandler.directionFromKeyCode(ke.getKeyCode());
-                if (KeyPressHandler.removeKeypress(d)) model.playerMoveTowards(KeyPressHandler.getKeyDirection());
+                KeyPressHandler.keyReleased(model, ke.getKeyCode());
             }
 
         };
     }
 
+
     public MapView getMapView() {return mapView;}
+    public FooterLabel getFooter() {return footer;}
 
  }

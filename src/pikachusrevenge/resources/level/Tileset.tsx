@@ -946,16 +946,6 @@
    <property name="Bridge" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="1483">
-  <properties>
-   <property name="Collision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="1484">
-  <properties>
-   <property name="Collision" type="bool" value="true"/>
-  </properties>
- </tile>
  <tile id="1487">
   <properties>
    <property name="Collision" type="bool" value="true"/>
@@ -1004,6 +994,18 @@
  <tile id="1545">
   <properties>
    <property name="Water" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="1560">
+  <properties>
+   <property name="Collision" type="bool" value="true"/>
+   <property name="Sign" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="1561">
+  <properties>
+   <property name="Collision" type="bool" value="true"/>
+   <property name="Sign" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="1564">

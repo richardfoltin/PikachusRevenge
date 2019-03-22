@@ -1,6 +1,5 @@
 package pikachusrevenge.model;
 
-import pikachusrevenge.LevelWindow;
 import pikachusrevenge.model.Direction;
 
 public class Position {

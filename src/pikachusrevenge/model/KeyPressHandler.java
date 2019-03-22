@@ -10,7 +10,22 @@ public  class KeyPressHandler {
 
     private static List<Direction> pressedKeys = new ArrayList<Direction>();;
     
-    public static boolean addKeypress(Direction d){
+    public static void keyPressed(Model model, int key) {
+        Direction d = directionFromKeyCode(key);
+        if (d == Direction.STOP) {
+            switch (key){
+                case KeyEvent.VK_SPACE : model.playerInteraction();
+            }
+        }
+        if (newDirectionWith(d)) model.playerMoveTowards(getMovingDirection());
+    }
+    
+    public static void keyReleased(Model model, int key) {
+        Direction d = directionFromKeyCode(key);
+        if (newDirectionWithout(d)) model.playerMoveTowards(getMovingDirection());     
+    }
+    
+    private static boolean newDirectionWith(Direction d){
         if (!pressedKeys.contains(d)) {
             if (pressedKeys.size() == 2) {
                 //System.out.println("CHANGE : " + pressedKeys.get(0) + " -> " + d);
@@ -25,7 +40,7 @@ public  class KeyPressHandler {
         return false;
     }
     
-    public static boolean removeKeypress(Direction d){
+    private static boolean newDirectionWithout(Direction d){
         //System.out.println("REMOVE : " + d);
         if (pressedKeys.contains(d)) {
             pressedKeys.remove(d);
@@ -34,7 +49,7 @@ public  class KeyPressHandler {
         return false;     
     }
     
-    public static Direction getKeyDirection(){
+    private static Direction getMovingDirection(){
         double x = 0;
         double y = 0;
         for (Direction d : pressedKeys) {
@@ -47,7 +62,7 @@ public  class KeyPressHandler {
     }
     
                 
-    public static Direction directionFromKeyCode(int keyCode){
+    private static Direction directionFromKeyCode(int keyCode){
         switch (keyCode){
             case KeyEvent.VK_LEFT :
             case KeyEvent.VK_A :  return Direction.LEFT; 

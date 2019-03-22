@@ -1,7 +1,6 @@
 package pikachusrevenge.unit;
 
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
@@ -10,6 +9,7 @@ public class Player extends Unit {
     
     private int balls;
     private int lives;
+    private boolean atSign;
     
     public Player(double x, double y, Model model){
         super(model);
@@ -57,10 +57,17 @@ public class Player extends Unit {
             System.out.println("Winner");
         }
     }
+    
+    @Override
+    public void loop() {
+        super.loop();
+        pickUpBalls();
+        atSign = model.checkSign(pos);
+    }
+    
        
     @Override
     protected void loadNextPosition() {
-        pickUpBalls();
         if (nextDirection != Direction.STOP) {
             Position targetPosition = new Position(pos.x + nextDirection.x * speed, pos.y + nextDirection.y * speed);
             Rectangle targetRectangle = new Rectangle(0, 0, C_BOX_WIDTH, C_BOX_HEIGHT);
@@ -75,10 +82,12 @@ public class Player extends Unit {
         }
     }
     
-    public void addLives() {
+    private void addLives() {
         for (int i = 0; i < lives; ++i){
             model.getStats().addLife();
         }
     }
     
+    public boolean isAtSign() {return atSign;}
+    public int getBalls() {return balls;}
 }
