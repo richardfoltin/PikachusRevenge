@@ -71,6 +71,10 @@ public class StatsPanel extends JPanel {
         }
     }
     
+    public void pokemonFound(int id) {
+        
+    }
+    
     public JLabel addBall() {
         
         Image image = null;
@@ -85,6 +89,22 @@ public class StatsPanel extends JPanel {
         pokemonPane.add(label);
         
         return label;
+    }
+    
+    public void clearPane() {
+        for (JLabel label : pokemons){
+            pokemonPane.remove(label);
+        }
+        pokemons.clear();
+        pokemonPane.revalidate();
+        pokemonPane.repaint();
+            
+        for (JLabel label : lives){
+            livesPane.remove(label);
+        }
+        lives.clear();
+        livesPane.revalidate();
+        livesPane.repaint();
     }
     
     public void pokemonFound() {

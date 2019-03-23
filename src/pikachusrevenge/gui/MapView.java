@@ -24,6 +24,8 @@ public class MapView extends JPanel {
     private final Model model;
     private final MapRenderer renderer;
 
+    public static final int GRIDSIZE = 16;
+    
     public MapView(Map map, Model model) {
         this.map = map;
         this.model = model;

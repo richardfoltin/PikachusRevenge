@@ -123,7 +123,7 @@ public class NPC extends Unit {
         double distance = playerPostion.distanceFrom(pos);
         Direction playerDirection = Direction.getDirection(pos, playerPostion);
         if (Direction.isInLineOfSight(direction, playerDirection)) {
-            System.out.println(String.format("Player is in LOS : %s - %s (%.0f)",direction,playerDirection.name(),distance));
+            //System.out.println(String.format("Player is in LOS : %s - %s (%.0f)",direction,playerDirection.name(),distance));
             if (distance < throwDistance && model.canThrow(this)) {
                 startWait(THROW_WAIT);
                 throwBall();
@@ -140,6 +140,13 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Noob NPC";
                 setImg("trchar035.png");
+                break;
+            case 2 : 
+                this.speed = 2; 
+                this.throwDistance = 200; // 200 - easy, 300 - very hard
+                this.throwSpeed = 10;
+                this.name = "Noobest NPC";
+                setImg("trchar026.png");
                 break;
         }
         

@@ -1,26 +1,28 @@
 package pikachusrevenge.unit;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import pikachusrevenge.gui.MainWindow;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
 
 public class Player extends Unit {
     
-    private int balls;
+    private ArrayList<Pokemon> freed;
     private int lives;
+    private int availableLevels;
     private boolean atSign;
     
-    public Player(double x, double y, Model model){
+    public Player(Model model){
         super(model);
         
         this.lives = 3;
-        addLives();
-        this.balls = 0;
+        this.availableLevels = 1;
+        this.freed = new ArrayList<>();
         this.speed = 5.0;
         this.name = "Pikachu";
         
-        setStartingPostion(x, y);
         setImg("pokemons\\025.png");
         
         this.direction = Direction.STOP;
@@ -33,7 +35,7 @@ public class Player extends Unit {
     
     public void caught() {
         lives--;
-        model.getStats().removeLife();
+        MainWindow.getInstance().getStats().removeLife();
         System.out.println("Ball hit! " + lives);
         if (lives  <= 0) {
             lives = 0;
@@ -43,17 +45,17 @@ public class Player extends Unit {
         }
     }
     
-    private void pickUpBalls() {
-        boolean ball = model.checkBallAt(collisionBox);
-        if (ball){
-            balls++;
+    private void freePokemon() {
+        Pokemon pokemon = model.checkBallPokemonAt(collisionBox);
+        if (pokemon != null){
+            freed.add(pokemon);
             System.out.println(String.format("Ball found at (%.0f,%.0f)",pos.x,pos.y));
             checkWin();
         }
     }
     
     private void checkWin() {
-        if (balls == model.getBallCount()) {
+        if (freed.size() == model.getBallCount()) {
             System.out.println("Winner");
         }
     }
@@ -61,7 +63,7 @@ public class Player extends Unit {
     @Override
     public void loop() {
         super.loop();
-        pickUpBalls();
+        freePokemon();
         atSign = model.checkSign(pos);
     }
     
@@ -82,12 +84,12 @@ public class Player extends Unit {
         }
     }
     
-    private void addLives() {
-        for (int i = 0; i < lives; ++i){
-            model.getStats().addLife();
-        }
+    public void increaseAvailableLevels(int level) {
+        if (level > availableLevels) availableLevels = level;
     }
     
     public boolean isAtSign() {return atSign;}
-    public int getBalls() {return balls;}
+    public int getFreedCount() {return freed.size();}
+    public int getLives() {return lives;}
+    public int getAvailableLevels() {return availableLevels;}
 }

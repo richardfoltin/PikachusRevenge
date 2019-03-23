@@ -16,9 +16,8 @@ import org.mapeditor.core.ObjectGroup;
 import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
-import pikachusrevenge.LevelWindow;
-import static pikachusrevenge.LevelWindow.GRIDSIZE;
-import pikachusrevenge.gui.StatsPanel;
+import pikachusrevenge.gui.MainWindow;
+import static pikachusrevenge.gui.MapView.GRIDSIZE;
 import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
@@ -26,38 +25,51 @@ import pikachusrevenge.unit.PokeBall;
 import pikachusrevenge.unit.Pokemon;
 
 public class Model implements ActionListener {
-    
-    private final List<MapLayer> layers;
+        
+    private List<MapLayer> layers;
     private final ArrayList<NPC> npcs;
     private final ArrayList<Pokemon> pokemons;
-    private final Map map;
-    private final StatsPanel stats;
-    private LevelWindow mainPanel;
-    private Player player;
+    private Map map;
+    private MainWindow mainWindow;
+    private final Player player;
     private final ArrayList<PokeBall> thrownBalls;
     private final ArrayList<MovingSprite> cleanUp;
     private int ballCount;
     private final Timer timer;
-    public final Rectangle MAP_RECTANGLE;
+    public Rectangle MAP_RECTANGLE;
 
     private final static int MAIN_LOOP = 40;  
     
-    public Model (Map map, StatsPanel stats, LevelWindow mainPanel){
+    public Model (Map map, MainWindow mainWindow){
         this.layers = map.getLayers();
         this.npcs = new ArrayList<>();
         this.thrownBalls = new ArrayList<>();
         this.pokemons = new ArrayList<>();
         this.cleanUp = new ArrayList<>();
-        this.mainPanel = mainPanel;
+        this.player = new Player(this);
+        this.mainWindow = mainWindow;
         this.map = map;
-        this.stats = stats;
         MAP_RECTANGLE = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);
         this.timer = new Timer(MAIN_LOOP, this);
         
-        addUnits();
-        countPokemons();
+        addUnitsToMap();
     }
     
+    public void changeMap(Map map) {
+        this.layers = map.getLayers();
+        this.map = map;
+        MAP_RECTANGLE = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);
+        
+        npcs.clear();
+        thrownBalls.clear();
+        pokemons.clear();
+        cleanUp.clear();
+        mainWindow.getStats().clearPane();
+        
+        addUnitsToMap();  
+    }
+    
+
     public boolean canMoveTo(Rectangle target){
         if (!MAP_RECTANGLE.contains(target)) return false;
         
@@ -91,7 +103,9 @@ public class Model implements ActionListener {
 
     public void playerInteraction(){
         if (player.isAtSign()){
-            if (canMoveToNextLevel()) writeInfo("Moving to next level...");
+            if (canMoveToNextLevel()) {
+                mainWindow.loadNextLevel();
+            }
             else writeInfo("Can't move to next level yet!");
         }
     }
@@ -101,12 +115,21 @@ public class Model implements ActionListener {
     }
     
     public void startGame() {
+        for (int i = 0; i < player.getLives(); ++i){
+            mainWindow.getStats().addLife();
+        }
+        countPokemonsAndAddToStats();
         timer.start();
         for (NPC npc : npcs) npc.startMoving();
         player.startMoving();
     }
     
-    public boolean checkBallAt(Rectangle target){
+    public void stopGame() {
+        timer.stop();
+        player.stopMoving();
+    }
+    
+    public Pokemon checkBallPokemonAt(Rectangle target){
         
         PathIterator pi = target.getPathIterator(null);
         
@@ -124,9 +147,9 @@ public class Model implements ActionListener {
                             for (Pokemon p : pokemons) {
                                 if (p.getTileX() == x && p.getTileY() == y) {
                                     p.found();
+                                    return p;
                                 }
                             }
-                            return true;
                         }
                     } 
                 }
@@ -134,7 +157,7 @@ public class Model implements ActionListener {
             pi.next();
         }  
          
-        return false;
+        return null;
     }
     
     public boolean checkSign(Position pos) {
@@ -170,10 +193,10 @@ public class Model implements ActionListener {
     }
     
     private void writeInfo(String str){
-        mainPanel.getFooter().write(str);
+        mainWindow.getFooter().write(str);
     }
     
-    private void countPokemons() {
+    private void countPokemonsAndAddToStats() {
         for (MapLayer l : layers){
             if (l instanceof TileLayer){
                 for (int i = 0; i < map.getWidth(); ++i) {
@@ -181,9 +204,8 @@ public class Model implements ActionListener {
                         Tile t = ((TileLayer)l).getTileAt(i, j);
                         if (hasProperty(t,"Ball")) {
                             ballCount++;
-                            JLabel label = stats.addBall();
-                            Pokemon p = new Pokemon(i,j,this,0);
-                            p.setLabel(label);
+                            JLabel label = mainWindow.getStats().addBall();
+                            Pokemon p = new Pokemon(i,j,this,label);
                             pokemons.add(p);
                         }                  
                     }
@@ -192,12 +214,12 @@ public class Model implements ActionListener {
         }
     }
     
-    private void addUnits() {
+    private void addUnitsToMap() {
         for (MapLayer l : layers){
             if (l instanceof ObjectGroup){
                 for (MapObject o : ((ObjectGroup)l).getObjects()){
                     if (o.getName().equals("Enter")){
-                        player = new Player(o.getX(),o.getY(),this);
+                        player.setStartingPostion(o.getX(),o.getY());
                     }else if (o.getName().equals("NPC")) {
                         Properties prop = o.getProperties();
                         
@@ -218,8 +240,8 @@ public class Model implements ActionListener {
             for (Pokemon p : pokemons) if (p.isMoving()) p.loop();
             for (PokeBall pb : thrownBalls) if (pb.isMoving()) pb.loop();
             cleanUp();
-            mainPanel.getFooter().loop();
-            mainPanel.getMapView().repaint();
+            mainWindow.getFooter().loop();
+            mainWindow.repaintMap();
             movePanelTo(player.getPosition());
         }
     }    
@@ -234,11 +256,11 @@ public class Model implements ActionListener {
     }
     
     public void movePanelTo(Position position){
-        mainPanel.scrollTo(position);
+        mainWindow.scrollTo(position);
     }
 
     public boolean canThrow(NPC npc){
-        if (thrownBalls.size() == 0) return true;
+        if (thrownBalls.isEmpty()) return true;
         for (PokeBall b : thrownBalls) {
             if (b.getOwner() == npc) return false;
         }
@@ -246,8 +268,8 @@ public class Model implements ActionListener {
     }
     
     public boolean canMoveToNextLevel() {
-        if (player.getBalls() == ballCount) return true;
-        return false;
+        if (player.getFreedCount() == ballCount) return true;
+        return true;
     }
     
     public ArrayList<NPC> getNpcs() {return npcs;}
@@ -255,7 +277,4 @@ public class Model implements ActionListener {
     public ArrayList<PokeBall> getThrownBalls() {return thrownBalls;}
     public int getBallCount() {return ballCount;}
     public Player getPlayer() {return player;}
-    public StatsPanel getStats() {return stats;}
-
-
 }

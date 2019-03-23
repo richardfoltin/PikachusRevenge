@@ -45,7 +45,7 @@ public class MovingSprite {
         catch (IOException e) {System.err.println("Can't load file: " + filePath);} 
     }
     
-    protected void setStartingPostion(double x, double y){
+    public void setStartingPostion(double x, double y){
         this.pos.x = x;
         this.pos.y = y;
         this.startPosition.x = x;

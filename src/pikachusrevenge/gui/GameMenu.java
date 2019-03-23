@@ -5,12 +5,14 @@ import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import pikachusrevenge.model.Model;
 
 public class GameMenu  extends JMenuBar {
 
@@ -19,15 +21,18 @@ public class GameMenu  extends JMenuBar {
     private final JMenuItem saveMenu;
     private final JMenuItem exitSaveMenu;
     private final JMenuItem exitMenu;
+    private final JMenu levelSelect;
     private final JMenuItem restartMenu;
     private JMenuItem pauseMenu;
     private JMenuItem resumeMenu;
+    private final Model model;
     
     private static final int MENUITEM_WIDTH = 180;
     private static final int MENUITEM_HEIGHT = 25;
     
-    public GameMenu() {
-
+    public GameMenu(Model model) {
+        this.model = model;
+        
         JMenu menuFile = new JMenu("File");  
         menuFile.setMnemonic('F');
         
@@ -78,7 +83,7 @@ public class GameMenu  extends JMenuBar {
         restartMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuGame.add(restartMenu); 
         
-        JMenu levelSelect = new JMenu("Go back to level..."); 
+        levelSelect = new JMenu("Go back to level..."); 
         levelSelect.setMnemonic('G'); 
         levelSelect.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuGame.add(levelSelect); 
@@ -105,15 +110,17 @@ public class GameMenu  extends JMenuBar {
         
     }
     
+    public void setAvailableLevels(int maxLevel){
+        for (int i = 0; i < levelSelect.getItemCount(); ++i){
+            levelSelect.getItem(i).setEnabled(i < maxLevel);
+        }
+    }
+    
     private void addLevels(JMenu menu){
         
         for (int i = 1; i <= 10; ++i){
-            JMenuItem menuItem = new JMenuItem(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    
-                }
-            });
+            JMenuItem menuItem = new JMenuItem();
+            menuItem.addActionListener(startLevelAction(i));
             menuItem.setText("Level " + i);
             if (i > 5) menuItem.setEnabled(false);
             menuItem.setPreferredSize(new Dimension(MENUITEM_WIDTH / 2,MENUITEM_HEIGHT));
@@ -124,7 +131,7 @@ public class GameMenu  extends JMenuBar {
     private final Action restartAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            MainWindow.getInstance().restartLevel();
         }
     };
     
@@ -200,6 +207,14 @@ public class GameMenu  extends JMenuBar {
         }
     };
     
+    public static final ActionListener startLevelAction(final int level) {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    MainWindow.getInstance().loadLevel(level);
+            }
+        };
+    } 
     
     private final Action exitAction = new AbstractAction() {
         @Override

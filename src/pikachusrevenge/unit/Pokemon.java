@@ -11,7 +11,7 @@ import pikachusrevenge.resources.Resource;
 
 public class Pokemon extends Unit {
     
-    private final int id;
+    private int id;
     private final int tileX;
     private final int tileY;
     private boolean found;
@@ -19,7 +19,19 @@ public class Pokemon extends Unit {
     private int movingCounter;
     private final int movingCounterMax;
     
+    public Pokemon(int tileX, int tileY, Model model, JLabel label) {
+        this(tileX,tileY,model);
+        this.label = label;
+        this.id = new Random().nextInt(150) + 1;
+        setIdImg();
+    }
+    
     public Pokemon(int tileX, int tileY, Model model, int id) {
+        this(tileX,tileY,model);
+        this.id = id;
+    }
+    
+    private Pokemon(int tileX, int tileY, Model model) {
         super(model);
         
         this.found = false;
@@ -28,11 +40,8 @@ public class Pokemon extends Unit {
         this.movingCounter = 0;
         this.tileX = tileX;
         this.tileY = tileY;
-        this.id = (id <= 0) ? new Random().nextInt(150) + 1 : id;
         
         setStartingPostion(Model.tileCenterFromTileCoord(tileX), Model.tileCenterFromTileCoord(tileY));
-        setImg(String.format("pokemons\\%03d.png",this.id));
-        
         this.direction = Direction.STOP;
     }
     
@@ -56,6 +65,10 @@ public class Pokemon extends Unit {
         
         label.setIcon(new ImageIcon(image));
     }
+    
+    private void setIdImg() {
+        setImg(String.format("pokemons\\%03d.png",this.id));
+    }
 
     @Override
     public void loop() {
@@ -78,8 +91,6 @@ public class Pokemon extends Unit {
     public int getId() {return id;}
     public int getTileX() {return tileX;}
     public int getTileY() {return tileY;}
-
-    public void setLabel(JLabel label) {this.label = label;}
     
     
 }

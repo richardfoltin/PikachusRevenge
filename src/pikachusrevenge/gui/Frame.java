@@ -3,7 +3,7 @@ package pikachusrevenge.gui;
 import java.awt.image.BufferedImage;
 import pikachusrevenge.unit.Unit;
 import static pikachusrevenge.unit.Unit.UNITSIZE;
-import static pikachusrevenge.LevelWindow.GRIDSIZE;
+import static pikachusrevenge.gui.MapView.GRIDSIZE;
 
 public class Frame {
 
