@@ -53,6 +53,7 @@ public class MainWindow extends JFrame {
     private MainWindow(){
         
         this.instance = this;
+        this.model = new Model(this);
         
         setTitle("Pikachu's Revenge");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -87,7 +88,7 @@ public class MainWindow extends JFrame {
     public void startGameWindow(int id) throws MapLoadingException {
         this.level = id;
         this.map = loadMap(id);
-        this.model = new Model(map,this);
+        model.buildLevel(map, id);
         
         if (startPanel != null) remove(startPanel);
 
@@ -119,13 +120,7 @@ public class MainWindow extends JFrame {
         model.startGame(); 
     }
     
-    public void loadNextLevel() {
-        loadLevel(level + 1);
-    }
-    
-    public void restartLevel() {
-        loadLevel(level);
-    }
+
     
     public void loadLevel(int id) {
 
@@ -135,7 +130,7 @@ public class MainWindow extends JFrame {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        model.changeMap(map);
+        model.buildLevel(map,id);
         this.level = id;
         
         remove(mainPanel);
@@ -145,7 +140,6 @@ public class MainWindow extends JFrame {
         menu.setAvailableLevels(model.getPlayer().getAvailableLevels());
         
         pack();
-        model.setTime(0);
         model.startGame();     
     }
     
@@ -196,6 +190,9 @@ public class MainWindow extends JFrame {
         
         return "src\\pikachusrevenge\\resources\\level\\" + mapName + ".tmx";
     }
+    
+    public void loadNextLevel() {loadLevel(level + 1);}  
+    public void restartLevel() {loadLevel(level);}
     
     protected void centerWindow(JFrame window) {
         int x = (Toolkit.getDefaultToolkit().getScreenSize().width - window.getWidth()) / 2;  

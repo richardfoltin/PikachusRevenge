@@ -1,5 +1,6 @@
 package pikachusrevenge.unit;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
@@ -8,61 +9,58 @@ import javax.swing.JLabel;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
+import pikachusrevenge.model.TilePosition;
 import pikachusrevenge.resources.Resource;
+import static pikachusrevenge.unit.Unit.C_BOX_HEIGHT;
+import static pikachusrevenge.unit.Unit.C_BOX_WIDTH;
 
 public class Pokemon extends Unit {
     
     private int id;
-    private final int tileX;
-    private final int tileY;
     private boolean found;
     private JLabel label;
+    private TilePosition tpos;
+    private int distance;
     
-    private static final int FOLLOW_DISTANCE = 50;
+    private static final int FOLLOW_DISTANCE = 45;
+    private static final int MAX_DISTANCE = 280;
     
-    public Pokemon(int tileX, int tileY, Model model, JLabel label) {
-        this(tileX,tileY,model);
-        this.label = label;
-        this.id = new Random().nextInt(150) + 1;
+    public Pokemon(Model model, TilePosition tpos, int id) {
+        super(model);
+        
+        this.id = (id == 0) ? newRandomId() : id;
+        this.found = false;
+        this.tpos = tpos;
+        this.speed = model.getPlayer().getSpeed();
+        this.direction = Direction.STOP;
         setIdImg();
     }
     
-    public Pokemon(int tileX, int tileY, Model model, int id) {
-        this(tileX,tileY,model);
-        this.id = id;
-    }
-    
-    private Pokemon(int tileX, int tileY, Model model) {
-        super(model);
-        
-        this.found = false;
-        this.speed = 8.0;
-        this.tileX = tileX;
-        this.tileY = tileY;
-        
-        setStartingPostion(Model.tileCenterFromTileCoord(tileX), Model.tileCenterFromTileCoord(tileY));
-        this.direction = Direction.STOP;
-    }
-    
     public void found() {
-        this.nextDirection = Direction.STOP;
         this.found = true;
+        for (Pokemon p : model.getMapPokemons()) {
+            if (p.found) this.distance += FOLLOW_DISTANCE;
+        }
         revealLabel();
-        startMoving();
+        restartFromStratingPoint();
     }
     
-    public boolean isDrawn() {
-        return found;
+    public void revealLabel(){
+        if (label != null) {
+            BufferedImage image = null;
+            try {image = Resource.loadBufferedImage(String.format("pokemons\\icon%03d.png",this.id));} 
+            catch (IOException e) {System.err.println("Can't load file");} 
+            image = Resource.getSprite(image, 0, 0);
+            image = Resource.getScaledImage(image, 30, 30);
+
+            label.setIcon(new ImageIcon(image));
+        }
     }
     
-    private void revealLabel(){
-        BufferedImage image = null;
-        try {image = Resource.loadBufferedImage(String.format("pokemons\\icon%03d.png",this.id));} 
-        catch (IOException e) {System.err.println("Can't load file");} 
-        image = Resource.getSprite(image, 0, 0);
-        image = Resource.getScaledImage(image, 30, 30);
-        
-        label.setIcon(new ImageIcon(image));
+    public void putNextToPlayer() {
+        pos = model.getPlayer().getPosition();
+        nextPosition = pos;
+        nextDirection = Direction.STOP;
     }
     
     private void setIdImg() {
@@ -73,19 +71,51 @@ public class Pokemon extends Unit {
     protected void loadNextPosition(){
         Position playerPosition = model.getPlayer().getPosition();
         double distance = playerPosition.distanceFrom(pos);
-        if (distance > FOLLOW_DISTANCE) {
-            nextDirection = Direction.getDirection(pos, playerPosition);
+        if (distance > MAX_DISTANCE) {
+            nextDirection = Direction.getDirection(pos, playerPosition);   
+        } else if (distance > this.distance) {  
+            nextDirection = Direction.getDirection(pos, playerPosition);          
+            Position targetPosition = new Position(pos.x + nextDirection.x * speed, pos.y + nextDirection.y * speed);
+            Rectangle targetRectangle = new Rectangle(0, 0, C_BOX_WIDTH, C_BOX_HEIGHT);
+            moveNextCollisionBoxTo(targetRectangle,targetPosition);
+            if (!model.canMoveTo(targetRectangle)) nextDirection = Direction.STOP;
         } else {
             nextDirection = Direction.STOP;
         }
         super.loadNextPosition();        
     }
-
-    public int getId() {return id;}
-    public int getTileX() {return tileX;}
-    public int getTileY() {return tileY;}
     
-    public static final String[] pokemonName = {"Bulbasaur",
+    private int newRandomId() {
+        int maxPokemonCount = POKEMON_NAME.length;
+        int randomId = new Random().nextInt(maxPokemonCount-1) + 1;
+        int i = 0;
+        if (model.getAllIds().size() < maxPokemonCount-1) {
+            while (i < maxPokemonCount-1) {
+                i++;
+                if (model.getAllIds().contains(randomId) || randomId == 25) {
+                    randomId = randomId % maxPokemonCount + 1;
+                } else {
+                    break;
+                }
+            }
+        }
+        return randomId;
+    }
+    
+    @Override
+    public void restartFromStratingPoint() {
+        Position playerPosition = model.getPlayer().getPosition();
+        setStartingPostion(playerPosition.x, playerPosition.y);
+        super.restartFromStratingPoint();  
+        startMoving();
+    }
+    
+    public int getId() {return id;}
+    public TilePosition getTilePosition() {return tpos;}
+    public boolean isFound() {return found;} 
+    public void setLabel(JLabel label) {this.label = label;}
+    
+    public static final String[] POKEMON_NAME = {"Bulbasaur",
                                                 "Ivysaur",
                                                 "Venusaur",
                                                 "Charmander",
@@ -236,5 +266,6 @@ public class Pokemon extends Unit {
                                                 "Dragonite",
                                                 "Mewtwo",
                                                 "Mew"};
+
 }
             

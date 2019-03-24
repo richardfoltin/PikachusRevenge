@@ -4,21 +4,19 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.PathIterator;
-import static java.lang.Math.floor;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 import org.mapeditor.core.Map;
 import org.mapeditor.core.MapLayer;
-import org.mapeditor.core.MapObject;
-import org.mapeditor.core.ObjectGroup;
-import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 import pikachusrevenge.gui.MainWindow;
 import static pikachusrevenge.gui.MapView.GRIDSIZE;
-import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.PokeBall;
@@ -26,56 +24,61 @@ import pikachusrevenge.unit.Pokemon;
 
 public class Model implements ActionListener {
         
+    private final HashMap<TilePosition,Pokemon> pokemons;
+    private final ArrayList<Level> levels;
     private List<MapLayer> layers;
-    private final ArrayList<NPC> npcs;
-    private final ArrayList<Pokemon> pokemons;
-    private Map map;
-    private MainWindow mainWindow;
+    private Level actualLevel;
+    private final MainWindow mainWindow;
     private final Player player;
-    private final ArrayList<PokeBall> thrownBalls;
-    private final ArrayList<MovingSprite> cleanUp;
-    private int ballCount;
     private final Timer timer;
     private final Timer clock;
-    private int time;
     public Rectangle MAP_RECTANGLE;
 
-    private final static int MAIN_LOOP = 40;  
+    private static final int MAIN_LOOP = 40;  
     
-    public Model (Map map, MainWindow mainWindow){
-        this.layers = map.getLayers();
-        this.npcs = new ArrayList<>();
-        this.thrownBalls = new ArrayList<>();
-        this.pokemons = new ArrayList<>();
-        this.cleanUp = new ArrayList<>();
+    public Model (MainWindow mainWindow){
+        this.pokemons = new HashMap<>();
+        this.levels = new ArrayList<>();
         this.player = new Player(this);
         this.mainWindow = mainWindow;
-        this.map = map;
-        MAP_RECTANGLE = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);
         this.timer = new Timer(MAIN_LOOP, this);
         this.clock = new Timer(1000, (ActionEvent e) -> {
-            ++time;
-            mainWindow.getStats().updateTimeLabel(time);
+            mainWindow.getStats().updateTimeLabel(actualLevel.increaseTime());
         });
-        
-        addUnitsToMap();
     }
     
-    public void changeMap(Map map) {
+    public void buildLevel(Map map, int id) {
+        Level level = null;
+        for (Level l : levels) if (l.getId() == id) level = l;
+        
+        this.actualLevel = (level == null) ? new Level(this,map,id,0) : level; 
+        this.levels.add(actualLevel);
+        
         this.layers = map.getLayers();
-        this.map = map;
         MAP_RECTANGLE = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);
         
-        npcs.clear();
-        thrownBalls.clear();
-        pokemons.clear();
-        cleanUp.clear();
-        mainWindow.getStats().clearPane();
-        
-        addUnitsToMap();  
     }
     
-
+    public void startGame() {
+        mainWindow.getStats().clearPane();
+        // put lives on stats
+        for (int i = 0; i < player.getLives(); ++i) mainWindow.getStats().addLife();
+        
+        // put pokemons and balls on stats
+        for (Pokemon p : actualLevel.getPokemons()) {
+            JLabel label = mainWindow.getStats().addBall();
+            p.setLabel(label);
+            if (p.isFound()) p.revealLabel();
+        }
+        
+        clock.start();
+        timer.start();
+        player.setStartingPostion(actualLevel.getPlayerStartingPosition());
+        for (NPC npc : actualLevel.getNpcs()) npc.startMoving();
+        for (Pokemon p : actualLevel.getPokemons()) if (p.isFound()) p.restartFromStratingPoint();
+        player.startMoving();
+    }
+    
     public boolean canMoveTo(Rectangle target){
         if (!MAP_RECTANGLE.contains(target)) return false;
         
@@ -86,24 +89,22 @@ public class Model implements ActionListener {
             double[] coords = new double[2];
             int type = pi.currentSegment(coords);
             if (type!= PathIterator.SEG_CLOSE) {
-                collisions.add(Collision.collisionOnTileAt(layers,tileCoordFromMapCoord(coords[0]), tileCoordFromMapCoord(coords[1]))) ;
+                collisions.add(Collision.collisionOnTileAt(layers,new Position(coords))) ;
             }
             pi.next();
-        }
-        
+        }  
         return Collision.canMoveToCollisions(collisions);
     }
     
     public void ballThrow(Position from, double speed, NPC owner){
         PokeBall ball = new PokeBall(from.x, from.y, speed, this, owner);
-        thrownBalls.add(ball);
+        actualLevel.getThrownBalls().add(ball);
         ball.startMoving();
     }
     
     public void ballReachedPlayer(PokeBall ball) {
-        cleanUp.add(ball);
-        for (Pokemon p : pokemons) p.stopMoving();
-        player.caught();
+        actualLevel.addCleanUp(ball);
+        player.playerCaught();
         writeInfo(String.format("%s caught you!",ball.getOwner().getName()));
     }
 
@@ -120,24 +121,24 @@ public class Model implements ActionListener {
         System.out.println("Game over");
     }
     
-    public void startGame() {
-        for (int i = 0; i < player.getLives(); ++i){
-            mainWindow.getStats().addLife();
-        }
-        clock.start();
-        timer.start();
-        countPokemonsAndAddToStats();
-        for (NPC npc : npcs) npc.startMoving();
-        player.startMoving();
-    }
-    
     public void stopGame() {
         clock.stop();
         timer.stop();
         player.stopMoving();
     }
+
     
-    public Pokemon checkBallPokemonAt(Rectangle target){
+    public boolean checkSign(Position pos) {
+        for (MapLayer l : layers){
+            if (l instanceof TileLayer){
+                Tile t = ((TileLayer)l).getTileAt(TilePosition.tileCoordFromMapCoord(pos.x),TilePosition.tileCoordFromMapCoord(pos.y));
+                if (actualLevel.hasProperty(t,"Sign")) return true;
+            } 
+        } 
+        return false;
+    }
+    
+    public void checkBallPokemonAt(Rectangle target){
         
         PathIterator pi = target.getPathIterator(null);
         
@@ -145,147 +146,56 @@ public class Model implements ActionListener {
             double[] coords = new double[2];
             int type = pi.currentSegment(coords);
             if (type!= PathIterator.SEG_CLOSE) {
-                int x = tileCoordFromMapCoord(coords[0]);
-                int y = tileCoordFromMapCoord(coords[1]);
-                for (MapLayer l : layers){
-                    if (l instanceof TileLayer){
-                        Tile t = ((TileLayer)l).getTileAt(x,y);
-                        if (hasProperty(t,"Ball")) {
-                            ((TileLayer)l).setTileAt(x, y, null);
-                            for (Pokemon p : pokemons) {
-                                if (p.getTileX() == x && p.getTileY() == y) {
-                                    writeInfo("You have found " + Pokemon.pokemonName[p.getId()-1]);
-                                    p.found();
-                                    return p;
-                                }
-                            }
-                        }
-                    } 
+                TilePosition tpos = TilePosition.fromMapPosition(new Position(coords),actualLevel.getId());
+                if (pokemons.containsKey(tpos)) {
+                    Pokemon p = pokemons.get(tpos);
+                    if (!p.isFound()) {
+                        writeInfo("You have found " + Pokemon.POKEMON_NAME[p.getId()-1]);
+                        actualLevel.clearTileWithProperty("Ball", tpos);
+                        p.found();
+                    }
                 }
             }
             pi.next();
         }  
-         
-        return null;
-    }
-    
-    public boolean checkSign(Position pos) {
-        for (MapLayer l : layers){
-            if (l instanceof TileLayer){
-                Tile t = ((TileLayer)l).getTileAt(tileCoordFromMapCoord(pos.x),tileCoordFromMapCoord(pos.y));
-                if (hasProperty(t,"Sign")) return true;
-            } 
-        } 
-        return false;
-    }
-    
-    private static boolean hasProperty(Tile t, String property) {
-        if (t != null) {
-            Properties prop = t.getProperties();
-            if (!prop.isEmpty()) {
-                if (Boolean.parseBoolean(prop.getProperty(property, "false"))) return true;
-            }
-        }     
-        return false;
-    }
-    
-    private static int tileCoordFromMapCoord(double coord){
-        return (int)floor((coord) / GRIDSIZE);
-    }
-    
-    public static double tileCenterFromTileCoord(int mapCoord){
-        return (double)mapCoord * GRIDSIZE + GRIDSIZE/2;
-    }
-    
-    public void playerMoveTowards(Direction d){
-        player.moveToDirection(d);
-    }
-    
-    private void writeInfo(String str){
-        mainWindow.getFooter().write(str);
-    }
-    
-    private void countPokemonsAndAddToStats() {
-        for (MapLayer l : layers){
-            if (l instanceof TileLayer){
-                for (int i = 0; i < map.getWidth(); ++i) {
-                    for (int j = 0; j < map.getHeight(); ++j){
-                        Tile t = ((TileLayer)l).getTileAt(i, j);
-                        if (hasProperty(t,"Ball")) {
-                            ballCount++;
-                            JLabel label = mainWindow.getStats().addBall();
-                            Pokemon p = new Pokemon(i,j,this,label);
-                            pokemons.add(p);
-                        }                  
-                    }
-                }
-            }
-        }
-    }
-    
-    private void addUnitsToMap() {
-        for (MapLayer l : layers){
-            if (l instanceof ObjectGroup){
-                for (MapObject o : ((ObjectGroup)l).getObjects()){
-                    if (o.getName().equals("Enter")){
-                        player.setStartingPostion(o.getX(),o.getY());
-                    }else if (o.getName().equals("NPC")) {
-                        Properties prop = o.getProperties();
-                        
-                        int level = Integer.parseInt(prop.getProperty("Level", "1"));
-                        NPC npc = new NPC(o, level, this);
-                        npcs.add(npc);
-                    }
-                }
-            }
-        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == timer){
             if (player.isMoving()) player.loop();
-            for (NPC npc : npcs) if (npc.isMoving()) npc.loop();
-            for (Pokemon p : pokemons) if (p.isMoving()) p.loop();
-            for (PokeBall pb : thrownBalls) if (pb.isMoving()) pb.loop();
-            cleanUp();
+            actualLevel.loop();
             mainWindow.getFooter().loop();
             mainWindow.repaintMap();
             movePanelTo(player.getPosition());
         }
     }    
     
-    private void cleanUp() {
-        for (MovingSprite m : cleanUp) {
-            if (m instanceof PokeBall) thrownBalls.remove(m);
-            else if (m instanceof NPC) npcs.remove(m);
-            else if (m instanceof Pokemon) pokemons.remove(m);
-        }
-        cleanUp.clear();
-    }
+    private void writeInfo(String str){
+        mainWindow.getFooter().write(str);
+    }   
     
     public void movePanelTo(Position position){
         mainWindow.scrollTo(position);
     }
 
     public boolean canThrow(NPC npc){
-        if (thrownBalls.isEmpty()) return true;
-        for (PokeBall b : thrownBalls) {
+        if (actualLevel.getThrownBalls().isEmpty()) return true;
+        for (PokeBall b : actualLevel.getThrownBalls()) {
             if (b.getOwner() == npc) return false;
         }
         return true;
     }
     
     public boolean canMoveToNextLevel() {
-        if (player.getFreedCount() == ballCount) return true;
-        return true;
+        return actualLevel.canFinish();
     }
     
-    public void setTime(int time){this.time = time;}
-    
-    public ArrayList<NPC> getNpcs() {return npcs;}
-    public ArrayList<Pokemon> getPokemons() {return pokemons;}
-    public ArrayList<PokeBall> getThrownBalls() {return thrownBalls;}
-    public int getBallCount() {return ballCount;}
+ 
+    public ArrayList<NPC> getNpcs() {return actualLevel.getNpcs();}
+    public ArrayList<Pokemon> getMapPokemons() {return actualLevel.getPokemons();}
+    public HashMap<TilePosition,Pokemon> getAllPokemons() {return pokemons;}
+    public ArrayList<PokeBall> getThrownBalls() {return actualLevel.getThrownBalls();}
     public Player getPlayer() {return player;}
+    public Collection<Integer> getAllIds() {return pokemons.values().stream().map(p -> p.getId()).collect(Collectors.toList());}
 }

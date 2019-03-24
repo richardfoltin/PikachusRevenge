@@ -1,7 +1,6 @@
 package pikachusrevenge.unit;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
 import pikachusrevenge.gui.MainWindow;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
@@ -9,7 +8,6 @@ import pikachusrevenge.model.Position;
 
 public class Player extends Unit {
     
-    private ArrayList<Pokemon> freed;
     private int lives;
     private int availableLevels;
     private boolean atSign;
@@ -19,7 +17,6 @@ public class Player extends Unit {
         
         this.lives = 3;
         this.availableLevels = 1;
-        this.freed = new ArrayList<>();
         this.speed = 5.0;
         this.name = "Pikachu";
         
@@ -32,7 +29,7 @@ public class Player extends Unit {
         this.nextDirection = d;
     }
     
-    public void caught() {
+    public void playerCaught() {
         lives--;
         MainWindow.getInstance().getStats().removeLife();
         System.out.println("Ball hit! " + lives);
@@ -41,28 +38,16 @@ public class Player extends Unit {
             model.gameOver();
         } else {
             restartFromStratingPoint();
-        }
-    }
-    
-    private void freePokemon() {
-        Pokemon pokemon = model.checkBallPokemonAt(collisionBox);
-        if (pokemon != null){
-            freed.add(pokemon);
-            System.out.println(String.format("Ball found at (%.0f,%.0f)",pos.x,pos.y));
-            checkWin();
-        }
-    }
-    
-    private void checkWin() {
-        if (freed.size() == model.getBallCount()) {
-            System.out.println("Winner");
+            for (Pokemon p : model.getMapPokemons()) {
+                p.restartFromStratingPoint();
+            }
         }
     }
     
     @Override
     public void loop() {
         super.loop();
-        freePokemon();
+        model.checkBallPokemonAt(collisionBox);
         atSign = model.checkSign(pos);
     }
     
@@ -72,7 +57,7 @@ public class Player extends Unit {
         if (nextDirection != Direction.STOP) {
             Position targetPosition = new Position(pos.x + nextDirection.x * speed, pos.y + nextDirection.y * speed);
             Rectangle targetRectangle = new Rectangle(0, 0, C_BOX_WIDTH, C_BOX_HEIGHT);
-            moveCollisionBoxTo(targetRectangle,targetPosition);
+            moveNextCollisionBoxTo(targetRectangle,targetPosition);
             if (model.canMoveTo(targetRectangle)){
                 //System.out.println(String.format("Move to: %s (%.0f,%.0f) -> (%.0f,%.0f)",nextDirection.name(),collisionBox.getX(),collisionBox.getY(),targetRectangle.getX(),targetRectangle.getY()));
                 super.loadNextPosition();      
@@ -88,7 +73,7 @@ public class Player extends Unit {
     }
     
     public boolean isAtSign() {return atSign;}
-    public int getFreedCount() {return freed.size();}
     public int getLives() {return lives;}
     public int getAvailableLevels() {return availableLevels;}
+    public double getSpeed() {return speed;}
 }

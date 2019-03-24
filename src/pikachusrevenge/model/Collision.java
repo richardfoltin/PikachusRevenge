@@ -14,6 +14,10 @@ public enum Collision {
     BRIDGE,
     EMPTY;
     
+    public static Collision collisionOnTileAt(List<MapLayer> layers, Position pos) {
+        return collisionOnTileAt(layers,TilePosition.tileCoordFromMapCoord(pos.x), TilePosition.tileCoordFromMapCoord(pos.y));
+    }
+    
     public static Collision collisionOnTileAt(List<MapLayer> layers, int tileX, int tileY) {                 
         boolean water = false;
         boolean collision = false;

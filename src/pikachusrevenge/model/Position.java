@@ -1,7 +1,5 @@
 package pikachusrevenge.model;
 
-import pikachusrevenge.model.Direction;
-
 public class Position {
     public double x;
     public double y;

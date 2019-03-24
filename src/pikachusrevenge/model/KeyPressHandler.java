@@ -1,6 +1,5 @@
 package pikachusrevenge.model;
 
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import static java.lang.Math.signum;
 import java.util.ArrayList;
@@ -17,12 +16,12 @@ public  class KeyPressHandler {
                 case KeyEvent.VK_SPACE : model.playerInteraction();
             }
         }
-        if (newDirectionWith(d)) model.playerMoveTowards(getMovingDirection());
+        if (newDirectionWith(d)) model.getPlayer().moveToDirection(getMovingDirection());
     }
     
     public static void keyReleased(Model model, int key) {
         Direction d = directionFromKeyCode(key);
-        if (newDirectionWithout(d)) model.playerMoveTowards(getMovingDirection());     
+        if (newDirectionWithout(d)) model.getPlayer().moveToDirection(getMovingDirection());     
     }
     
     private static boolean newDirectionWith(Direction d){

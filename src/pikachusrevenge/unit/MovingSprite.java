@@ -45,6 +45,10 @@ public class MovingSprite {
         catch (IOException e) {System.err.println("Can't load file: " + filePath);} 
     }
     
+    public void setStartingPostion(Position pos) {
+        setStartingPostion(pos.x, pos.y);
+    }
+    
     public void setStartingPostion(double x, double y){
         this.pos.x = x;
         this.pos.y = y;
@@ -57,10 +61,10 @@ public class MovingSprite {
     protected void loadNextPosition(){
         nextPosition.x = pos.x + nextDirection.x * speed;
         nextPosition.y = pos.y + nextDirection.y * speed;
-        moveCollisionBoxTo(nextCollisionBox,nextPosition);
+        moveNextCollisionBoxTo(nextCollisionBox,nextPosition);
     }
     
-    protected void moveCollisionBoxTo(Rectangle box, Position pos){
+    protected void moveNextCollisionBoxTo(Rectangle box, Position pos){
         box.setLocation((int)(pos.x + cOffsetX - box.width/2), (int)(pos.y + cOffsetY - box.height/2));
     }
     

@@ -35,10 +35,7 @@ public class MapView extends JPanel {
         setOpaque(true);
     }
 
-    private void paintUnitsBottom(Graphics2D g){
-        Player player = model.getPlayer();
-        g.drawImage(player.getBottomSprite(),player.getCornerX(),player.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
-        
+    private void paintUnitsBottom(Graphics2D g){     
         for (PokeBall ball : model.getThrownBalls()){
             g.drawImage(ball.getImg(),ball.getCornerX(),ball.getCornerY(),PokeBall.BALLSIZE,PokeBall.BALLSIZE,null);
         }
@@ -47,22 +44,25 @@ public class MapView extends JPanel {
             g.drawImage(npc.getBottomSprite(),npc.getCornerX(),npc.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
         }
         
-        for (Pokemon p : model.getPokemons()){
-            if (p.isDrawn()) g.drawImage(p.getBottomSprite(),p.getCornerX(),p.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
+        for (Pokemon p : model.getMapPokemons()){
+            if (p.isFound()) g.drawImage(p.getBottomSprite(),p.getCornerX(),p.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
         }
+        
+        Player player = model.getPlayer();
+        g.drawImage(player.getBottomSprite(),player.getCornerX(),player.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
     }
 
-    private void paintUnitsTop(Graphics2D g){
-        Player player = model.getPlayer();
-        g.drawImage(player.getTopSprite(),player.getCornerX(),player.getCornerY(),UNITSIZE,CUT,null);        
-
+    private void paintUnitsTop(Graphics2D g){     
         for (NPC npc : model.getNpcs()){
             g.drawImage(npc.getTopSprite(),npc.getCornerX(),npc.getCornerY(),UNITSIZE,CUT,null);
         }
         
-        for (Pokemon p : model.getPokemons()){
-            if (p.isDrawn()) g.drawImage(p.getTopSprite(),p.getCornerX(),p.getCornerY(),UNITSIZE,CUT,null);
+        for (Pokemon p : model.getMapPokemons()){
+            if (p.isFound()) g.drawImage(p.getTopSprite(),p.getCornerX(),p.getCornerY(),UNITSIZE,CUT,null);
         }
+        
+        Player player = model.getPlayer();
+        g.drawImage(player.getTopSprite(),player.getCornerX(),player.getCornerY(),UNITSIZE,CUT,null);   
     } 
     
     @Override

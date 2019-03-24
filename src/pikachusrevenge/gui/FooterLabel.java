@@ -16,7 +16,6 @@ public class FooterLabel extends JLabel {
         this.info = false;
         
         setForeground(Color.GRAY);
-        setHelpText();
     }
 
     public void setHelpText() {
