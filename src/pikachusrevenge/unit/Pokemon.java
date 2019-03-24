@@ -7,6 +7,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
+import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
 
 public class Pokemon extends Unit {
@@ -16,8 +17,8 @@ public class Pokemon extends Unit {
     private final int tileY;
     private boolean found;
     private JLabel label;
-    private int movingCounter;
-    private final int movingCounterMax;
+    
+    private static final int FOLLOW_DISTANCE = 50;
     
     public Pokemon(int tileX, int tileY, Model model, JLabel label) {
         this(tileX,tileY,model);
@@ -36,8 +37,6 @@ public class Pokemon extends Unit {
         
         this.found = false;
         this.speed = 8.0;
-        this.movingCounterMax = 100;
-        this.movingCounter = 0;
         this.tileX = tileX;
         this.tileY = tileY;
         
@@ -46,14 +45,14 @@ public class Pokemon extends Unit {
     }
     
     public void found() {
-        this.nextDirection = Direction.randomMove();
+        this.nextDirection = Direction.STOP;
         this.found = true;
         revealLabel();
         startMoving();
     }
     
     public boolean isDrawn() {
-        return found && nextDirection != Direction.STOP;
+        return found;
     }
     
     private void revealLabel(){
@@ -71,26 +70,171 @@ public class Pokemon extends Unit {
     }
 
     @Override
-    public void loop() {
-        super.loop();
-        if (nextDirection != Direction.STOP) {
-            if (movingCounter < movingCounterMax) {
-                movingCounter++;
-            } else {
-                stopMoving();
-            }   
+    protected void loadNextPosition(){
+        Position playerPosition = model.getPlayer().getPosition();
+        double distance = playerPosition.distanceFrom(pos);
+        if (distance > FOLLOW_DISTANCE) {
+            nextDirection = Direction.getDirection(pos, playerPosition);
+        } else {
+            nextDirection = Direction.STOP;
         }
-    }
-    
-    @Override
-    public void stopMoving() {
-        nextDirection = Direction.STOP;
-        super.stopMoving();
+        super.loadNextPosition();        
     }
 
     public int getId() {return id;}
     public int getTileX() {return tileX;}
     public int getTileY() {return tileY;}
     
-    
+    public static final String[] pokemonName = {"Bulbasaur",
+                                                "Ivysaur",
+                                                "Venusaur",
+                                                "Charmander",
+                                                "Charmeleon",
+                                                "Charizard",
+                                                "Squirtle",
+                                                "Wartortle",
+                                                "Blastoise",
+                                                "Caterpie",
+                                                "Metapod",
+                                                "Butterfree",
+                                                "Weedle",
+                                                "Kakuna",
+                                                "Beedrill",
+                                                "Pidgey",
+                                                "Pidgeotto",
+                                                "Pidgeot",
+                                                "Rattata",
+                                                "Raticate",
+                                                "Spearow",
+                                                "Fearow",
+                                                "Ekans",
+                                                "Arbok",
+                                                "Pikachu",
+                                                "Raichu",
+                                                "Sandshrew",
+                                                "Sandslash",
+                                                "Nidoran♀",
+                                                "Nidorina",
+                                                "Nidoqueen",
+                                                "Nidoran♂",
+                                                "Nidorino",
+                                                "Nidoking",
+                                                "Clefairy",
+                                                "Clefable",
+                                                "Vulpix",
+                                                "Ninetales",
+                                                "Jigglypuff",
+                                                "Wigglytuff",
+                                                "Zubat",
+                                                "Golbat",
+                                                "Oddish",
+                                                "Gloom",
+                                                "Vileplume",
+                                                "Paras",
+                                                "Parasect",
+                                                "Venonat",
+                                                "Venomoth",
+                                                "Diglett",
+                                                "Dugtrio",
+                                                "Meowth",
+                                                "Persian",
+                                                "Psyduck",
+                                                "Golduck",
+                                                "Mankey",
+                                                "Primeape",
+                                                "Growlithe",
+                                                "Arcanine",
+                                                "Poliwag",
+                                                "Poliwhirl",
+                                                "Poliwrath",
+                                                "Abra",
+                                                "Kadabra",
+                                                "Alakazam",
+                                                "Machop",
+                                                "Machoke",
+                                                "Machamp",
+                                                "Bellsprout",
+                                                "Weepinbell",
+                                                "Victreebel",
+                                                "Tentacool",
+                                                "Tentacruel",
+                                                "Geodude",
+                                                "Graveler",
+                                                "Golem",
+                                                "Ponyta",
+                                                "Rapidash",
+                                                "Slowpoke",
+                                                "Slowbro",
+                                                "Magnemite",
+                                                "Magneton",
+                                                "Farfetch’d",
+                                                "Doduo",
+                                                "Dodrio",
+                                                "Seel",
+                                                "Dewgong",
+                                                "Grimer",
+                                                "Muk",
+                                                "Shellder",
+                                                "Cloyster",
+                                                "Gastly",
+                                                "Haunter",
+                                                "Gengar",
+                                                "Onix",
+                                                "Drowzee",
+                                                "Hypno",
+                                                "Krabby",
+                                                "Kingler",
+                                                "Voltorb",
+                                                "Electrode",
+                                                "Exeggcute",
+                                                "Exeggutor",
+                                                "Cubone",
+                                                "Marowak",
+                                                "Hitmonlee",
+                                                "Hitmonchan",
+                                                "Lickitung",
+                                                "Koffing",
+                                                "Weezing",
+                                                "Rhyhorn",
+                                                "Rhydon",
+                                                "Chansey",
+                                                "Tangela",
+                                                "Kangaskhan",
+                                                "Horsea",
+                                                "Seadra",
+                                                "Goldeen",
+                                                "Seaking",
+                                                "Staryu",
+                                                "Starmie",
+                                                "Mr. Mime",
+                                                "Scyther",
+                                                "Jynx",
+                                                "Electabuzz",
+                                                "Magmar",
+                                                "Pinsir",
+                                                "Tauros",
+                                                "Magikarp",
+                                                "Gyarados",
+                                                "Lapras",
+                                                "Ditto",
+                                                "Eevee",
+                                                "Vaporeon",
+                                                "Jolteon",
+                                                "Flareon",
+                                                "Porygon",
+                                                "Omanyte",
+                                                "Omastar",
+                                                "Kabuto",
+                                                "Kabutops",
+                                                "Aerodactyl",
+                                                "Snorlax",
+                                                "Articuno",
+                                                "Zapdos",
+                                                "Moltres",
+                                                "Dratini",
+                                                "Dragonair",
+                                                "Dragonite",
+                                                "Mewtwo",
+                                                "Mew"};
 }
+            

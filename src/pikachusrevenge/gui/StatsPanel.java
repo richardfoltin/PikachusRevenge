@@ -3,13 +3,18 @@ package pikachusrevenge.gui;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import pikachusrevenge.resources.Resource;
 
 public class StatsPanel extends JPanel {
@@ -19,28 +24,33 @@ public class StatsPanel extends JPanel {
     private final JLabel timerLabel;
     private final List<JLabel> lives;
     private final List<JLabel> pokemons;
+    private final SimpleDateFormat timeFormat;
+    
+    private static final int STATS_HEIGHT = 30;
     
     public StatsPanel(int width) {
   
-        setPreferredSize(new Dimension(width ,30));
+        setPreferredSize(new Dimension(width, STATS_HEIGHT));
         
-        lives = new ArrayList<>();
-        livesPane = new JPanel();
-        livesPane.setPreferredSize(new Dimension(width/3,30));
-        livesPane.setLayout(new FlowLayout(FlowLayout.LEFT));
-        //livesPane.setAlignmentY(JLabel.CENTER_ALIGNMENT);
-        //livesPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.lives = new ArrayList<>();
+        this.livesPane = new JPanel();
+        this.timeFormat = new SimpleDateFormat("mm:ss");
+        
+        livesPane.setPreferredSize(new Dimension(width/3,STATS_HEIGHT));
+        livesPane.setLayout(new FlowLayout(FlowLayout.LEFT,0,0));
         add(livesPane);
         
-        pokemons = new ArrayList<>();
-        pokemonPane = new JPanel();
-        pokemonPane.setPreferredSize(new Dimension(width/3,30));
-        pokemonPane.setLayout(new FlowLayout(FlowLayout.LEFT));
+        this.pokemons = new ArrayList<>();
+        this.pokemonPane = new JPanel();
+        pokemonPane.setPreferredSize(new Dimension(2*width/3-40,STATS_HEIGHT));
+        pokemonPane.setLayout(new FlowLayout(FlowLayout.LEFT,0,0));
         add(pokemonPane);
         
-        timerLabel = new JLabel("Timer:");
-        timerLabel.setPreferredSize(new Dimension(width/3,30));
+        this.timerLabel = new JLabel("00:00");
+        timerLabel.setPreferredSize(new Dimension(40,30));
+        timerLabel.setLayout(new FlowLayout(FlowLayout.RIGHT,0,0));
         add(timerLabel);
+
         
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
     }
@@ -53,8 +63,7 @@ public class StatsPanel extends JPanel {
         image = Resource.getScaledImage(image, 26, 26);
         
         JLabel label = new JLabel(new ImageIcon(image),JLabel.CENTER);
-        label.setAlignmentY(JLabel.CENTER_ALIGNMENT);
-        label.setPreferredSize(new Dimension(26,26));    
+        label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));    
         lives.add(label);
         livesPane.add(label);
     }
@@ -75,6 +84,11 @@ public class StatsPanel extends JPanel {
         
     }
     
+    public void updateTimeLabel(int time) {
+        Date date = new Date(time * 1000);
+        timerLabel.setText(timeFormat.format(date));
+    }
+    
     public JLabel addBall() {
         
         Image image = null;
@@ -83,8 +97,7 @@ public class StatsPanel extends JPanel {
         image = Resource.getScaledImage(image, 20, 20);
         
         JLabel label = new JLabel(new ImageIcon(image),JLabel.CENTER);
-        label.setAlignmentY(JLabel.CENTER_ALIGNMENT);
-        label.setPreferredSize(new Dimension(26,26));    
+        label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));    
         pokemons.add(label);
         pokemonPane.add(label);
         

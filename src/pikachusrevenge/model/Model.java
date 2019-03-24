@@ -36,6 +36,8 @@ public class Model implements ActionListener {
     private final ArrayList<MovingSprite> cleanUp;
     private int ballCount;
     private final Timer timer;
+    private final Timer clock;
+    private int time;
     public Rectangle MAP_RECTANGLE;
 
     private final static int MAIN_LOOP = 40;  
@@ -51,6 +53,10 @@ public class Model implements ActionListener {
         this.map = map;
         MAP_RECTANGLE = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);
         this.timer = new Timer(MAIN_LOOP, this);
+        this.clock = new Timer(1000, (ActionEvent e) -> {
+            ++time;
+            mainWindow.getStats().updateTimeLabel(time);
+        });
         
         addUnitsToMap();
     }
@@ -118,13 +124,15 @@ public class Model implements ActionListener {
         for (int i = 0; i < player.getLives(); ++i){
             mainWindow.getStats().addLife();
         }
-        countPokemonsAndAddToStats();
+        clock.start();
         timer.start();
+        countPokemonsAndAddToStats();
         for (NPC npc : npcs) npc.startMoving();
         player.startMoving();
     }
     
     public void stopGame() {
+        clock.stop();
         timer.stop();
         player.stopMoving();
     }
@@ -146,6 +154,7 @@ public class Model implements ActionListener {
                             ((TileLayer)l).setTileAt(x, y, null);
                             for (Pokemon p : pokemons) {
                                 if (p.getTileX() == x && p.getTileY() == y) {
+                                    writeInfo("You have found " + Pokemon.pokemonName[p.getId()-1]);
                                     p.found();
                                     return p;
                                 }
@@ -271,6 +280,8 @@ public class Model implements ActionListener {
         if (player.getFreedCount() == ballCount) return true;
         return true;
     }
+    
+    public void setTime(int time){this.time = time;}
     
     public ArrayList<NPC> getNpcs() {return npcs;}
     public ArrayList<Pokemon> getPokemons() {return pokemons;}

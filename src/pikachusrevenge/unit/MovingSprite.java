@@ -70,8 +70,8 @@ public class MovingSprite {
             pos.x = nextPosition.x;
             pos.y = nextPosition.y;
             collisionBox.setLocation((int)nextCollisionBox.getX(),(int)nextCollisionBox.getY());
-            direction = nextDirection;
         }
+        direction = nextDirection;
         loadNextPosition();
     }
     

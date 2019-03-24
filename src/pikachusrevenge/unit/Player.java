@@ -30,7 +30,6 @@ public class Player extends Unit {
     
     public void moveToDirection(Direction d){
         this.nextDirection = d;
-        //this.loadNextPosition();
     }
     
     public void caught() {

@@ -145,6 +145,7 @@ public class MainWindow extends JFrame {
         menu.setAvailableLevels(model.getPlayer().getAvailableLevels());
         
         pack();
+        model.setTime(0);
         model.startGame();     
     }
     
