@@ -1,24 +1,30 @@
 package pikachusrevenge.unit;
 
+import java.awt.Image;
 import pikachusrevenge.model.Position;
 import java.awt.Shape;
 import java.awt.geom.PathIterator;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import org.mapeditor.core.MapObject;
 import org.mapeditor.core.Properties;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
+import pikachusrevenge.resources.Resource;
 
 public class NPC extends Unit {
     
     private final int level;
     private double throwDistance;
     private double throwSpeed;
-    private boolean waiting;
-    private int waitCount;
-    private int waitUntil;
+    private final BufferedImage exclamation;
+    private HashMap<NPC_STATE,NpcState> states;
     
     private List<Position> route;
     private List<Integer> routeWait;
@@ -26,12 +32,25 @@ public class NPC extends Unit {
     private Position targetPosition;
     private boolean forward = true;
     
-    private final int THROW_WAIT = 50;
+    public static final int EXCLAMATION_SIZE = 40;
+    
+    private enum NPC_STATE {
+        STOP_LOOKOUT,
+        STOP_EXCLAMATION,
+        STOP_THROW,
+        WALKING_CAUTIOUS
+    }
+
     
     public NPC(MapObject obj, int level, Model model){
         super(model);
         this.level = level;
-        this.waiting = false;
+        this.states = getStateArray();
+        
+        Image image = null;
+        try {image = Resource.loadImage("exclamation.png");} 
+        catch (IOException e) {System.err.println("Can't load file");} 
+        exclamation = Resource.getScaledImage(image, EXCLAMATION_SIZE, EXCLAMATION_SIZE);
         
         loadLevelProperties();
         loadRoute(obj.getShape());
@@ -45,25 +64,77 @@ public class NPC extends Unit {
     
     @Override
     protected void loadNextPosition() {
-        if (waiting) {
-            waitCount++;
-            if (waitCount == waitUntil) {
-                this.nextDirection = this.direction;
-                this.direction = direction.STOP;
-                waiting = false;
-            } else {
-                this.nextDirection = Direction.STOP;
+        
+        // check lookout and wait there
+        if (targetPosition.distanceFrom(pos) <= speed) {
+            int wait = routeWait.get(route.indexOf(targetPosition));
+            if (wait != 0) {
+                states.get(NPC_STATE.STOP_LOOKOUT).max = wait;
+                states.get(NPC_STATE.STOP_LOOKOUT).active = true;
             }
-        } else {
-            if (targetPosition.distanceFrom(pos) <= speed) {
-                int waitingHere = routeWait.get(route.indexOf(targetPosition));
-                if (waitingHere != 0) startWait(waitingHere);
-                targetPosition = nextTarget();
-            }
-            if (!waiting) this.nextDirection = Direction.getDirection(pos,targetPosition);
+            targetPosition = nextRouteTarget();
         }
+        
+        // increase
+        states.get(NPC_STATE.STOP_LOOKOUT).increase();
+        states.get(NPC_STATE.STOP_THROW).increase();
+        states.get(NPC_STATE.WALKING_CAUTIOUS).increase();
+        
+        // if nothing stops go to next direction
+        if (states.get(NPC_STATE.STOP_LOOKOUT).active ||
+            states.get(NPC_STATE.STOP_EXCLAMATION).active ||
+            states.get(NPC_STATE.STOP_THROW).active) stopWalking();
+        else startWalking(); 
+        
+        // ha épp befejeződött az álló várakozás akkor még ne induljon el
+        if (states.get(NPC_STATE.STOP_EXCLAMATION).increase()) {
+            states.get(NPC_STATE.WALKING_CAUTIOUS).active = true;
+            stopWalking();
+        }
+        if (!states.get(NPC_STATE.STOP_LOOKOUT).active) {
+            nextDirection = Direction.getDirection(pos,targetPosition);
+        }
+        
         super.loadNextPosition();
     }
+    
+    private Position nextRouteTarget() {
+        if ((!routeIterator.hasNext() && forward) || (!routeIterator.hasPrevious() && !forward)) forward = !forward;
+
+        if (forward) return routeIterator.next();
+        else return routeIterator.previous();
+    }
+    
+    @Override
+    public void loop() {
+        Position playerPostion = model.getPlayer().getPosition();
+        double playerDistance = playerPostion.distanceFrom(pos);
+        Direction playerDirection = Direction.getDirection(pos, playerPostion);
+        if (Direction.isInLineOfSight(direction, playerDirection)) {
+            //System.out.println(String.format("Player is in LOS : %s - %s (%.0f)",direction,playerDirection.name(),distance));
+            
+            // Ha LOS-ban van és nem éppen dob
+            if (!states.get(NPC_STATE.STOP_THROW).active){
+                // Ha dobási távolságon belül van
+                if (playerDistance < throwDistance) {
+                    // Ha figyelmesen halad, akkor dobjon
+                    if (states.get(NPC_STATE.WALKING_CAUTIOUS).active) {
+                        throwBall();
+                        states.get(NPC_STATE.STOP_THROW).active = true;
+                        states.get(NPC_STATE.STOP_EXCLAMATION).active = false;
+                        states.get(NPC_STATE.WALKING_CAUTIOUS).active = false;
+                    } else {
+                    // egyébként indítson el egy várakozót
+                        states.get(NPC_STATE.STOP_EXCLAMATION).active = true;
+                    }
+                }
+            }
+        }
+        super.loop();
+    }
+    
+    public boolean seesPlayer() {return states.get(NPC_STATE.STOP_EXCLAMATION).active || states.get(NPC_STATE.WALKING_CAUTIOUS).active;}
+    public BufferedImage getExclamation() {return exclamation;}
     
     private void loadRoute(Shape shape){
         this.route = new ArrayList<>();
@@ -101,53 +172,57 @@ public class NPC extends Unit {
         }
     }
     
-    private void startWait(int count) {
-        waiting = true;
-        waitCount = 0;
-        waitUntil = count;
-    }   
-    
-    private Position nextTarget() {
-        if ((!routeIterator.hasNext() && forward) || (!routeIterator.hasPrevious() && !forward)) {
-            forward = !forward;
-        }
+    private HashMap<NPC_STATE,NpcState> getStateArray() {
+         HashMap<NPC_STATE,NpcState> states = new HashMap<>();
+         states.put(NPC_STATE.STOP_LOOKOUT,new NpcState(0));
+         states.put(NPC_STATE.STOP_EXCLAMATION,new NpcState(0));
+         states.put(NPC_STATE.STOP_THROW,new NpcState(45));
+         states.put(NPC_STATE.WALKING_CAUTIOUS,new NpcState(99));
+         return states;
+    }
         
-        if (forward) return routeIterator.next();
-        else return routeIterator.previous();
-    }
-    
-    @Override
-    public void loop() {
-        super.loop();
-        Position playerPostion = model.getPlayer().getPosition();
-        double distance = playerPostion.distanceFrom(pos);
-        Direction playerDirection = Direction.getDirection(pos, playerPostion);
-        if (Direction.isInLineOfSight(direction, playerDirection)) {
-            //System.out.println(String.format("Player is in LOS : %s - %s (%.0f)",direction,playerDirection.name(),distance));
-            if (distance < throwDistance && model.canThrow(this)) {
-                startWait(THROW_WAIT);
-                throwBall();
-            }
-        }
-    }
-    
     private void loadLevelProperties() {
         switch (level) {
             default:
             case 1 : 
                 this.speed = 2; 
-                this.throwDistance = 200; // 200 - easy, 300 - very hard
+                this.throwDistance = 150; // 150 - easy, 300 - very hard
                 this.throwSpeed = 10;
                 this.name = "Noob NPC";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 49;
                 setImg("trchar035.png");
                 break;
             case 2 : 
                 this.speed = 2; 
-                this.throwDistance = 200; // 200 - easy, 300 - very hard
+                this.throwDistance = 150; // 150 - easy, 300 - very hard
                 this.throwSpeed = 10;
                 this.name = "Noobest NPC";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 49;
                 setImg("trchar026.png");
                 break;
+        }
+    }
+    
+    private class NpcState{
+        public boolean active;
+        private int counter;
+        public int max;
+
+        public NpcState(int max) {
+            this.max = max;
+        }
+        
+        // returns true if reached max
+        public boolean increase() {
+            if (active) {
+                counter++;
+                if (counter == max) {
+                    active = false;
+                    counter = 0;
+                    return true;
+                }
+            }
+            return false;
         }
         
     }

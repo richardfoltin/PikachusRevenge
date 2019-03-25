@@ -55,9 +55,9 @@ public class StatsPanel extends JPanel {
     public void addLife() {
         
         Image image = null;
-        try {image = Resource.loadImage("item045.png");} 
+        try {image = Resource.loadImage("heart.png");} 
         catch (IOException e) {System.err.println("Can't load file");} 
-        image = Resource.getScaledImage(image, 26, 26);
+        //image = Resource.getScaledImage(image, 20, 20);
         
         JLabel label = new JLabel(new ImageIcon(image),JLabel.CENTER);
         label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));    
@@ -77,10 +77,6 @@ public class StatsPanel extends JPanel {
         }
     }
     
-    public void pokemonFound(int id) {
-        
-    }
-    
     public void updateTimeLabel(int time) {
         Date date = new Date(time * 1000);
         timerLabel.setText(timeFormat.format(date));
@@ -89,9 +85,9 @@ public class StatsPanel extends JPanel {
     public JLabel addBall() {
         
         Image image = null;
-        try {image = Resource.loadImage("object_ball.png");} 
+        try {image = Resource.loadImage("ball.png");} 
         catch (IOException e) {System.err.println("Can't load file");} 
-        image = Resource.getScaledImage(image, 20, 20);
+        //image = Resource.getScaledImage(image, 20, 20);
         
         JLabel label = new JLabel(new ImageIcon(image),JLabel.CENTER);
         label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));    
@@ -115,10 +111,6 @@ public class StatsPanel extends JPanel {
         lives.clear();
         livesPane.revalidate();
         livesPane.repaint();
-    }
-    
-    public void pokemonFound() {
-        
     }
     
 }

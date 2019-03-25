@@ -17,10 +17,13 @@ import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 import pikachusrevenge.gui.MainWindow;
 import static pikachusrevenge.gui.MapView.GRIDSIZE;
+import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.PokeBall;
 import pikachusrevenge.unit.Pokemon;
+import static pikachusrevenge.unit.Unit.C_BOX_HEIGHT;
+import static pikachusrevenge.unit.Unit.C_BOX_WIDTH;
 
 public class Model implements ActionListener {
         
@@ -33,10 +36,19 @@ public class Model implements ActionListener {
     private final Timer timer;
     private final Timer clock;
     public Rectangle mapRectangle;
+    private final String fileName;
+    private final int dbId;
 
     private static final int MAIN_LOOP = 40;  
     
-    public Model (){
+    
+    public Model () {this(null, 0);}
+    public Model (int dbId) {this(null, dbId);}
+    public Model (String fileName) {this(fileName, 0);}
+    
+    private Model (String fileName, int dbId){
+        this.dbId = dbId;
+        this.fileName = fileName;
         this.pokemons = new HashMap<>();
         this.levels = new ArrayList<>();
         this.player = new Player(this);
@@ -66,6 +78,11 @@ public class Model implements ActionListener {
         this.layers = map.getLayers();
         this.mapRectangle = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);       
          
+        // MenuBar
+        boolean canBeSaved = (dbId != 0 || fileName != null);
+        mainWindow.getGameMenu().getSaveMenu().setEnabled(canBeSaved);
+        mainWindow.getGameMenu().buildPokedexMenu(this);
+        
         mainWindow.getStats().clearPane();
         // put lives on stats
         for (int i = 0; i < player.getLives(); ++i) mainWindow.getStats().addLife();
@@ -80,12 +97,16 @@ public class Model implements ActionListener {
         clock.start();
         timer.start();
         player.setStartingPostion(actualLevel.getPlayerStartingPosition());
-        for (NPC npc : actualLevel.getNpcs()) npc.startMoving();
+        for (NPC npc : actualLevel.getNpcs()) npc.startLooping();
         for (Pokemon p : actualLevel.getPokemons()) if (p.isFound()) p.restartFromStratingPoint();
-        player.startMoving();
+        player.startLooping();
     }
     
-    public boolean canMoveTo(Rectangle target){
+    public boolean canMoveTo(Position from, Direction nextDirection, double speed){
+        if (nextDirection == Direction.STOP) return false;
+        Position targetPosition = new Position(from.x + nextDirection.x * speed, from.y + nextDirection.y * speed);
+        Rectangle target = new Rectangle(0, 0, C_BOX_WIDTH, C_BOX_HEIGHT);
+        MovingSprite.moveCollisionBoxTo(target,targetPosition);
         if (!mapRectangle.contains(target)) return false;
         
         PathIterator pi = target.getPathIterator(null);
@@ -105,7 +126,7 @@ public class Model implements ActionListener {
     public void ballThrow(Position from, double speed, NPC owner){
         PokeBall ball = new PokeBall(from.x, from.y, speed, this, owner);
         actualLevel.getThrownBalls().add(ball);
-        ball.startMoving();
+        ball.startLooping();
     }
     
     public void ballReachedPlayer(PokeBall ball) {
@@ -131,6 +152,11 @@ public class Model implements ActionListener {
     public void stopGame() {
         clock.stop();
         timer.stop();
+    }
+    
+    public void restartGame() {
+        clock.restart();
+        timer.restart();
     }
 
     public boolean checkSign(Position pos) {
@@ -158,6 +184,7 @@ public class Model implements ActionListener {
                         writeInfo("You have found " + Pokemon.POKEMON_NAME[p.getId()-1]);
                         actualLevel.clearTileWithProperty("Ball", tpos);
                         p.found();
+                        mainWindow.getGameMenu().buildPokedexMenu(this);
                     }
                 }
             }
@@ -168,7 +195,7 @@ public class Model implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == timer){
-            if (player.isMoving()) player.loop();
+            if (player.isLooping()) player.loop();
             actualLevel.loop();
             mainWindow.getFooter().loop();
             mainWindow.repaintMap();
@@ -183,26 +210,21 @@ public class Model implements ActionListener {
     public void movePanelTo(Position position){
         mainWindow.scrollTo(position);
     }
-
-    public boolean canThrow(NPC npc){
-        if (actualLevel.getThrownBalls().isEmpty()) return true;
-        for (PokeBall b : actualLevel.getThrownBalls()) {
-            if (b.getOwner() == npc) return false;
-        }
-        return true;
-    }
     
     public boolean canMoveToNextLevel() {
         return actualLevel.canAdvanceToNextLevel();
     }
     
- 
     public ArrayList<NPC> getNpcs() {return actualLevel.getNpcs();}
     public ArrayList<Pokemon> getMapPokemons() {return actualLevel.getPokemons();}
     public HashMap<TilePosition,Pokemon> getAllPokemons() {return pokemons;}
     public ArrayList<PokeBall> getThrownBalls() {return actualLevel.getThrownBalls();}
     public Player getPlayer() {return player;}
     public Collection<Integer> getAllIds() {return pokemons.values().stream().map(p -> p.getId()).collect(Collectors.toList());}
+    public Collection<Integer> getAllFoundIds() {return pokemons.values().stream().filter(p -> p.isFound()).map(p -> p.getId()).collect(Collectors.toList());}
     public ArrayList<Level> getLevels() {return levels;}
     public int getActualLevelId() {return actualLevel.getId();}
+    public String getFileName() {return fileName;}
+    public int getDbId() {return dbId;}
+    public boolean isSavedToDb() {return (dbId != 0 && fileName == null);}
 }

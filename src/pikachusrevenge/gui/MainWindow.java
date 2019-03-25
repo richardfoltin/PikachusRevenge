@@ -55,8 +55,8 @@ public class MainWindow extends JFrame {
         this.model = new Model();
         
         setTitle("Pikachu's Revenge");
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        loadIcon("pokemons\\icon025.png");
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        loadIcon("pikachu_small.png");
         
         setPreferredSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT));
         addWindowListener(new WindowAdapter() {
@@ -88,11 +88,6 @@ public class MainWindow extends JFrame {
         setResizable(false);
         setVisible(true);
     }
-    
-    public void restartNewGame() {
-        this.model = new Model();
-        loadLevel(1);
-    }   
     
     public void startGameFrame() {
         
@@ -159,7 +154,6 @@ public class MainWindow extends JFrame {
     private void loadIcon(String filePath){
         try {
             BufferedImage image = Resource.loadBufferedImage(filePath);
-            image = Resource.getSprite(image, 0, 0);
             setIconImage(image);
         } catch (IOException ex) {
             System.err.println("Can't load file");
@@ -216,5 +210,5 @@ public class MainWindow extends JFrame {
     public StatsPanel getStats() {return statsPanel;}
     public FooterLabel getFooter() {return footer;}
     public Model getModel() {return model;}
-
+    public GameMenu getGameMenu() {return menu;}
 }

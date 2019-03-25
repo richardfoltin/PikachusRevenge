@@ -131,9 +131,9 @@ public class Level {
     }
     
     public void loop(){
-        for (NPC npc : npcs) if (npc.isMoving()) npc.loop();
-        for (Pokemon p : pokemons) if (p.isMoving() && p.getTilePosition().getLevel() == id) p.loop();
-        for (PokeBall pb : thrownBalls) if (pb.isMoving()) pb.loop();
+        for (NPC npc : npcs) if (npc.isLooping()) npc.loop();
+        for (Pokemon p : pokemons) if (p.isLooping() && p.getTilePosition().getLevel() == id) p.loop();
+        for (PokeBall pb : thrownBalls) if (pb.isLooping()) pb.loop();
         cleanUp();
     }    
     

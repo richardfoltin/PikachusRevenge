@@ -27,8 +27,6 @@ public class Unit extends MovingSprite {
         imageSize = UNITSIZE;
         collisionBox.setSize(C_BOX_WIDTH, C_BOX_HEIGHT);
         nextCollisionBox.setSize(C_BOX_WIDTH, C_BOX_HEIGHT);
-        cOffsetX = C_BOX_OFFSET_X;
-        cOffsetY = C_BOX_OFFSET_Y;
     }
     
     @Override
@@ -48,24 +46,29 @@ public class Unit extends MovingSprite {
     }
 
     @Override
-    public void loop() {     
-        if (nextDirection != direction) {
-            if (nextDirection == Direction.STOP && animation != null) animation.stop();
-            switch (nextDirection) {
-                case UP : animation = walk[3]; break;
-                case LEFT :
-                case UPLEFT :
-                case DOWNLEFT : animation = walk[1]; break;
-                case DOWN : animation = walk[0]; break;
-                case RIGHT :
-                case DOWNRIGHT :
-                case UPRIGHT : animation = walk[2]; break;
-            }
-            if (nextDirection != Direction.STOP && animation != null) animation.start();
-        } else {
-            animation.update();
+    public void loop() { 
+        switch (nextDirection) {
+            case UP : animation = walk[3]; break;
+            case LEFT :
+            case UPLEFT :
+            case DOWNLEFT : animation = walk[1]; break;
+            case DOWN : animation = walk[0]; break;
+            case RIGHT :
+            case DOWNRIGHT :
+            case UPRIGHT : animation = walk[2]; break;
         }
+        if (moving) animation.update();
         super.loop();
+    }
+    
+    public void startWalking(){
+        animation.start();
+        moving = true;
+    }
+    
+    public void stopWalking() {
+        animation.stop();
+        moving = false;
     }
 
     public BufferedImage getTopSprite() {

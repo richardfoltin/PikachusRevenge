@@ -7,6 +7,8 @@ import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
+import static pikachusrevenge.unit.Unit.C_BOX_OFFSET_X;
+import static pikachusrevenge.unit.Unit.C_BOX_OFFSET_Y;
 
 
 public class MovingSprite {
@@ -23,9 +25,8 @@ public class MovingSprite {
     protected final Model model;
     protected Rectangle collisionBox;
     protected Rectangle nextCollisionBox;
-    protected int cOffsetX;
-    protected int cOffsetY;
-    private boolean moving;
+    private boolean looping;
+    protected boolean moving;
     
     public MovingSprite(Model model){
         this.pos = new Position(0,0);
@@ -37,7 +38,7 @@ public class MovingSprite {
         this.direction = Direction.STOP;
         this.model = model;     
         this.animated = true;
-        this.moving = false;
+        this.looping = false;
     }
     
     protected void setImg(String filePath){
@@ -61,16 +62,16 @@ public class MovingSprite {
     protected void loadNextPosition(){
         nextPosition.x = pos.x + nextDirection.x * speed;
         nextPosition.y = pos.y + nextDirection.y * speed;
-        moveNextCollisionBoxTo(nextCollisionBox,nextPosition);
+        moveCollisionBoxTo(nextCollisionBox,nextPosition);
     }
     
-    protected void moveNextCollisionBoxTo(Rectangle box, Position pos){
-        box.setLocation((int)(pos.x + cOffsetX - box.width/2), (int)(pos.y + cOffsetY - box.height/2));
+    public static void moveCollisionBoxTo(Rectangle box, Position pos){
+        box.setLocation((int)(pos.x + C_BOX_OFFSET_X - box.width/2), (int)(pos.y + C_BOX_OFFSET_Y - box.height/2));
     }
     
     public void loop() {
         //System.out.println(String.format("Move (%.0f,%.0f): %s",nextPosition.x,nextPosition.y,new SimpleDateFormat("mm:ss.SSS").format(new Date())));   
-        if (nextDirection != Direction.STOP) {
+        if (moving) {
             pos.x = nextPosition.x;
             pos.y = nextPosition.y;
             collisionBox.setLocation((int)nextCollisionBox.getX(),(int)nextCollisionBox.getY());
@@ -79,12 +80,12 @@ public class MovingSprite {
         loadNextPosition();
     }
     
-    public void startMoving() {
-        moving = true;
+    public void startLooping() {
+        looping = true;
     }
     
-    public void stopMoving() {
-        moving = false;
+    public void stopLooping() {
+        looping = false;
     }
     
     public double getX() {return pos.x;}
@@ -93,7 +94,7 @@ public class MovingSprite {
     public int getCornerY() {return (int)pos.y - imageSize/2;}
     public BufferedImage getImg() {return img;}
     public Position getPosition() {return pos;}
-    public boolean isMoving() {return moving;}
+    public boolean isLooping() {return looping;}
     
     
 }

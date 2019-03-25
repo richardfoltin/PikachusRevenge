@@ -15,7 +15,7 @@ public class Player extends Unit {
     public Player(Model model){
         super(model);
         
-        this.lives = 3;
+        this.lives = 1;
         this.availableLevels = 1;
         this.speed = 5.0;
         this.name = "Pikachu";
@@ -54,17 +54,11 @@ public class Player extends Unit {
        
     @Override
     protected void loadNextPosition() {
-        if (nextDirection != Direction.STOP) {
-            Position targetPosition = new Position(pos.x + nextDirection.x * speed, pos.y + nextDirection.y * speed);
-            Rectangle targetRectangle = new Rectangle(0, 0, C_BOX_WIDTH, C_BOX_HEIGHT);
-            moveNextCollisionBoxTo(targetRectangle,targetPosition);
-            if (model.canMoveTo(targetRectangle)){
-                //System.out.println(String.format("Move to: %s (%.0f,%.0f) -> (%.0f,%.0f)",nextDirection.name(),collisionBox.getX(),collisionBox.getY(),targetRectangle.getX(),targetRectangle.getY()));
-                super.loadNextPosition();      
-            } else {
-                //System.out.println(String.format("Stop at: %s (%.0f,%.0f) -> (%.0f,%.0f)",nextDirection.name(),collisionBox.getX(),collisionBox.getY(),targetRectangle.getX(),targetRectangle.getY()));
-                nextDirection = Direction.STOP;
-            }
+        if (nextDirection != Direction.STOP && model.canMoveTo(pos,nextDirection,speed)) {
+            if (!moving) startWalking();
+            super.loadNextPosition();    
+        } else {
+            stopWalking();
         }
     }
     

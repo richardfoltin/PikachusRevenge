@@ -33,12 +33,25 @@ public enum Direction {
     public static Direction getDirection(Position from, Position to){
         double dx = to.x - from.x;
         double dy = to.y - from.y;
-        int sixth = (int)floor(Math.abs(Math.atan(dy/dx)) / (Math.PI / 6));
-        switch (sixth) {
+        int eighth = (int)floor(Math.abs(Math.atan(dy/dx)) / (Math.PI / 8));
+        switch (eighth) {
             case 0 : return getDirection(signum(dx),0);
-            case 1 : return getDirection(signum(dx),signum(dy));
-            case 2 : 
-            case 3 : return getDirection(0,signum(dy));
+            case 1 : 
+            case 2 : return getDirection(signum(dx),signum(dy));
+            case 3 : 
+            case 4 : return getDirection(0,signum(dy));
+            default: return Direction.STOP;
+        }
+    }
+    
+    public static Direction getSecondDirection(Position from, Position to){
+        double dx = to.x - from.x;
+        double dy = to.y - from.y;
+        int fouth = (int)floor(Math.abs(Math.atan(dy/dx)) / (Math.PI / 4));
+        switch (fouth) {
+            case 0 : return getDirection(0,signum(dy));
+            case 1 : 
+            case 2 : return getDirection(signum(dx),0);
             default: return Direction.STOP;
         }
     }

@@ -1,6 +1,5 @@
 package pikachusrevenge.unit;
 
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
@@ -11,8 +10,6 @@ import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
 import pikachusrevenge.model.TilePosition;
 import pikachusrevenge.resources.Resource;
-import static pikachusrevenge.unit.Unit.C_BOX_HEIGHT;
-import static pikachusrevenge.unit.Unit.C_BOX_WIDTH;
 
 public class Pokemon extends Unit {
     
@@ -23,7 +20,7 @@ public class Pokemon extends Unit {
     private int distance;
     
     private static final int FOLLOW_DISTANCE = 45;
-    private static final int MAX_DISTANCE = 280;
+    private static final int MAX_DISTANCE = 300;
     
     public Pokemon(Model model, TilePosition tpos, int id, boolean found) {
         this(model, tpos, id);
@@ -72,19 +69,22 @@ public class Pokemon extends Unit {
     @Override
     protected void loadNextPosition(){
         Position playerPosition = model.getPlayer().getPosition();
-        double distance = playerPosition.distanceFrom(pos);
-        if (distance > MAX_DISTANCE) {
-            nextDirection = Direction.getDirection(pos, playerPosition);   
-        } else if (distance > this.distance) {  
-            nextDirection = Direction.getDirection(pos, playerPosition);          
-            Position targetPosition = new Position(pos.x + nextDirection.x * speed, pos.y + nextDirection.y * speed);
-            Rectangle targetRectangle = new Rectangle(0, 0, C_BOX_WIDTH, C_BOX_HEIGHT);
-            moveNextCollisionBoxTo(targetRectangle,targetPosition);
-            if (!model.canMoveTo(targetRectangle)) nextDirection = Direction.STOP;
+        double playerDistance = playerPosition.distanceFrom(pos);
+        if (playerDistance > MAX_DISTANCE) {
+            nextDirection = Direction.getDirection(pos, playerPosition);
+            startWalking();
+            super.loadNextPosition();
+        } else if (playerDistance > distance && model.canMoveTo(pos,Direction.getDirection(pos, playerPosition),speed)) {
+            nextDirection = Direction.getDirection(pos, playerPosition);
+            startWalking();
+            super.loadNextPosition();
+        } else if (playerDistance > distance && model.canMoveTo(pos,Direction.getSecondDirection(pos, playerPosition),speed)) {
+            nextDirection = Direction.getSecondDirection(pos, playerPosition);
+            startWalking();
+            super.loadNextPosition();
         } else {
-            nextDirection = Direction.STOP;
-        }
-        super.loadNextPosition();        
+            stopWalking();
+        }  
     }
     
     private int newRandomId() {
@@ -105,7 +105,7 @@ public class Pokemon extends Unit {
     }
     
     @Override
-    public void startMoving() {
+    public void startLooping() {
         int i = 1;
         for (Pokemon p : model.getMapPokemons()) {
             if (p.isFound()) {
@@ -113,12 +113,12 @@ public class Pokemon extends Unit {
                 i++;
             }
         }
-        super.startMoving();
+        super.startLooping();
     }
     
     @Override
     public void restartFromStratingPoint() {
-        startMoving();
+        startLooping();
         Position playerPosition = model.getPlayer().getPosition();
         setStartingPostion(playerPosition.x, playerPosition.y);
         super.restartFromStratingPoint();  

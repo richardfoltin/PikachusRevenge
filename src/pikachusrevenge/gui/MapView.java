@@ -13,6 +13,7 @@ import org.mapeditor.view.OrthogonalRenderer;
 import static pikachusrevenge.gui.Frame.CUT;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.unit.NPC;
+import static pikachusrevenge.unit.NPC.EXCLAMATION_SIZE;
 import pikachusrevenge.unit.Player;
 import static pikachusrevenge.unit.Unit.UNITSIZE;
 import pikachusrevenge.unit.PokeBall;
@@ -55,6 +56,7 @@ public class MapView extends JPanel {
     private void paintUnitsTop(Graphics2D g){     
         for (NPC npc : model.getNpcs()){
             g.drawImage(npc.getTopSprite(),npc.getCornerX(),npc.getCornerY(),UNITSIZE,CUT,null);
+            if (npc.seesPlayer()) g.drawImage(npc.getExclamation(),npc.getCornerX()+17,npc.getCornerY()-EXCLAMATION_SIZE+14,EXCLAMATION_SIZE,EXCLAMATION_SIZE,null);
         }
         
         for (Pokemon p : model.getMapPokemons()){
