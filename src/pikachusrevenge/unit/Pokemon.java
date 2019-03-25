@@ -25,6 +25,11 @@ public class Pokemon extends Unit {
     private static final int FOLLOW_DISTANCE = 45;
     private static final int MAX_DISTANCE = 280;
     
+    public Pokemon(Model model, TilePosition tpos, int id, boolean found) {
+        this(model, tpos, id);
+        this.found = found;
+    }
+    
     public Pokemon(Model model, TilePosition tpos, int id) {
         super(model);
         
@@ -38,9 +43,6 @@ public class Pokemon extends Unit {
     
     public void found() {
         this.found = true;
-        for (Pokemon p : model.getMapPokemons()) {
-            if (p.found) this.distance += FOLLOW_DISTANCE;
-        }
         revealLabel();
         restartFromStratingPoint();
     }
@@ -103,17 +105,30 @@ public class Pokemon extends Unit {
     }
     
     @Override
+    public void startMoving() {
+        int i = 1;
+        for (Pokemon p : model.getMapPokemons()) {
+            if (p.isFound()) {
+                p.setDistance(FOLLOW_DISTANCE * i);
+                i++;
+            }
+        }
+        super.startMoving();
+    }
+    
+    @Override
     public void restartFromStratingPoint() {
+        startMoving();
         Position playerPosition = model.getPlayer().getPosition();
         setStartingPostion(playerPosition.x, playerPosition.y);
         super.restartFromStratingPoint();  
-        startMoving();
     }
     
     public int getId() {return id;}
     public TilePosition getTilePosition() {return tpos;}
     public boolean isFound() {return found;} 
     public void setLabel(JLabel label) {this.label = label;}
+    public void setDistance(int distance) {this.distance = distance;}
     
     public static final String[] POKEMON_NAME = {"Bulbasaur",
                                                 "Ivysaur",

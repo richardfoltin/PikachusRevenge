@@ -9,6 +9,7 @@ import org.mapeditor.core.ObjectGroup;
 import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
+import org.mapeditor.io.TMXMapReader;
 import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.PokeBall;
@@ -22,16 +23,25 @@ public class Level {
     private final ArrayList<NPC> npcs;
     private final ArrayList<Pokemon> pokemons;
     private int time;
-    private final Map map;
+    private Map map = null;
     private final Model model;
     private List<MapLayer> layers;
     private int maxPokemonCount;
     private int foundPokemonCount;
     private Position playerStartingPosition;
     
-    public Level(Model model,Map map, int id, int time) {
+    private static String[] mapName = {"MapTest","Level1"};
+    
+    public Level(Model model, int id, int time) {
         this.id = id;
-        this.map = map;
+        
+        try {
+            TMXMapReader mapReader = new TMXMapReader();
+            this.map = mapReader.readMap("src\\pikachusrevenge\\resources\\level\\" + mapName[id-1] + ".tmx");
+        } catch (Exception e) {
+            System.out.println("Error while reading the map:\n" + e.getMessage());
+        }
+        
         this.time = time;
         this.pokemons = new ArrayList<>();
         this.thrownBalls = new ArrayList<>();
@@ -57,7 +67,6 @@ public class Level {
                             if (model.getAllPokemons().containsKey(tpos)) {
                                 p = model.getAllPokemons().get(tpos);
                                 if (p.isFound()) {
-                                    p.found();
                                     clearTileWithProperty("Ball",tpos);
                                     foundPokemonCount++;
                                 }
@@ -91,11 +100,10 @@ public class Level {
         }
     }
     
-    public boolean canFinish() {
+    public boolean canAdvanceToNextLevel() {
         if (maxPokemonCount == foundPokemonCount) return true;
         return true;
     }
-    
     
     public void addCleanUp(MovingSprite sprite) {
         cleanUp.add(sprite);
@@ -137,13 +145,15 @@ public class Level {
         }
         cleanUp.clear();
     }
-    
+
     public int increaseTime() {return ++time;}
     
     public ArrayList<PokeBall> getThrownBalls() {return thrownBalls;}
     public ArrayList<NPC> getNpcs() {return npcs;}
     public ArrayList<Pokemon> getPokemons() {return pokemons;}
     public int getId() {return id;}
+    public int getTime() {return time;}
+    public Map getMap() {return map;}
     public Position getPlayerStartingPosition() {return playerStartingPosition;}
     
 }

@@ -32,34 +32,40 @@ public class Model implements ActionListener {
     private final Player player;
     private final Timer timer;
     private final Timer clock;
-    public Rectangle MAP_RECTANGLE;
+    public Rectangle mapRectangle;
 
     private static final int MAIN_LOOP = 40;  
     
-    public Model (MainWindow mainWindow){
+    public Model (){
         this.pokemons = new HashMap<>();
         this.levels = new ArrayList<>();
         this.player = new Player(this);
-        this.mainWindow = mainWindow;
+        this.mainWindow = MainWindow.getInstance();
         this.timer = new Timer(MAIN_LOOP, this);
         this.clock = new Timer(1000, (ActionEvent e) -> {
             mainWindow.getStats().updateTimeLabel(actualLevel.increaseTime());
         });
     }
     
-    public void buildLevel(Map map, int id) {
+    public Level buildLevelIfNotExists(int id, int time) {
         Level level = null;
         for (Level l : levels) if (l.getId() == id) level = l;
         
-        this.actualLevel = (level == null) ? new Level(this,map,id,0) : level; 
-        this.levels.add(actualLevel);
+        if (level == null) {
+            level = new Level(this,id,time);
+            this.levels.add(level);
+        }
         
-        this.layers = map.getLayers();
-        MAP_RECTANGLE = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);
-        
+        return level;
     }
     
-    public void startGame() {
+    public void startGame(Level level) {
+
+        this.actualLevel = level; 
+        Map map = level.getMap();
+        this.layers = map.getLayers();
+        this.mapRectangle = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);       
+         
         mainWindow.getStats().clearPane();
         // put lives on stats
         for (int i = 0; i < player.getLives(); ++i) mainWindow.getStats().addLife();
@@ -80,7 +86,7 @@ public class Model implements ActionListener {
     }
     
     public boolean canMoveTo(Rectangle target){
-        if (!MAP_RECTANGLE.contains(target)) return false;
+        if (!mapRectangle.contains(target)) return false;
         
         PathIterator pi = target.getPathIterator(null);
         ArrayList<Collision> collisions = new ArrayList<>();
@@ -111,7 +117,8 @@ public class Model implements ActionListener {
     public void playerInteraction(){
         if (player.isAtSign()){
             if (canMoveToNextLevel()) {
-                mainWindow.loadNextLevel();
+                stopGame();
+                mainWindow.loadLevel(actualLevel.getId() + 1);
             }
             else writeInfo("Can't move to next level yet!");
         }
@@ -124,10 +131,8 @@ public class Model implements ActionListener {
     public void stopGame() {
         clock.stop();
         timer.stop();
-        player.stopMoving();
     }
 
-    
     public boolean checkSign(Position pos) {
         for (MapLayer l : layers){
             if (l instanceof TileLayer){
@@ -188,7 +193,7 @@ public class Model implements ActionListener {
     }
     
     public boolean canMoveToNextLevel() {
-        return actualLevel.canFinish();
+        return actualLevel.canAdvanceToNextLevel();
     }
     
  
@@ -198,4 +203,6 @@ public class Model implements ActionListener {
     public ArrayList<PokeBall> getThrownBalls() {return actualLevel.getThrownBalls();}
     public Player getPlayer() {return player;}
     public Collection<Integer> getAllIds() {return pokemons.values().stream().map(p -> p.getId()).collect(Collectors.toList());}
+    public ArrayList<Level> getLevels() {return levels;}
+    public int getActualLevelId() {return actualLevel.getId();}
 }

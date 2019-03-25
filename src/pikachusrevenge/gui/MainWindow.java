@@ -8,20 +8,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.WindowConstants;
 import org.mapeditor.core.Map;
-import org.mapeditor.io.TMXMapReader;
-import pikachusrevenge.PikachusRevenge;
 import pikachusrevenge.model.KeyPressHandler;
+import pikachusrevenge.model.Level;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
@@ -30,8 +30,6 @@ public class MainWindow extends JFrame {
     
     private static MainWindow instance = null;
     
-    private int level;
-    private Map map;
     private Model model;
     private MapView mapView;
     private JScrollPane mainPanel;
@@ -39,6 +37,7 @@ public class MainWindow extends JFrame {
     private GameMenu menu;
     private StatsPanel statsPanel;
     private FooterLabel footer;
+    private KeyAdapter keyAdapter;
       
     public static final int WINDOW_WIDTH = 450;
     public static final int WINDOW_HEIGHT = 350;
@@ -53,13 +52,21 @@ public class MainWindow extends JFrame {
     private MainWindow(){
         
         this.instance = this;
-        this.model = new Model(this);
+        this.model = new Model();
         
         setTitle("Pikachu's Revenge");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         loadIcon("pokemons\\icon025.png");
         
         setPreferredSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT));
+        addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                showExitConfirmation();
+            }
+
+        });
         
         startPanel = new JPanel();
         JButton startButton = new JButton("Start");
@@ -67,11 +74,8 @@ public class MainWindow extends JFrame {
         startButton.addActionListener(new ActionListener() { 
             @Override
             public void actionPerformed(ActionEvent e) { 
-                try {
-                    MainWindow.this.startGameWindow(1);
-                } catch (MainWindow.MapLoadingException ex) {
-                    Logger.getLogger(PikachusRevenge.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                MainWindow.this.startGameFrame();
+                MainWindow.this.loadLevel(1);
             } 
         } );
         
@@ -85,66 +89,55 @@ public class MainWindow extends JFrame {
         setVisible(true);
     }
     
-    public void startGameWindow(int id) throws MapLoadingException {
-        this.level = id;
-        this.map = loadMap(id);
-        model.buildLevel(map, id);
-        
-        if (startPanel != null) remove(startPanel);
-
-        // stats
-        statsPanel = new StatsPanel(WINDOW_WIDTH);
-        
-        // footer
-        JPanel footerPanel = new JPanel();
-        footerPanel.setPreferredSize(new Dimension(WINDOW_WIDTH,25));
-        footer = new FooterLabel(model);
-        footerPanel.add(footer);
-        
-        // layout
-        setLayout(new BorderLayout());
-        add(statsPanel, BorderLayout.NORTH);
-        add(footerPanel, BorderLayout.SOUTH);
-        
-        // menu
-        this.menu = new GameMenu(model);
-        setJMenuBar(menu);
-        menu.setAvailableLevels(model.getPlayer().getAvailableLevels());
-        
-        // keylistener
-        addKeyListener(getKeyAdapter(model));
-
-        //appFrame.setLocationRelativeTo(null);
-        addMapToMainPanel();
-        pack();
-        model.startGame(); 
-    }
+    public void restartNewGame() {
+        this.model = new Model();
+        loadLevel(1);
+    }   
     
+    public void startGameFrame() {
+        
+        if (startPanel != null) {
+            remove(startPanel);
 
-    
-    public void loadLevel(int id) {
+            // stats
+            statsPanel = new StatsPanel(WINDOW_WIDTH);
 
-        try {
-            this.map = loadMap(id);
-        } catch (MapLoadingException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            // footer
+            JPanel footerPanel = new JPanel();
+            footerPanel.setPreferredSize(new Dimension(WINDOW_WIDTH,25));
+            footer = new FooterLabel(model);
+            footerPanel.add(footer);
+
+            // layout
+            setLayout(new BorderLayout());
+            add(statsPanel, BorderLayout.NORTH);
+            add(footerPanel, BorderLayout.SOUTH);
+
+            // menu
+            this.menu = new GameMenu();
+            setJMenuBar(menu);
+
+            // keylistener
+            this.keyAdapter = getKeyAdapter();
+            addKeyListener(keyAdapter);
         }
-        
-        model.buildLevel(map,id);
-        this.level = id;
-        
-        remove(mainPanel);
-        addMapToMainPanel();
-        
-        model.getPlayer().increaseAvailableLevels(id);
-        menu.setAvailableLevels(model.getPlayer().getAvailableLevels());
-        
-        pack();
-        model.startGame();     
     }
     
-    private void addMapToMainPanel(){
-        mapView = new MapView(map,model);
+    public void loadLevelWithNewModel(Model model, int id){
+        if (this.model != null) this.model.stopGame();
+        if (this.keyAdapter != null) removeKeyListener(keyAdapter);
+        
+        this.model = model;
+        startGameFrame();
+        footer.setModel(model);
+        loadLevel(id);
+    }
+     
+    public void loadLevel(int id) {
+        Level level = model.buildLevelIfNotExists(id,0);
+        
+        if (mainPanel != null) remove(mainPanel);
+        mapView = new MapView(level.getMap(),model);
         mainPanel = new JScrollPane(mapView);
         mainPanel.setBorder(null);
         setPreferredSize(null);
@@ -153,21 +146,14 @@ public class MainWindow extends JFrame {
         mainPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);   
         
         add(mainPanel, BorderLayout.CENTER);
-        scrollTo(model.getPlayer().getPosition());
         this.requestFocus();
-    }
-    
-    private Map loadMap(int id) throws MapLoadingException {  
-        Map map = null;
-        try {
-            TMXMapReader mapReader = new TMXMapReader();
-            map = mapReader.readMap(fileFromId(id));
-        } catch (Exception e) {
-            System.out.println("Error while reading the map:\n" + e.getMessage());
-            throw new MapLoadingException();
-        }
-        System.out.println(map.toString() + " loaded");
-        return map;
+        
+        model.getPlayer().increaseAvailableLevels(id);
+        menu.setAvailableLevels(model.getPlayer().getAvailableLevels());
+        
+        model.startGame(level);   
+        scrollTo(model.getPlayer().getPosition());  
+        pack();
     }
     
     private void loadIcon(String filePath){
@@ -179,22 +165,8 @@ public class MainWindow extends JFrame {
             System.err.println("Can't load file");
         }     
     }
-    
-    private String fileFromId(int id){    
-        String mapName = "";
-        
-        switch (id) {
-            case 1 : mapName = "MapTest"; break;
-            case 2 : mapName = "Level1"; break;
-        }
-        
-        return "src\\pikachusrevenge\\resources\\level\\" + mapName + ".tmx";
-    }
-    
-    public void loadNextLevel() {loadLevel(level + 1);}  
-    public void restartLevel() {loadLevel(level);}
-    
-    protected void centerWindow(JFrame window) {
+      
+    private void centerWindow(JFrame window) {
         int x = (Toolkit.getDefaultToolkit().getScreenSize().width - window.getWidth()) / 2;  
         int y = (Toolkit.getDefaultToolkit().getScreenSize().height - window.getHeight()-100) / 2;  
   
@@ -203,8 +175,8 @@ public class MainWindow extends JFrame {
     
     public void scrollTo(Position position){
         JViewport visible = mainPanel.getViewport();
-        int scrollX = scrollPostion(position.x, WINDOW_WIDTH, model.MAP_RECTANGLE.width);
-        int scrollY = scrollPostion(position.y, WINDOW_HEIGHT, model.MAP_RECTANGLE.height);
+        int scrollX = scrollPostion(position.x, WINDOW_WIDTH, model.mapRectangle.width);
+        int scrollY = scrollPostion(position.y, WINDOW_HEIGHT, model.mapRectangle.height);
         visible.setViewPosition(new Point(scrollX,scrollY));
     }
     
@@ -214,16 +186,16 @@ public class MainWindow extends JFrame {
         else return (int)coord - visibleSize/2;
     }
     
-    private KeyAdapter getKeyAdapter(Model model) {
+    private KeyAdapter getKeyAdapter() {
         return new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent ke) {
-                KeyPressHandler.keyPressed(model, ke.getKeyCode());
+                KeyPressHandler.keyPressed(MainWindow.this.model, ke.getKeyCode());
             }
             
             @Override
             public void keyReleased(KeyEvent ke) {
-                KeyPressHandler.keyReleased(model, ke.getKeyCode());
+                KeyPressHandler.keyReleased(MainWindow.this.model, ke.getKeyCode());
             }
 
         };
@@ -233,9 +205,16 @@ public class MainWindow extends JFrame {
         mapView.repaint();        
     }
 
+    protected void showExitConfirmation() {
+        int n = JOptionPane.showConfirmDialog(this, "Are you sure you want to exit?",
+                "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (n == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+    }
+    
     public StatsPanel getStats() {return statsPanel;}
-    public Map getMap() {return map;}
     public FooterLabel getFooter() {return footer;}
-    public int getLevel() {return level;}
+    public Model getModel() {return model;}
 
 }

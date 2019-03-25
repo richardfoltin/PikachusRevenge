@@ -42,4 +42,6 @@ public class FooterLabel extends JLabel {
         info = true;
         setText(str);
     }
+    
+    public void setModel(Model model) {this.model = model;}
 }

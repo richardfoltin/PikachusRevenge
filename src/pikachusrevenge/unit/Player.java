@@ -39,7 +39,7 @@ public class Player extends Unit {
         } else {
             restartFromStratingPoint();
             for (Pokemon p : model.getMapPokemons()) {
-                p.restartFromStratingPoint();
+                if (p.isFound()) p.restartFromStratingPoint();
             }
         }
     }
@@ -71,6 +71,8 @@ public class Player extends Unit {
     public void increaseAvailableLevels(int level) {
         if (level > availableLevels) availableLevels = level;
     }
+    
+    public void setLives(int lives) {this.lives = lives;}
     
     public boolean isAtSign() {return atSign;}
     public int getLives() {return lives;}
