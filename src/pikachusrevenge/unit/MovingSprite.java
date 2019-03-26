@@ -3,6 +3,7 @@ package pikachusrevenge.unit;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import static pikachusrevenge.gui.MapView.ZOOM;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
@@ -21,7 +22,6 @@ public class MovingSprite {
     protected Direction nextDirection;
     protected double speed;
     private BufferedImage img;
-    protected int imageSize;
     protected final Model model;
     protected Rectangle collisionBox;
     protected Rectangle nextCollisionBox;
@@ -66,7 +66,7 @@ public class MovingSprite {
     }
     
     public static void moveCollisionBoxTo(Rectangle box, Position pos){
-        box.setLocation((int)(pos.x + C_BOX_OFFSET_X - box.width/2), (int)(pos.y + C_BOX_OFFSET_Y - box.height/2));
+        box.setLocation((int)(pos.x + C_BOX_OFFSET_X*ZOOM - box.width/2), (int)(pos.y + C_BOX_OFFSET_Y*ZOOM - box.height/2));
     }
     
     public void loop() {
@@ -90,8 +90,6 @@ public class MovingSprite {
     
     public double getX() {return pos.x;}
     public double getY() {return pos.y;}
-    public int getCornerX() {return (int)pos.x - imageSize/2;}
-    public int getCornerY() {return (int)pos.y - imageSize/2;}
     public BufferedImage getImg() {return img;}
     public Position getPosition() {return pos;}
     public boolean isLooping() {return looping;}

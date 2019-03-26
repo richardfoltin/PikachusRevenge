@@ -17,7 +17,6 @@ public class PokeBall extends MovingSprite {
         this.owner = owner;
         this.speed = speed;
         this.moving = true;
-        imageSize = BALLSIZE;
         setImg("object_ball.png");
         setStartingPostion(x, y);
         

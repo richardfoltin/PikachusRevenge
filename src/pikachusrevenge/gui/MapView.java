@@ -12,10 +12,12 @@ import org.mapeditor.view.MapRenderer;
 import org.mapeditor.view.OrthogonalRenderer;
 import static pikachusrevenge.gui.Frame.CUT;
 import pikachusrevenge.model.Model;
+import pikachusrevenge.model.Position;
 import pikachusrevenge.unit.NPC;
 import static pikachusrevenge.unit.NPC.EXCLAMATION_SIZE;
+import static pikachusrevenge.unit.PokeBall.BALLSIZE;
+import static pikachusrevenge.unit.Unit.SPRITE_SIZE;
 import pikachusrevenge.unit.Player;
-import static pikachusrevenge.unit.Unit.UNITSIZE;
 import pikachusrevenge.unit.PokeBall;
 import pikachusrevenge.unit.Pokemon;
 
@@ -26,6 +28,7 @@ public class MapView extends JPanel {
     private final MapRenderer renderer;
 
     public static final int GRIDSIZE = 16;
+    public static final double ZOOM = 0.5;
     
     public MapView(Map map, Model model) {
         this.map = map;
@@ -38,33 +41,54 @@ public class MapView extends JPanel {
 
     private void paintUnitsBottom(Graphics2D g){     
         for (PokeBall ball : model.getThrownBalls()){
-            g.drawImage(ball.getImg(),ball.getCornerX(),ball.getCornerY(),PokeBall.BALLSIZE,PokeBall.BALLSIZE,null);
+            Position pos = ball.getPosition();
+            int size = (int) ((double)BALLSIZE*ZOOM);
+            g.drawImage(ball.getImg(), (int)pos.x - size/2, (int)pos.y - size/2, size, size,null);
         }
         
         for (NPC npc : model.getNpcs()){
-            g.drawImage(npc.getBottomSprite(),npc.getCornerX(),npc.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
+            Position pos = npc.getPosition();
+            int size = (int) ((double)SPRITE_SIZE*ZOOM);
+            int cut = (int) ((double)CUT*ZOOM);
+            g.drawImage(npc.getBottomSprite(),(int)pos.x - size/2, (int)pos.y - size/2 + cut, size , size-cut,null);
         }
         
         for (Pokemon p : model.getMapPokemons()){
-            if (p.isFound()) g.drawImage(p.getBottomSprite(),p.getCornerX(),p.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
+            Position pos = p.getPosition();
+            int size = (int) ((double)SPRITE_SIZE*ZOOM);
+            int cut = (int) ((double)CUT*ZOOM);
+            g.drawImage(p.getBottomSprite(),(int)pos.x - size/2, (int)pos.y - size/2 + cut, size , size-cut,null);
         }
         
         Player player = model.getPlayer();
-        g.drawImage(player.getBottomSprite(),player.getCornerX(),player.getCornerY()+CUT,UNITSIZE,UNITSIZE-CUT,null);
+        Position pos = player.getPosition();
+        int size = (int) ((double)SPRITE_SIZE*ZOOM);
+        int cut = (int) ((double)CUT*ZOOM);
+        g.drawImage(player.getBottomSprite(),(int)pos.x - size/2, (int)pos.y - size/2 + cut, size , size-cut,null);
     }
 
     private void paintUnitsTop(Graphics2D g){     
         for (NPC npc : model.getNpcs()){
-            g.drawImage(npc.getTopSprite(),npc.getCornerX(),npc.getCornerY(),UNITSIZE,CUT,null);
-            if (npc.seesPlayer()) g.drawImage(npc.getExclamation(),npc.getCornerX()+17,npc.getCornerY()-EXCLAMATION_SIZE+14,EXCLAMATION_SIZE,EXCLAMATION_SIZE,null);
+            Position pos = npc.getPosition();
+            int size = (int) ((double)SPRITE_SIZE*ZOOM);
+            int cut = (int) ((double)CUT*ZOOM);
+            int exSize = (int) ((double)EXCLAMATION_SIZE*ZOOM);
+            g.drawImage(npc.getTopSprite(),(int)pos.x - size/2, (int)pos.y - size/2, size, cut, null);
+            if (npc.seesPlayer()) g.drawImage(npc.getExclamation(),(int)pos.x - size/2 + 17,(int)pos.y - size/2-exSize+14,exSize,exSize,null);
         }
         
         for (Pokemon p : model.getMapPokemons()){
-            if (p.isFound()) g.drawImage(p.getTopSprite(),p.getCornerX(),p.getCornerY(),UNITSIZE,CUT,null);
+            Position pos = p.getPosition();
+            int size = (int) ((double)SPRITE_SIZE*ZOOM);
+            int cut = (int) ((double)CUT*ZOOM);
+            g.drawImage(p.getTopSprite(),(int)pos.x - size/2, (int)pos.y - size/2, size, cut, null);
         }
         
         Player player = model.getPlayer();
-        g.drawImage(player.getTopSprite(),player.getCornerX(),player.getCornerY(),UNITSIZE,CUT,null);   
+        Position pos = player.getPosition();
+        int size = (int) ((double)SPRITE_SIZE*ZOOM);
+        int cut = (int) ((double)CUT*ZOOM);
+        g.drawImage(player.getTopSprite(),(int)pos.x - size/2, (int)pos.y - size/2, size, cut, null);  
     } 
     
     @Override

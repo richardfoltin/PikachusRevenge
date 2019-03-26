@@ -1453,6 +1453,11 @@
  <tile id="2619" terrain="8,9,8,8"/>
  <tile id="2620" terrain=",7,7,7"/>
  <tile id="2621" terrain="7,,7,7"/>
+ <tile id="2623">
+  <properties>
+   <property name="Life" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="2695" terrain="8,8,9,8"/>
  <tile id="2696" terrain="8,8,8,9"/>
  <tile id="2697" terrain="7,7,,7"/>

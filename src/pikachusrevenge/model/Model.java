@@ -17,6 +17,7 @@ import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 import pikachusrevenge.gui.MainWindow;
 import static pikachusrevenge.gui.MapView.GRIDSIZE;
+import static pikachusrevenge.gui.MapView.ZOOM;
 import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.Player;
@@ -105,7 +106,7 @@ public class Model implements ActionListener {
     public boolean canMoveTo(Position from, Direction nextDirection, double speed){
         if (nextDirection == Direction.STOP) return false;
         Position targetPosition = new Position(from.x + nextDirection.x * speed, from.y + nextDirection.y * speed);
-        Rectangle target = new Rectangle(0, 0, C_BOX_WIDTH, C_BOX_HEIGHT);
+        Rectangle target = new Rectangle(0, 0, (int)(C_BOX_WIDTH*ZOOM), (int)(C_BOX_HEIGHT*ZOOM));
         MovingSprite.moveCollisionBoxTo(target,targetPosition);
         if (!mapRectangle.contains(target)) return false;
         

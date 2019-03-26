@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import javax.imageio.ImageIO;
-import static pikachusrevenge.unit.Unit.UNITSIZE;
+import static pikachusrevenge.unit.Unit.SPRITE_SIZE;
 
 public class Resource {
     
@@ -27,7 +27,7 @@ public class Resource {
     }
     
     public static BufferedImage getSprite(BufferedImage spriteSheet, int xGrid, int yGrid) {
-        return spriteSheet.getSubimage(xGrid * UNITSIZE, yGrid * UNITSIZE, UNITSIZE, UNITSIZE);
+        return spriteSheet.getSubimage(xGrid * SPRITE_SIZE, yGrid * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE);
     }
     
     public static BufferedImage getScaledImage(Image srcImg, int w, int h){

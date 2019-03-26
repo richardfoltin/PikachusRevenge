@@ -7,11 +7,9 @@ import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import org.mapeditor.core.MapObject;
 import org.mapeditor.core.Properties;
 import pikachusrevenge.model.Direction;
@@ -40,8 +38,7 @@ public class NPC extends Unit {
         STOP_THROW,
         WALKING_CAUTIOUS
     }
-
-    
+ 
     public NPC(MapObject obj, int level, Model model){
         super(model);
         this.level = level;
@@ -59,6 +56,9 @@ public class NPC extends Unit {
     
     private void throwBall() {
         System.out.println("Ball thrown");
+        states.get(NPC_STATE.STOP_THROW).active = true;
+        states.get(NPC_STATE.STOP_EXCLAMATION).active = false;
+        states.get(NPC_STATE.WALKING_CAUTIOUS).active = false;
         model.ballThrow(pos, throwSpeed, this);
     }
     
@@ -120,12 +120,10 @@ public class NPC extends Unit {
                     // Ha figyelmesen halad, akkor dobjon
                     if (states.get(NPC_STATE.WALKING_CAUTIOUS).active) {
                         throwBall();
-                        states.get(NPC_STATE.STOP_THROW).active = true;
-                        states.get(NPC_STATE.STOP_EXCLAMATION).active = false;
-                        states.get(NPC_STATE.WALKING_CAUTIOUS).active = false;
                     } else {
-                    // egyébként indítson el egy várakozót
+                    // egyébként indítson el egy várakozót és ha még közelebb jön dobjon
                         states.get(NPC_STATE.STOP_EXCLAMATION).active = true;
+                        if (playerDistance < throwDistance*0.5) throwBall();
                     }
                 }
             }
@@ -133,7 +131,9 @@ public class NPC extends Unit {
         super.loop();
     }
     
-    public boolean seesPlayer() {return states.get(NPC_STATE.STOP_EXCLAMATION).active || states.get(NPC_STATE.WALKING_CAUTIOUS).active;}
+    public boolean seesPlayer() {return states.get(NPC_STATE.STOP_EXCLAMATION).active || 
+                                        states.get(NPC_STATE.WALKING_CAUTIOUS).active ||
+                                        states.get(NPC_STATE.STOP_THROW).active;}
     public BufferedImage getExclamation() {return exclamation;}
     
     private void loadRoute(Shape shape){
@@ -145,7 +145,7 @@ public class NPC extends Unit {
             int type = pi.currentSegment(coords);
             
             if (type!= PathIterator.SEG_CLOSE) {
-                coords[1] -= (double)UNITSIZE * 0.4; // route should be at feet, not in center
+                coords[1] -= (double)SPRITE_SIZE * 0.4; // route should be at feet, not in center
                 Position position = new Position(coords);
                 if (!(position.x == 0 && position.y == 0)) route.add(position);
             }

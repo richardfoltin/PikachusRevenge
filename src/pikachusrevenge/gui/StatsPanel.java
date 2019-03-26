@@ -57,7 +57,7 @@ public class StatsPanel extends JPanel {
         Image image = null;
         try {image = Resource.loadImage("heart.png");} 
         catch (IOException e) {System.err.println("Can't load file");} 
-        //image = Resource.getScaledImage(image, 20, 20);
+        image = Resource.getScaledImage(image, 15, 15);
         
         JLabel label = new JLabel(new ImageIcon(image),JLabel.CENTER);
         label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));    
@@ -87,7 +87,7 @@ public class StatsPanel extends JPanel {
         Image image = null;
         try {image = Resource.loadImage("ball.png");} 
         catch (IOException e) {System.err.println("Can't load file");} 
-        //image = Resource.getScaledImage(image, 20, 20);
+        image = Resource.getScaledImage(image, 15, 15);
         
         JLabel label = new JLabel(new ImageIcon(image),JLabel.CENTER);
         label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));    

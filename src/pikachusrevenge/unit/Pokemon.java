@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import static pikachusrevenge.gui.MapView.ZOOM;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
@@ -109,7 +110,7 @@ public class Pokemon extends Unit {
         int i = 1;
         for (Pokemon p : model.getMapPokemons()) {
             if (p.isFound()) {
-                p.setDistance(FOLLOW_DISTANCE * i);
+                p.setDistance((int)((double)FOLLOW_DISTANCE * ZOOM * (double)i));
                 i++;
             }
         }

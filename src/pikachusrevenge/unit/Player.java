@@ -1,10 +1,8 @@
 package pikachusrevenge.unit;
 
-import java.awt.Rectangle;
 import pikachusrevenge.gui.MainWindow;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
-import pikachusrevenge.model.Position;
 
 public class Player extends Unit {
     
@@ -17,7 +15,7 @@ public class Player extends Unit {
         
         this.lives = 1;
         this.availableLevels = 1;
-        this.speed = 5.0;
+        this.speed = 3.0;
         this.name = "Pikachu";
         
         setImg("pokemons\\025.png");
@@ -27,6 +25,7 @@ public class Player extends Unit {
     
     public void moveToDirection(Direction d){
         this.nextDirection = d;
+        if (nextDirection != Direction.STOP) startWalking();
     }
     
     public void playerCaught() {
@@ -55,7 +54,7 @@ public class Player extends Unit {
     @Override
     protected void loadNextPosition() {
         if (nextDirection != Direction.STOP && model.canMoveTo(pos,nextDirection,speed)) {
-            if (!moving) startWalking();
+            startWalking();
             super.loadNextPosition();    
         } else {
             stopWalking();

@@ -2,6 +2,7 @@ package pikachusrevenge.unit;
 
 import pikachusrevenge.gui.Animation;
 import java.awt.image.BufferedImage;
+import static pikachusrevenge.gui.MapView.ZOOM;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.resources.Resource;
@@ -14,19 +15,18 @@ public class Unit extends MovingSprite {
     private final Animation[] walk;
     private Animation animation;
         
-    public final static int UNITSIZE = 64;
-    public final static int C_BOX_WIDTH = 10;
-    public final static int C_BOX_HEIGHT = 12;
-    public final static int C_BOX_OFFSET_X = 0;
-    public final static int C_BOX_OFFSET_Y = 24;
+    public final static int SPRITE_SIZE = 64;
+    public final static double C_BOX_WIDTH = 10;
+    public final static double C_BOX_HEIGHT = 12;
+    public final static double C_BOX_OFFSET_X = 0;
+    public final static double C_BOX_OFFSET_Y = 24;
     public final static double FRAMEDELAY = 8;
     
     public Unit(Model model){
         super(model);
         walk = new Animation[4];
-        imageSize = UNITSIZE;
-        collisionBox.setSize(C_BOX_WIDTH, C_BOX_HEIGHT);
-        nextCollisionBox.setSize(C_BOX_WIDTH, C_BOX_HEIGHT);
+        collisionBox.setSize((int)(C_BOX_WIDTH*ZOOM), (int)(C_BOX_HEIGHT*ZOOM));
+        nextCollisionBox.setSize((int)(C_BOX_WIDTH*ZOOM), (int)(C_BOX_HEIGHT*ZOOM));
     }
     
     @Override
