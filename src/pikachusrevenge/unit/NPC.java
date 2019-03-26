@@ -103,7 +103,7 @@ public class NPC extends Unit {
             else routeTarget = 0;
         } else {
             if (routeTarget - 1 >= 0) routeTarget--;
-            else routeTarget = route.size();
+            else routeTarget = route.size()-1;
         }
         return route.get(routeTarget).pos;
     }
@@ -148,7 +148,7 @@ public class NPC extends Unit {
             int type = pi.currentSegment(coords); // 0 - start, 1 - normal, 4 - close
             
             if (type!= PathIterator.SEG_CLOSE) {
-                coords[1] -= (double)SPRITE_SIZE * 0.3; // route should be at feet, not in center
+                coords[1] -= 5; // route should be at feet, not in center
                 Position position = new Position(coords);
                 if (!(position.x == 0 && position.y == 0)) route.add(new NpcRoute(position));
             }
@@ -192,32 +192,56 @@ public class NPC extends Unit {
                 this.throwDistance = 120; // 150 - easy, 300 - very hard
                 this.throwSpeed = 8;
                 this.name = "Green Girl";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 70;
                 setImg("npc\\trchar153.png"); // green girl
                 break;
             case 2 : 
-                this.speed = 0.8; 
-                this.throwDistance = 130; // 150 - easy, 300 - very hard
-                this.throwSpeed = 10;
-                this.name = "Red Hat Girl";
+                this.speed = 1; 
+                this.throwDistance = 140; // 150 - easy, 300 - very hard
+                this.throwSpeed = 8;
+                this.name = "Blonde Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\trchar035.png"); // red hat girl
+                setImg("npc\\trchar066.png"); // blonde girl
                 break;
             case 3 : 
-                this.speed = 0.8; 
-                this.throwDistance = 130; // 150 - easy, 300 - very hard
-                this.throwSpeed = 8;
-                this.name = "Blue Cap Boy";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\trchar040.png"); // blue hat boy
-                break;
-            case 4 : 
                 this.speed = 1; 
-                this.throwDistance = 150; // 150 - easy, 300 - very hard
+                this.throwDistance = 140; // 150 - easy, 300 - very hard
                 this.throwSpeed = 8;
                 this.name = "Green Hat Boy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
                 setImg("npc\\trchar026.png"); // green hat boy
+                break;
+            case 4 : 
+                this.speed = 0.6; 
+                this.throwDistance = 150; // 150 - easy, 300 - very hard
+                this.throwSpeed = 6;
+                this.name = "Old Fart";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 70;
+                setImg("npc\\trchar060.png"); // old boy
+                break;
+            case 5 : 
+                this.speed = 1; 
+                this.throwDistance = 150; // 150 - easy, 300 - very hard
+                this.throwSpeed = 8;
+                this.name = "Red Hat Girl";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                setImg("npc\\trchar035.png"); // red hat girl
+                break;
+            case 6 : 
+                this.speed = 1; 
+                this.throwDistance = 150; // 150 - easy, 300 - very hard
+                this.throwSpeed = 8;
+                this.name = "Blue Cap Boy";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
+                setImg("npc\\trchar040.png"); // blue hat boy
+                break;
+            case 7 : 
+                this.speed = 1.2; 
+                this.throwDistance = 170; // 150 - easy, 300 - very hard
+                this.throwSpeed = 12;
+                this.name = "Ginger Boy";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
+                setImg("npc\\trchar075.png"); // red boy
                 break;
             case 10 : 
                 this.speed = 2.5; 

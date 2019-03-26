@@ -32,10 +32,15 @@ public class Level {
     private Position playerBackStartingPosition;
     
     //private static String[] mapName = {"MapTest","MapTest2"};
-    private static String[] mapName = {"Level1","Level2"};
+    private static String[] mapName = {"Level1","Level2","Level3","Level4"};
     
     public Level(Model model, int id, int time) {
         this.id = id;
+        
+        if (mapName.length < id) {
+            System.err.println("No Level");
+            id = 1;
+        }
         
         try {
             TMXMapReader mapReader = new TMXMapReader();
@@ -114,7 +119,7 @@ public class Level {
     }
     
     public int minimumFoundPokemon() {
-        return maxPokemonCount/2;
+        return (maxPokemonCount + 1) / 2;
     }
     
     public void addCleanUp(MovingSprite sprite) {

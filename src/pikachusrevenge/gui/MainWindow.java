@@ -127,7 +127,7 @@ public class MainWindow extends JFrame {
     }
      
     public void loadLevel(int id) {
-        boolean forward = (model.getActualLevelId() < id);
+        boolean forward = (model.getActualLevelId() <= id);
         Level level = model.buildLevelIfNotExists(id,0);
         
         if (mainPanel != null) remove(mainPanel);

@@ -49,8 +49,6 @@ public class MapView extends JPanel {
             Position pos = npc.getPosition();
             int size = (int) ((double)SPRITE_SIZE*ZOOM);
             g.drawImage(npc.getImg(),(int)pos.x - size/2, (int)pos.y - size/2, size , size,null);
-            int exSize = (int) ((double)EXCLAMATION_SIZE*ZOOM);
-            if (npc.seesPlayer()) g.drawImage(npc.getExclamation(),(int)pos.x - size/2 + 17,(int)pos.y - size/2-exSize+14,exSize,exSize,null);
         }
         
         for (Pokemon p : model.getMapPokemons()){
@@ -63,6 +61,18 @@ public class MapView extends JPanel {
         Position pos = player.getPosition();
         int size = (int) ((double)SPRITE_SIZE*ZOOM);
         g.drawImage(player.getImg(),(int)pos.x - size/2, (int)pos.y - size/2, size , size,null);
+    }
+    
+    
+    private void paintBubbles(Graphics2D g){  
+        for (NPC npc : model.getNpcs()){
+            if (npc.seesPlayer()) {
+                Position pos = npc.getPosition();
+            int size = (int) ((double)SPRITE_SIZE*ZOOM);
+                int exSize = (int) ((double)EXCLAMATION_SIZE*ZOOM);
+                g.drawImage(npc.getExclamation(),(int)pos.x - size/2 + 17,(int)pos.y - size/2-exSize+14,exSize,exSize,null);
+            }
+        }
     }
 
     @Override
@@ -79,6 +89,7 @@ public class MapView extends JPanel {
             if (layer instanceof TileLayer) renderer.paintTileLayer(g2d, (TileLayer) layer);
             //else if (layer instanceof ObjectGroup) renderer.paintObjectGroup(g2d, (ObjectGroup) layer);      
         } 
+        paintBubbles(g2d);
     }
 
 }

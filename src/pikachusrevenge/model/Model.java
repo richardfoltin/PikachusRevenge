@@ -95,12 +95,12 @@ public class Model implements ActionListener {
             if (p.isFound()) p.revealLabel();
         }
         
-        clock.start();
-        timer.start();
         player.setStartingPostion(actualLevel.getPlayerStartingPosition(forward));
         for (NPC npc : actualLevel.getNpcs()) npc.startLooping();
         for (Pokemon p : actualLevel.getPokemons()) if (p.isFound()) p.restartFromStratingPoint();
         player.startLooping();
+        clock.start();
+        timer.start();
     }
     
     public boolean canMoveTo(Position from, Direction nextDirection, double speed){
@@ -151,6 +151,7 @@ public class Model implements ActionListener {
     }
     
     public void stopGame() {
+        player.stopLooping();
         clock.stop();
         timer.stop();
     }

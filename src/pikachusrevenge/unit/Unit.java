@@ -17,10 +17,10 @@ public class Unit extends MovingSprite {
     private Animation animation;
         
     public final static int SPRITE_SIZE = 64;
-    public final static double C_BOX_WIDTH = 10;
-    public final static double C_BOX_HEIGHT = 12;
+    public final static double C_BOX_WIDTH = 8;
+    public final static double C_BOX_HEIGHT = 8;
     public final static double C_BOX_OFFSET_X = 0;
-    public final static double C_BOX_OFFSET_Y = 24;
+    public final static double C_BOX_OFFSET_Y = 16;
     public final static double FRAMEDELAY = 4;
     
     public Unit(Model model){
@@ -48,15 +48,17 @@ public class Unit extends MovingSprite {
 
     @Override
     public void loop() { 
-        switch (nextDirection) {
-            case UP : animation = walk[3]; break;
-            case LEFT :
-            case UPLEFT :
-            case DOWNLEFT : animation = walk[1]; break;
-            case DOWN : animation = walk[0]; break;
-            case RIGHT :
-            case DOWNRIGHT :
-            case UPRIGHT : animation = walk[2]; break;
+        if (nextDirection == direction) {
+            switch (nextDirection) {
+                case UP : animation = walk[3]; break;
+                case LEFT :
+                case UPLEFT :
+                case DOWNLEFT : animation = walk[1]; break;
+                case DOWN : animation = walk[0]; break;
+                case RIGHT :
+                case DOWNRIGHT :
+                case UPRIGHT : animation = walk[2]; break;
+            }
         }
         if (moving) animation.update();
         super.loop();
