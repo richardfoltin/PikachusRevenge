@@ -27,7 +27,7 @@ public class FooterLabel extends JLabel {
         if (!info) {
             if (model.getPlayer().isAtSign()) {
                 if (model.canMoveToNextLevel()) setText("Press SPACE to move to the next level!");
-                else setText("Find more pokemons to move to the next level!");
+                else setText("You have to find at least " + MainWindow.getInstance().getActiveLevel().minimumFoundPokemon() + " to move to the next level!");
             } else setHelpText();
         } else {
             infoCounter++;

@@ -72,7 +72,7 @@ public class Model implements ActionListener {
         return level;
     }
     
-    public void startGame(Level level) {
+    public void startGame(Level level, boolean forward) {
 
         this.actualLevel = level; 
         Map map = level.getMap();
@@ -97,7 +97,7 @@ public class Model implements ActionListener {
         
         clock.start();
         timer.start();
-        player.setStartingPostion(actualLevel.getPlayerStartingPosition());
+        player.setStartingPostion(actualLevel.getPlayerStartingPosition(forward));
         for (NPC npc : actualLevel.getNpcs()) npc.startLooping();
         for (Pokemon p : actualLevel.getPokemons()) if (p.isFound()) p.restartFromStratingPoint();
         player.startLooping();
@@ -184,6 +184,7 @@ public class Model implements ActionListener {
                     if (!p.isFound()) {
                         writeInfo("You have found " + Pokemon.POKEMON_NAME[p.getId()-1]);
                         actualLevel.clearTileWithProperty("Ball", tpos);
+                        actualLevel.increaseFoundPokemonCount();
                         p.found();
                         mainWindow.getGameMenu().buildPokedexMenu(this);
                     }
@@ -224,7 +225,8 @@ public class Model implements ActionListener {
     public Collection<Integer> getAllIds() {return pokemons.values().stream().map(p -> p.getId()).collect(Collectors.toList());}
     public Collection<Integer> getAllFoundIds() {return pokemons.values().stream().filter(p -> p.isFound()).map(p -> p.getId()).collect(Collectors.toList());}
     public ArrayList<Level> getLevels() {return levels;}
-    public int getActualLevelId() {return actualLevel.getId();}
+    public int getActualLevelId() {return (actualLevel == null) ? 0 :actualLevel.getId();}
+    public Level getActualLevel() {return actualLevel;}
     public String getFileName() {return fileName;}
     public int getDbId() {return dbId;}
     public boolean isSavedToDb() {return (dbId != 0 && fileName == null);}

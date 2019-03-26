@@ -169,7 +169,8 @@ public class GameMenu  extends JMenuBar {
     
     public void setAvailableLevels(int maxLevel){
         for (int i = 0; i < levelSelect.getItemCount(); ++i){
-            levelSelect.getItem(i).setEnabled(i < maxLevel);
+            levelSelect.getItem(i).setEnabled(i < maxLevel-1);
+            levelSelect.getItem(i).setEnabled(true); // testing
         }
     }
     
@@ -179,7 +180,7 @@ public class GameMenu  extends JMenuBar {
             JMenuItem menuItem = new JMenuItem();
             menuItem.addActionListener(startLevelAction(i));
             menuItem.setText("Level " + i);
-            if (i > 5) menuItem.setEnabled(false);
+            menuItem.setEnabled(false);
             menuItem.setPreferredSize(new Dimension(MENUITEM_WIDTH / 2,MENUITEM_HEIGHT));
             menu.add(menuItem); 
         }

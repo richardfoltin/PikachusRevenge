@@ -29,8 +29,10 @@ public class Level {
     private int maxPokemonCount;
     private int foundPokemonCount;
     private Position playerStartingPosition;
+    private Position playerBackStartingPosition;
     
-    private static String[] mapName = {"MapTest","Level1"};
+    //private static String[] mapName = {"MapTest","MapTest2"};
+    private static String[] mapName = {"Level1","Level2"};
     
     public Level(Model model, int id, int time) {
         this.id = id;
@@ -88,6 +90,8 @@ public class Level {
                 for (MapObject o : ((ObjectGroup)l).getObjects()){
                     if (o.getName().equals("Enter")){
                         this.playerStartingPosition = new Position(o.getX(),o.getY());
+                    }else if (o.getName().equals("Back")){
+                        this.playerBackStartingPosition = new Position(o.getX(),o.getY());
                     }else if (o.getName().equals("NPC")) {
                         Properties prop = o.getProperties();
                         
@@ -100,9 +104,17 @@ public class Level {
         }
     }
     
+    public void increaseFoundPokemonCount() {
+        foundPokemonCount++;
+    }
+    
     public boolean canAdvanceToNextLevel() {
-        if (maxPokemonCount == foundPokemonCount) return true;
-        return true;
+        if (foundPokemonCount >= minimumFoundPokemon()) return true;
+        else return false;
+    }
+    
+    public int minimumFoundPokemon() {
+        return maxPokemonCount/2;
     }
     
     public void addCleanUp(MovingSprite sprite) {
@@ -154,6 +166,8 @@ public class Level {
     public int getId() {return id;}
     public int getTime() {return time;}
     public Map getMap() {return map;}
-    public Position getPlayerStartingPosition() {return playerStartingPosition;}
+    public Position getPlayerStartingPosition(boolean forward) {
+        return (forward) ? playerStartingPosition : playerBackStartingPosition;
+    }
     
 }

@@ -2,8 +2,6 @@ package pikachusrevenge.gui;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.List;
-
 
 public class Animation {
 
@@ -15,38 +13,33 @@ public class Animation {
 
     private boolean stopped;
 
-    private List<Frame> frames = new ArrayList<Frame>();
+    private ArrayList<BufferedImage> frames = new ArrayList<>();
 
-    public Animation(BufferedImage[] frames, int frameDelay) {
+    public Animation(ArrayList<BufferedImage>  frames, int frameDelay) {
         this.frameDelay = frameDelay;
         this.stopped = true;
-
-        for (int i = 0; i < frames.length; i++) {
-            this.frames.add(new Frame(frames[i], frameDelay));
-        }
-
+        this.frames = frames;
         this.frameCount = 0;
         this.frameDelay = frameDelay;
         this.currentFrame = 0;
         this.animationDirection = 1;
         this.totalFrames = this.frames.size();
-
     }
 
     public void start() {
         if (!stopped) return;
-        if (frames.size() == 0) return;
+        if (frames.isEmpty()) return;
         stopped = false;
     }
 
     public void stop() {
-        if (frames.size() == 0) return;
+        if (frames.isEmpty()) return;
         if (currentFrame != 2) currentFrame = 0;
         stopped = true;
     }
 
     public void restart() {
-        if (frames.size() == 0) return;
+        if (frames.isEmpty()) return;
         stopped = false;
         currentFrame = 0;
     }
@@ -57,7 +50,7 @@ public class Animation {
         this.currentFrame = 0;
     }
 
-    public Frame getFrame() {
+    public BufferedImage getFrame() {
         return frames.get(currentFrame);
     }
 

@@ -2,6 +2,7 @@ package pikachusrevenge.unit;
 
 import pikachusrevenge.gui.Animation;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import static pikachusrevenge.gui.MapView.ZOOM;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
@@ -20,7 +21,7 @@ public class Unit extends MovingSprite {
     public final static double C_BOX_HEIGHT = 12;
     public final static double C_BOX_OFFSET_X = 0;
     public final static double C_BOX_OFFSET_Y = 24;
-    public final static double FRAMEDELAY = 8;
+    public final static double FRAMEDELAY = 4;
     
     public Unit(Model model){
         super(model);
@@ -34,9 +35,9 @@ public class Unit extends MovingSprite {
         super.setImg(filePath);
         if (animated) {
             for (int i = 0; i < 4; ++i){
-                BufferedImage[] movement = new BufferedImage[4];
+                ArrayList<BufferedImage> movement = new ArrayList<>();
                 for (int j = 0; j < 4; ++j){
-                    movement[j] = Resource.getSprite(super.getImg(), j, i);
+                    movement.add(j,Resource.getSprite(super.getImg(), j, i));
                 }
                 Animation movementAnimation = new Animation(movement,(int)(FRAMEDELAY / speed));
                 walk[i] = movementAnimation;
@@ -70,13 +71,10 @@ public class Unit extends MovingSprite {
         animation.stop();
         moving = false;
     }
-
-    public BufferedImage getTopSprite() {
-        return animation.getFrame().getTop();
-    }
-
-    public BufferedImage getBottomSprite() {
-        return animation.getFrame().getBottom();
+    
+    @Override
+    public BufferedImage getImg() {
+        return animation.getFrame();
     }
     
     public void restartFromStratingPoint() {

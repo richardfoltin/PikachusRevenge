@@ -18,8 +18,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
-import javax.swing.WindowConstants;
-import org.mapeditor.core.Map;
 import pikachusrevenge.model.KeyPressHandler;
 import pikachusrevenge.model.Level;
 import pikachusrevenge.model.Model;
@@ -39,8 +37,8 @@ public class MainWindow extends JFrame {
     private FooterLabel footer;
     private KeyAdapter keyAdapter;
       
-    public static final int WINDOW_WIDTH = 450;
-    public static final int WINDOW_HEIGHT = 350;
+    public static final int WINDOW_WIDTH = 448; // 28 tiles
+    public static final int WINDOW_HEIGHT = 352; // 22 tiles
 
     public class MapLoadingException extends Exception {}
     
@@ -129,6 +127,7 @@ public class MainWindow extends JFrame {
     }
      
     public void loadLevel(int id) {
+        boolean forward = (model.getActualLevelId() < id);
         Level level = model.buildLevelIfNotExists(id,0);
         
         if (mainPanel != null) remove(mainPanel);
@@ -146,7 +145,7 @@ public class MainWindow extends JFrame {
         model.getPlayer().increaseAvailableLevels(id);
         menu.setAvailableLevels(model.getPlayer().getAvailableLevels());
         
-        model.startGame(level);   
+        model.startGame(level,forward);   
         scrollTo(model.getPlayer().getPosition());  
         pack();
     }
@@ -211,4 +210,5 @@ public class MainWindow extends JFrame {
     public FooterLabel getFooter() {return footer;}
     public Model getModel() {return model;}
     public GameMenu getGameMenu() {return menu;}
+    public Level getActiveLevel() {return model.getActualLevel();}
 }
