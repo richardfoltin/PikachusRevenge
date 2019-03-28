@@ -439,7 +439,9 @@ public class GameMenu  extends JMenuBar {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                    MainWindow.getInstance().loadLevel(level);
+                Model model = MainWindow.getInstance().getModel();
+                if (model != null) model.stopGame();
+                MainWindow.getInstance().loadLevel(level);
             }
         };
     } 

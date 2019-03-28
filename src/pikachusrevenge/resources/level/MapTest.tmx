@@ -223,7 +223,7 @@
   </object>
   <object id="7" name="NPC" type="Route" x="616" y="665">
    <properties>
-    <property name="Level" type="int" value="10"/>
+    <property name="Level" type="int" value="100"/>
     <property name="Reverse" type="int" value="5"/>
     <property name="Wait2" type="int" value="100"/>
     <property name="Wait5" type="int" value="50"/>

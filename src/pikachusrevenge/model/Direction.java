@@ -56,7 +56,7 @@ public enum Direction {
         }
     }
     
-    public static boolean isInLineOfSight(Direction from, Direction to) {
+    public static boolean isInDirectionOfSight(Direction from, Direction to) {
         if (from == to) return true;
         if (from == STOP || to == STOP) return false;
         if (Math.abs(from.x - to.x) + Math.abs(from.y - to.y) <= 1) return true;

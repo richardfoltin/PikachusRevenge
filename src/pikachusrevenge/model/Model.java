@@ -138,11 +138,16 @@ public class Model implements ActionListener {
 
     public void playerInteraction(){
         if (player.isAtSign()){
-            if (canMoveToNextLevel()) {
-                stopGame();
-                mainWindow.loadLevel(actualLevel.getId() + 1);
+            if (actualLevel.getId() == 10) {
+                System.out.println("Game finished");
+            } else {
+                if (canMoveToNextLevel()) {
+                    stopGame();
+                    mainWindow.loadLevel(actualLevel.getId() + 1);
+                }else {
+                    writeInfo("Can't move to next level yet!");
+                }
             }
-            else writeInfo("Can't move to next level yet!");
         }
     }
     

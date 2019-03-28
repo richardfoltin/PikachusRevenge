@@ -21,6 +21,7 @@ public class NPC extends Unit {
     private double throwDistance;
     private double throwSpeed;
     private final BufferedImage exclamation;
+    private int startRoute;
     private HashMap<NPC_STATE,NpcState> states;
     
     private List<NpcRoute> route;
@@ -100,7 +101,11 @@ public class NPC extends Unit {
         if (route.get(routeTarget).reverse) forward = !forward;
         if (forward) {
             if (routeTarget + 1 < route.size()) routeTarget++;
-            else routeTarget = 0;
+            else {
+                routeTarget = 0;
+                pos = route.get(0).pos;
+                nextPosition = route.get(0).pos;
+            }
         } else {
             if (routeTarget - 1 >= 0) routeTarget--;
             else routeTarget = route.size()-1;
@@ -113,24 +118,23 @@ public class NPC extends Unit {
         Position playerPostion = model.getPlayer().getPosition();
         double playerDistance = playerPostion.distanceFrom(pos);
         Direction playerDirection = Direction.getDirection(pos, playerPostion);
-        if (Direction.isInLineOfSight(direction, playerDirection)) {
+        if (!states.get(NPC_STATE.STOP_THROW).active &&                         // nem éppen dob
+            !model.getPlayer().insideBall() &&                                  // player nincs már elkapva
+            playerDistance < throwDistance &&                                   // player dobási távolságon belül van
+            Direction.isInDirectionOfSight(direction, playerDirection) &&       // player a megfelelő irányban van
+            model.getActualLevel().isInLineOfSight(pos,playerPostion)){        // player LOS-ban van 
             //System.out.println(String.format("Player is in LOS : %s - %s (%.0f)",direction,playerDirection.name(),distance));
             
-            // Ha LOS-ban van és nem éppen dob
-            if (!states.get(NPC_STATE.STOP_THROW).active){
-                // Ha dobási távolságon belül van
-                if (playerDistance < throwDistance) {
-                    // Ha figyelmesen halad, akkor dobjon
-                    if (states.get(NPC_STATE.WALKING_CAUTIOUS).active) {
-                        throwBall();
-                    } else {
-                    // egyébként indítson el egy várakozót és ha még közelebb jön dobjon
-                        states.get(NPC_STATE.STOP_EXCLAMATION).active = true;
-                        if (playerDistance < throwDistance*0.6) throwBall();
-                    }
-                }
+            // Ha figyelmesen halad, akkor dobjon
+            if (states.get(NPC_STATE.WALKING_CAUTIOUS).active) {
+                throwBall();
+            } else {
+                // egyébként indítson el egy várakozót és ha még közelebb jön dobjon
+                states.get(NPC_STATE.STOP_EXCLAMATION).active = true;
+                if (playerDistance < throwDistance*0.6) throwBall();
             }
-        }
+            
+       }
         super.loop();
     }
     
@@ -154,12 +158,6 @@ public class NPC extends Unit {
             }
             pi.next();
         }
-        
-        setStartingPostion(route.get(0).pos.x, route.get(0).pos.y);
-        this.targetPosition = route.get(1).pos;
-        routeTarget = 1;
-        
-        loadNextPosition();
     }
     
     private void loadNpcRoutePorperties(MapObject obj){
@@ -172,7 +170,15 @@ public class NPC extends Unit {
         int reverseId = Integer.parseInt(prop.getProperty("Reverse", "0"));
         if (reverseId != 0 && reverseId < route.size()){
             route.get(reverseId).reverse = true;
+            route.get(0).reverse = true;
         }
+        startRoute = Integer.parseInt(prop.getProperty("Start", "0"));
+        if (startRoute >= route.size()) startRoute = 0;
+        setStartingPostion(route.get(startRoute).pos.x, route.get(startRoute).pos.y);
+        this.targetPosition = route.get(startRoute + 1).pos;
+        routeTarget = startRoute + 1;
+        
+        loadNextPosition();
     }
     
     private HashMap<NPC_STATE,NpcState> getStateArray() {
@@ -243,7 +249,103 @@ public class NPC extends Unit {
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
                 setImg("npc\\trchar075.png"); // red boy
                 break;
+            case 8 : 
+                this.speed = 0.8; 
+                this.throwDistance = 100; // 150 - easy, 300 - very hard
+                this.throwSpeed = 8;
+                this.name = "Cultist";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                setImg("npc\\trchar163.png"); // cultist
+                break;
+            case 9 : 
+                this.speed = 1.0; 
+                this.throwDistance = 80; // 150 - easy, 300 - very hard
+                this.throwSpeed = 12;
+                this.name = "Cultist Boss";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
+                setImg("npc\\trchar164.png"); // boss cultist
+                break;
             case 10 : 
+                this.speed = 2.5; 
+                this.throwDistance = 50; // 150 - easy, 300 - very hard
+                this.throwSpeed = 12;
+                this.name = "Snowboard Boy";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\trchar013.png"); // snowboard boy
+                break;
+            case 11 : 
+                this.speed = 2.5; 
+                this.throwDistance = 50; // 150 - easy, 300 - very hard
+                this.throwSpeed = 12;
+                this.name = "Ski Girl";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\trchar014.png"); // ski girl
+                break;
+            case 12 : 
+                this.speed = 2.5; 
+                this.throwDistance = 50; // 150 - easy, 300 - very hard
+                this.throwSpeed = 12;
+                this.name = "Snowboard Boy";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\trchar013_mod.png"); // snowboard boy 2
+                break;
+            case 13 : 
+                this.speed = 2.5; 
+                this.throwDistance = 50; // 150 - easy, 300 - very hard
+                this.throwSpeed = 12;
+                this.name = "Ski Girl";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\trchar014_mod.png"); // ski girl 2
+                break;
+            case 14 : 
+                this.speed = 1.0; 
+                this.throwDistance = 200; // 150 - easy, 300 - very hard
+                this.throwSpeed = 10;
+                this.name = "Fat Evil Guy";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\Leader_Chuck.png"); // at Evil Guy
+                break;
+            case 15 : 
+                this.speed = 1.0; 
+                this.throwDistance = 200; // 150 - easy, 300 - very hard
+                this.throwSpeed = 10;
+                this.name = "White Hair Evil Guy";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\Leader_Damian.png"); // White Hair Evil Guy
+                break;
+            case 16 : 
+                this.speed = 1.0; 
+                this.throwDistance = 200; // 150 - easy, 300 - very hard
+                this.throwSpeed = 10;
+                this.name = "Purple Hair Evil Girl";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\Leader_Janine.png"); // Purple Hair Evil Girl
+                break;
+            case 17 : 
+                this.speed = 1.3; 
+                this.throwDistance = 200; // 150 - easy, 300 - very hard
+                this.throwSpeed = 10;
+                this.name = "Purple Evil Skirt Girl";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\Leader_Fantina.png"); // Purple Evil Skirt Girl
+                break;
+            case 18 : 
+                this.speed = 1.0; 
+                this.throwDistance = 200; // 150 - easy, 300 - very hard
+                this.throwSpeed = 10;
+                this.name = "Old Evil Guy";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\Leader_Pryce.png"); // Old Evil Guy
+                break;
+            case 19 : 
+                this.speed = 1.3; 
+                this.throwDistance = 200; // 150 - easy, 300 - very hard
+                this.throwSpeed = 10;
+                this.name = "Epic Fat Evil Guy";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\Leader_Wake.png"); // Epic Fat Evil Guy
+                break;
+            case 100 : 
                 this.speed = 2.5; 
                 this.throwDistance = 200; // 150 - easy, 300 - very hard
                 this.throwSpeed = 10;

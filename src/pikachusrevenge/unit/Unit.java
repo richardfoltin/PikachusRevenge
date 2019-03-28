@@ -20,7 +20,7 @@ public class Unit extends MovingSprite {
     public final static double C_BOX_WIDTH = 8;
     public final static double C_BOX_HEIGHT = 8;
     public final static double C_BOX_OFFSET_X = 0;
-    public final static double C_BOX_OFFSET_Y = 16;
+    public final static double C_BOX_OFFSET_Y = 18;
     public final static double FRAMEDELAY = 4;
     
     public Unit(Model model){

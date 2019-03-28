@@ -1,5 +1,8 @@
 package pikachusrevenge.model;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
+import static java.lang.Math.signum;
 import java.util.ArrayList;
 import java.util.List;
 import org.mapeditor.core.Map;
@@ -10,6 +13,7 @@ import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 import org.mapeditor.io.TMXMapReader;
+import static pikachusrevenge.model.TilePosition.tileCoordFromMapCoord;
 import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.PokeBall;
@@ -31,8 +35,10 @@ public class Level {
     private Position playerStartingPosition;
     private Position playerBackStartingPosition;
     
+    // maze with: http://www.mazegenerator.net/Default.aspx
+    
     //private static String[] mapName = {"MapTest","MapTest2"};
-    private static String[] mapName = {"Level1","Level2","Level3","Level4"};
+    private static String[] mapName = {"Level1","Level2","Level3","Level4","Level5","Level6","Level7","Level8","Level9","Level10"};
     
     public Level(Model model, int id, int time) {
         this.id = id;
@@ -107,6 +113,31 @@ public class Level {
                 }
             }
         }
+    }
+    
+    public boolean isInLineOfSight(Position npcPosition, Position playerPosition) {
+        if (id != 9) return true; // csak a 9. pályán van LOS
+        
+        Position pos = new Position(npcPosition);
+        double dx = playerPosition.x - npcPosition.x;
+        double dy = playerPosition.y - npcPosition.y;
+        double incX = (abs(dx) >= abs(dy)) ? (double)signum(dx) : dx/abs(dy); 
+        double incY = (abs(dx) >= abs(dy)) ? dy/abs(dx) : (double)signum(dy); 
+        int longer = (int)max(abs(dx),abs(dy));
+        for (int i = 0; i <= longer; ++i) {
+            int x = tileCoordFromMapCoord(pos.x += incX);
+            int y = tileCoordFromMapCoord(pos.y += incY);
+            for (MapLayer l : layers){
+                if (l instanceof TileLayer){
+                    Tile t = ((TileLayer)l).getTileAt(x, y);
+                    if (hasProperty(t,"LOS")) {
+                        return false;
+                    }
+                }
+          }
+        }
+        
+        return true;
     }
     
     public void increaseFoundPokemonCount() {
