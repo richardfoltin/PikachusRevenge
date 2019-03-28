@@ -482,7 +482,7 @@
     <property name="Wait4" type="int" value="50"/>
     <property name="Wait9" type="int" value="100"/>
    </properties>
-   <polygon points="0,0 79,8 23,57 27,151 65,187 -103,191 -100,114 -15,108 -22,32 -79,15"/>
+   <polygon points="-3,-1 79,8 23,57 27,151 65,187 -103,191 -100,114 -15,108 -22,32 -79,15"/>
   </object>
  </objectgroup>
 </map>

@@ -31,10 +31,12 @@ public class FooterLabel extends JLabel {
         if (!info) {
             if (model.getPlayer().isAtSign()) {
                 if (model.getActualLevelId() == 10) {
-                    setText("Press SPACE to finish the game!");
+                    setText("<html>Press <font color=black>SPACE</font> to finish the game!</html>");
                 } else {
-                    if (model.canMoveToNextLevel()) setText("Press SPACE to move to the next level!");
-                    else setText("You have to find at least " + MainWindow.getInstance().getActiveLevel().minimumFoundPokemon() + " pokémon to move to the next level!");
+                    if (model.canMoveToNextLevel()) setText("<html>Press <font color=black>SPACE</font> to move to the next level!</html>");
+                    else setText("<html>You have to find at least <font color=black>" + 
+                            MainWindow.getInstance().getActiveLevel().minimumFoundPokemon() + 
+                            " pokémon</font> to move to the next level!</html>");
                 }
             } else setHelpText();
         } else {
@@ -48,7 +50,7 @@ public class FooterLabel extends JLabel {
     public void write(String str) {
         infoCounter = 0;
         info = true;
-        setText(str);
+        setText("<html>" + str + "</html>");
     }
     
     public void setModel(Model model) {this.model = model;}

@@ -133,7 +133,7 @@ public class Model implements ActionListener {
     public void ballReachedPlayer(PokeBall ball) {
         actualLevel.addCleanUp(ball);
         player.playerCaught();
-        writeInfo(String.format("%s caught you!",ball.getOwner().getName()));
+        writeInfo(String.format("<font color=black>%s</font> caught you!",ball.getOwner().getName()));
     }
 
     public void playerInteraction(){
@@ -145,7 +145,7 @@ public class Model implements ActionListener {
                     stopGame();
                     mainWindow.loadLevel(actualLevel.getId() + 1);
                 }else {
-                    writeInfo("Can't move to next level yet!");
+                    writeInfo("<font color=black>Can't</font> move to next level yet!");
                 }
             }
         }
@@ -188,7 +188,7 @@ public class Model implements ActionListener {
                 if (pokemons.containsKey(tpos)) {
                     Pokemon p = pokemons.get(tpos);
                     if (!p.isFound()) {
-                        writeInfo("You have found " + Pokemon.POKEMON_NAME[p.getId()-1]);
+                        writeInfo("You have found <font color=black>" + Pokemon.POKEMON_NAME[p.getId()-1] + "</font>");
                         actualLevel.clearTileWithProperty("Ball", tpos);
                         actualLevel.increaseFoundPokemonCount();
                         p.found();
