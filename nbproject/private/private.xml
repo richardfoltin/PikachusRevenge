@@ -3,27 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/Player.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/test/pikachusrevenge/JUnitTest.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/model/Position.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/model/Direction.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/model/Model.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/MapView.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/model/KeyPressHandler.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/NPC.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/PokeBall.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/resources/Resource.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/Pokemon.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/PikachusRevenge.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/MovingSprite.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/unit/Unit.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/Frame.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/GameMenu.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/FooterLabel.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/model/Collision.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/StatsPanel.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/gui/Animation.java</file>
-            <file>file:/C:/Users/pokemonbudapest/Documents/NetBeansProjects/PikachusRevenge/src/pikachusrevenge/LevelWindow.java</file>
+            <file>file:/C:/Users/pokemonterkep/Documents/ELTE/Progtech/PikachusRevenge/src/pikachusrevenge/model/Level.java</file>
+            <file>file:/C:/Users/pokemonterkep/Documents/ELTE/Progtech/PikachusRevenge/src/pikachusrevenge/unit/NPC.java</file>
+            <file>file:/C:/Users/pokemonterkep/Documents/ELTE/Progtech/PikachusRevenge/src/pikachusrevenge/model/Model.java</file>
+            <file>file:/C:/Users/pokemonterkep/Documents/ELTE/Progtech/PikachusRevenge/src/pikachusrevenge/model/Collision.java</file>
         </group>
     </open-files>
 </project-private>

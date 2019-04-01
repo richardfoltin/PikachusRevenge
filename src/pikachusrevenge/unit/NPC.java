@@ -403,6 +403,14 @@ public class NPC extends Unit {
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
                 setImg("npc\\trchar051.png"); // Little Girl
                 break;
+            case 26 : 
+                this.speed = 0.8; 
+                this.throwDistance = 100; // 100 - easy, 200 - very hard
+                this.throwSpeed = 8;
+                this.name = "Old Monk";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                setImg("npc\\NPC_10.png"); // Old Monk
+                break;
                 //////
             case 30 : 
                 this.speed = 1.3; 

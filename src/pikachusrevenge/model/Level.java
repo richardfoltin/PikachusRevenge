@@ -34,9 +34,7 @@ public class Level {
     private int foundPokemonCount;
     private Position playerStartingPosition;
     private Position playerBackStartingPosition;
-    
-    // maze with: http://www.mazegenerator.net/Default.aspx
-    
+        
     //private static String[] mapName = {"MapTest","MapTest2"};
     private static String[] mapName = {"Level1","Level2","Level3","Level4","Level5","Level6","Level7","Level8","Level9","Level10"};
     
