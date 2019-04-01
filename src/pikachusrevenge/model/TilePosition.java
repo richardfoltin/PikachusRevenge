@@ -22,8 +22,8 @@ public class TilePosition {
         return (int)floor((coord) / GRIDSIZE);
     }
     
-    public Position tileCenter(){
-        return new Position((double)x * GRIDSIZE + GRIDSIZE/2,(double)y * GRIDSIZE + GRIDSIZE/2);
+    public static Position tileCenter(TilePosition tpos){
+        return new Position((double)tpos.getX() * GRIDSIZE + GRIDSIZE/2,(double)tpos.getY() * GRIDSIZE + GRIDSIZE/2);
     }
     
     @Override

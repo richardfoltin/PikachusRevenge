@@ -5,6 +5,7 @@ import java.io.IOException;
 import pikachusrevenge.gui.MainWindow;
 import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
+import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
 
 public class Player extends Unit {
@@ -12,6 +13,8 @@ public class Player extends Unit {
     private int lives;
     private int availableLevels;
     private boolean atSign;
+    private NPC atCarry;
+    private NPC onCarry;
     private BufferedImage caughtImage;
     private int caughtWait;
     private int caughtWaitMax;
@@ -34,8 +37,12 @@ public class Player extends Unit {
     }
     
     public void moveToDirection(Direction d){
-        this.nextDirection = d;
-        if (nextDirection != Direction.STOP) startWalking();
+        if (!isOnCarry()) {
+            this.nextDirection = d;
+            if (nextDirection != Direction.STOP) startWalking();
+        } else {
+            model.writeInfo("You can only get off by pressing <font color=black>SPACE</font> near shore!");
+        }
     }
     
     public void playerCaught() {
@@ -67,10 +74,14 @@ public class Player extends Unit {
         if (insideBall()) {
             caughtWait++;
             if (caughtWait >= caughtWaitMax) restartOrGameOver();
+        } else if (isOnCarry()) {
+            pos.x = onCarry.getX();
+            pos.y = onCarry.getY() - 7;
         } else {
             super.loop();
             model.checkBallPokemonAt(collisionBox);
             atSign = model.checkSign(pos);
+            atCarry = model.checkCarry(pos);
         }
     }
 
@@ -94,9 +105,23 @@ public class Player extends Unit {
         if (level > availableLevels) availableLevels = level;
     }
     
+    public void putOnCarry() {
+        onCarry = atCarry;
+        atCarry = null;
+    }
+    public void getOffCarry(Position shorePosition) {
+        pos.x = shorePosition.x;
+        pos.y = shorePosition.y;
+        nextPosition.x = pos.x;
+        nextPosition.y = pos.y;
+        onCarry = null;
+    }
+    
     public void setLives(int lives) {this.lives = lives;}
     
     public boolean isAtSign() {return atSign;}
+    public NPC isAtCarry() {return atCarry;}
+    public boolean isOnCarry() {return onCarry != null;}
     public int getLives() {return lives;}
     public int getAvailableLevels() {return availableLevels;}
     public double getSpeed() {return speed;}

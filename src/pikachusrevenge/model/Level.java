@@ -29,26 +29,26 @@ public class Level {
     private int time;
     private Map map = null;
     private final Model model;
-    private List<MapLayer> layers;
+    private final List<MapLayer> layers;
     private int maxPokemonCount;
     private int foundPokemonCount;
     private Position playerStartingPosition;
     private Position playerBackStartingPosition;
         
-    //private static String[] mapName = {"MapTest","MapTest2"};
-    private static String[] mapName = {"Level1","Level2","Level3","Level4","Level5","Level6","Level7","Level8","Level9","Level10"};
+    //private static final String[] mapName = {"Teodora","MapTest2"};
+    private static final String[] MAP_NAME = {"Level1","Level2","Level3","Level4","Level5","Level6","Level7","Level8","Level9","Level10"};
     
     public Level(Model model, int id, int time) {
         this.id = id;
         
-        if (mapName.length < id) {
+        if (MAP_NAME.length < id) {
             System.err.println("No Level");
             id = 1;
         }
         
         try {
             TMXMapReader mapReader = new TMXMapReader();
-            this.map = mapReader.readMap("src\\pikachusrevenge\\resources\\level\\" + mapName[id-1] + ".tmx");
+            this.map = mapReader.readMap("src\\pikachusrevenge\\resources\\level\\" + MAP_NAME[id-1] + ".tmx");
         } catch (Exception e) {
             System.out.println("Error while reading the map:\n" + e.getMessage());
         }
@@ -97,16 +97,21 @@ public class Level {
         for (MapLayer l : layers){
             if (l instanceof ObjectGroup){
                 for (MapObject o : ((ObjectGroup)l).getObjects()){
-                    if (o.getName().equals("Enter")){
-                        this.playerStartingPosition = new Position(o.getX(),o.getY());
-                    }else if (o.getName().equals("Back")){
-                        this.playerBackStartingPosition = new Position(o.getX(),o.getY());
-                    }else if (o.getName().equals("NPC")) {
-                        Properties prop = o.getProperties();
-                        
-                        int level = Integer.parseInt(prop.getProperty("Level", "1"));
-                        NPC npc = new NPC(o, level, model);
-                        npcs.add(npc);
+                    switch (o.getName()) {
+                        case "Enter":
+                            this.playerStartingPosition = new Position(o.getX(),o.getY());
+                            break;
+                        case "Back":
+                            this.playerBackStartingPosition = new Position(o.getX(),o.getY());
+                            break;
+                        case "NPC":
+                            Properties prop = o.getProperties();
+                            int level = Integer.parseInt(prop.getProperty("Level", "1"));
+                            NPC npc = new NPC(o, level, model);
+                            npcs.add(npc);
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -185,9 +190,9 @@ public class Level {
     
     private void cleanUp() {
         for (MovingSprite m : cleanUp) {
-            if (m instanceof PokeBall) thrownBalls.remove(m);
-            else if (m instanceof NPC) npcs.remove(m);
-            else if (m instanceof Pokemon) pokemons.remove(m);
+            if (m instanceof PokeBall) thrownBalls.remove((PokeBall)m);
+            else if (m instanceof NPC) npcs.remove((NPC)m);
+            else if (m instanceof Pokemon) pokemons.remove((Pokemon)m);
         }
         cleanUp.clear();
     }

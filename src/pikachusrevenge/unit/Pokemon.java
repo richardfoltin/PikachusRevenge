@@ -21,7 +21,7 @@ public class Pokemon extends Unit {
     private int distance;
     
     private static final int FOLLOW_DISTANCE = 45;
-    private static final int MAX_DISTANCE = 300;
+    private static final int MAX_DISTANCE = 330;
     
     public Pokemon(Model model, TilePosition tpos, int id, boolean found) {
         this(model, tpos, id);

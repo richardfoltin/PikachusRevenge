@@ -38,6 +38,10 @@ public class FooterLabel extends JLabel {
                             MainWindow.getInstance().getActiveLevel().minimumFoundPokemon() + 
                             " pokémon</font> to move to the next level!</html>");
                 }
+            } else if (model.getPlayer().isAtCarry() != null) {
+                setText("<html>Press <font color=black>SPACE</font> to carry yourself!</html>");
+            } else if (model.getPlayer().isOnCarry()) {
+                setText("<html>Press <font color=black>SPACE</font> to leave carry!</html>");
             } else setHelpText();
         } else {
             infoCounter++;

@@ -148,6 +148,15 @@ public class Model implements ActionListener {
                     writeInfo("<font color=black>Can't</font> move to next level yet!");
                 }
             }
+        } else if (player.isAtCarry() != null) {
+            player.putOnCarry();
+        } else if (player.isOnCarry()) {
+            Position shorePosition = checkCarryOff(player.getPosition());
+            if (shorePosition != null) {
+                player.getOffCarry(shorePosition);
+            } else {
+                writeInfo("You can only get of near shore!");
+            }  
         }
     }
     
@@ -174,6 +183,31 @@ public class Model implements ActionListener {
             } 
         } 
         return false;
+    }
+    
+    public NPC checkCarry(Position pos) {
+        for (NPC npc : actualLevel.getNpcs()){
+            if (npc.getCarry() && npc.getPosition().distanceFrom(pos) < 25) return npc;
+        } 
+        return null;
+    }
+    
+    public Position checkCarryOff(Position pos) {
+        int x = TilePosition.tileCoordFromMapCoord(pos.x);
+        int y = TilePosition.tileCoordFromMapCoord(pos.y + 12);
+        for (MapLayer l : layers){
+            if (l instanceof TileLayer){
+                for (int i = x - 1; i <= x + 1; ++i){
+                    for (int j = y - 1; j <= y + 1; ++j) {
+                        Tile t = ((TileLayer)l).getTileAt(i,j);
+                        if (actualLevel.hasProperty(t,"Carry")) {
+                            return TilePosition.tileCenter(new TilePosition(i,j,0)).movePosition(0, -12);
+                        } 
+                    }
+                }
+            } 
+        } 
+        return null;
     }
     
     public void checkBallPokemonAt(Rectangle target){
@@ -211,7 +245,7 @@ public class Model implements ActionListener {
         }
     }    
     
-    private void writeInfo(String str){
+    public void writeInfo(String str){
         mainWindow.getFooter().write(str);
     }   
     

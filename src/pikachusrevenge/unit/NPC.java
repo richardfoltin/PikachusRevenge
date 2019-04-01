@@ -29,6 +29,7 @@ public class NPC extends Unit {
     private int routeTarget;
     private Position targetPosition;
     private boolean forward = true;
+    private boolean carry;
     
     public static final int EXCLAMATION_SIZE = 40;
     
@@ -49,7 +50,7 @@ public class NPC extends Unit {
         catch (IOException e) {System.err.println("Can't load file");} 
         exclamation = Resource.getScaledImage(image, EXCLAMATION_SIZE, EXCLAMATION_SIZE);
         
-        loadLevelProperties();
+        loadNpcProperties();
         loadRoute(obj.getShape());
         loadNpcRoutePorperties(obj);
     }
@@ -126,7 +127,8 @@ public class NPC extends Unit {
             !model.getPlayer().insideBall() &&                                  // player nincs már elkapva
             playerDistance < throwDistance &&                                   // player dobási távolságon belül van
             Direction.isInDirectionOfSight(direction, playerDirection) &&       // player a megfelelő irányban van
-            model.getActualLevel().isInLineOfSight(pos,playerPostion)){        // player LOS-ban van 
+            model.getActualLevel().isInLineOfSight(pos,playerPostion) &&        // player LOS-ban van
+            !model.getPlayer().isOnCarry()){                                    // player nem épp carry-n van
             //System.out.println(String.format("Player is in LOS : %s - %s (%.0f)",direction,playerDirection.name(),distance));
             
             // Ha figyelmesen halad, akkor dobjon
@@ -146,6 +148,7 @@ public class NPC extends Unit {
                                         states.get(NPC_STATE.WALKING_CAUTIOUS).active ||
                                         states.get(NPC_STATE.STOP_THROW).active;}
     public BufferedImage getExclamation() {return exclamation;}
+    public boolean getCarry() {return carry;}
     
     private void loadRoute(Shape shape){
         this.route = new ArrayList<>();
@@ -166,6 +169,8 @@ public class NPC extends Unit {
     
     private void loadNpcRoutePorperties(MapObject obj){
         Properties prop = obj.getProperties();
+        
+        carry = Boolean.parseBoolean(prop.getProperty("Carry","false"));
         
         for (int i = 0; i < route.size(); ++i){
             String waitStr = prop.getProperty("Wait" + i, "0");
@@ -199,7 +204,7 @@ public class NPC extends Unit {
          return states;
     }
         
-    private void loadLevelProperties() {
+    private void loadNpcProperties() {
         switch (level) {
             default:
             case 1 : 
@@ -356,51 +361,51 @@ public class NPC extends Unit {
                 setImg("npc\\Leader_Wake.png"); // Epic Fat Evil Guy
                 break;
             case 20 : 
-                this.speed = 1.3; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
+                this.speed = 1.0; 
+                this.throwDistance = 120; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "Monopoly Guy";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
-                setImg("npc\\Leader_Blane.png"); // Monopoly Guy
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                setImg("npc\\Leader_Blaine.png"); // Monopoly Guy
                 break;
             case 21 : 
-                this.speed = 1.3; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
-                this.throwSpeed = 10;
-                this.name = "Motor Guy";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                this.speed = 2.0; 
+                this.throwDistance = 90; // 100 - easy, 200 - very hard
+                this.throwSpeed = 12;
+                this.name = "Motor Guy with Hat";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
                 setImg("npc\\trchar058.png"); // Motor Guy
                 break;
             case 22 : 
-                this.speed = 1.3; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
+                this.speed = 1.0; 
+                this.throwDistance = 210; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "Cameraman";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 60;
                 setImg("npc\\trchar069_0.png"); // Cameraman
                 break;
             case 23 : 
-                this.speed = 1.3; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
+                this.speed = 0.8; 
+                this.throwDistance = 140; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "Navy Guy";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
                 setImg("npc\\trchar027.png"); // Navy Guy
                 break;
             case 24 : 
-                this.speed = 1.3; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
+                this.speed = 1.0; 
+                this.throwDistance = 140; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "Policeman";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
                 setImg("npc\\trchar062.png"); // Policeman
                 break;
             case 25 : 
-                this.speed = 1.3; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
-                this.throwSpeed = 10;
+                this.speed = 1.0; 
+                this.throwDistance = 80; // 100 - easy, 200 - very hard
+                this.throwSpeed = 8;
                 this.name = "Little Girl";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 60;
                 setImg("npc\\trchar051.png"); // Little Girl
                 break;
             case 26 : 
@@ -408,41 +413,89 @@ public class NPC extends Unit {
                 this.throwDistance = 100; // 100 - easy, 200 - very hard
                 this.throwSpeed = 8;
                 this.name = "Old Monk";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
                 setImg("npc\\NPC_10.png"); // Old Monk
+                break;
+            case 27 : 
+                this.speed = 2.7; 
+                this.throwDistance = 70; // 100 - easy, 200 - very hard
+                this.throwSpeed = 12;
+                this.name = "Blonde Motor Guy";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
+                setImg("npc\\trchar008.png"); // Blonde Motor Guy
+                break;
+            case 28 : 
+                this.speed = 1.0; 
+                this.throwDistance = 120; // 100 - easy, 200 - very hard
+                this.throwSpeed = 10;
+                this.name = "Green Girl With a Ball";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                setImg("npc\\trchar069_1.png"); // Green Girl With a Ball
                 break;
                 //////
             case 30 : 
-                this.speed = 1.3; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
+                this.speed = 1.0; 
+                this.throwDistance = 100; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "Light Blue Hair Guy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
                 setImg("npc\\trchar081.png"); // Light Blue Hair Guy
                 break;
             case 31 : 
-                this.speed = 2.5; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
+                this.speed = 5.0; 
+                this.throwDistance = 60; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "red/purple boy";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
                 setImg("npc\\trchar183.png"); // red/purple boy
                 break;
             case 32 : 
-                this.speed = 2.5; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
+                this.speed = 1.0; 
+                this.throwDistance = 100; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "Pink Hair Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
                 setImg("npc\\Leader_Whitney.png"); // Pink Hair Girl
                 break;
             case 33 : 
-                this.speed = 2.5; 
-                this.throwDistance = 200; // 100 - easy, 200 - very hard
+                this.speed = 1.0; 
+                this.throwDistance = 100; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "Black Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
                 setImg("npc\\trchar272.png"); // Black Girl
+                break;
+            case 34 : 
+                this.speed = 1.0; 
+                this.throwDistance = 150; // 100 - easy, 200 - very hard
+                this.throwSpeed = 10;
+                this.name = "Black Mage Girl";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                setImg("npc\\trchar275.png"); // Black Mage Girl
+                break;
+            case 35 : 
+                this.speed = 1.2; 
+                this.throwDistance = 100; // 100 - easy, 200 - very hard
+                this.throwSpeed = 10;
+                this.name = "Island Cultist 1";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
+                setImg("npc\\trchar167.png"); // Island Cultist 1
+                break;
+            case 36 : 
+                this.speed = 1.2; 
+                this.throwDistance = 100; // 100 - easy, 200 - very hard
+                this.throwSpeed = 10;
+                this.name = "Island Cultist 2";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
+                setImg("npc\\trchar172.png"); // Island Cultist 2
+                break;
+            case 37 : 
+                this.speed = 1.2; 
+                this.throwDistance = 100; // 100 - easy, 200 - very hard
+                this.throwSpeed = 10;
+                this.name = "Island Cultist 3";
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
+                setImg("npc\\trchar174.png"); // Island Cultist 3
                 break;
             case 90 : 
                 this.speed = 0.8; 

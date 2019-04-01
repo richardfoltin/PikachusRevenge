@@ -19,9 +19,10 @@ public class Position {
         this.y = pos.y;
     }
     
-    public void movePosition(double dx, double dy) {
+    public Position movePosition(double dx, double dy) {
         this.x += dx;
         this.y += dy;
+        return this;
     }
     
     public void movePosition(Direction d, double speed){
