@@ -34,12 +34,14 @@ public class Level {
     private int foundPokemonCount;
     private Position playerStartingPosition;
     private Position playerBackStartingPosition;
+    private int livesAtBegining;
         
     //private static final String[] mapName = {"Teodora","MapTest2"};
     private static final String[] MAP_NAME = {"Level1","Level2","Level3","Level4","Level5","Level6","Level7","Level8","Level9","Level10"};
     
-    public Level(Model model, int id, int time) {
+    public Level(Model model, int id, int time, int lives) {
         this.id = id;
+        this.livesAtBegining = lives;
         
         if (MAP_NAME.length < id) {
             System.err.println("No Level");
@@ -204,6 +206,7 @@ public class Level {
     public ArrayList<Pokemon> getPokemons() {return pokemons;}
     public int getId() {return id;}
     public int getTime() {return time;}
+    public int getLivesAtBegining() {return livesAtBegining;}
     public Map getMap() {return map;}
     public Position getPlayerStartingPosition(boolean forward) {
         return (forward) ? playerStartingPosition : playerBackStartingPosition;

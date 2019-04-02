@@ -9,6 +9,10 @@ public  class KeyPressHandler {
 
     private static List<Direction> pressedKeys = new ArrayList<Direction>();;
     
+    public static void clearPressedKeys() {
+        pressedKeys.clear();
+    }
+    
     public static void keyPressed(Model model, int key) {
         Direction d = directionFromKeyCode(key);
         if (d == Direction.STOP) {

@@ -217,10 +217,10 @@ public class NPC extends Unit {
                 break;
             case 2 : 
                 this.speed = 1; 
-                this.throwDistance = 140; // 100 - easy, 200 - very hard
+                this.throwDistance = 120; // 100 - easy, 200 - very hard
                 this.throwSpeed = 8;
                 this.name = "Blonde Girl";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 70;
                 setImg("npc\\trchar066.png"); // blonde girl
                 break;
             case 3 : 
@@ -234,7 +234,7 @@ public class NPC extends Unit {
                 break;
             case 4 : 
                 this.speed = 0.6; 
-                this.throwDistance = 150; // 100 - easy, 200 - very hard
+                this.throwDistance = 140; // 100 - easy, 200 - very hard
                 this.throwSpeed = 6;
                 this.name = "Old Fart";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 70;
@@ -269,7 +269,7 @@ public class NPC extends Unit {
                 this.throwDistance = 100; // 100 - easy, 200 - very hard
                 this.throwSpeed = 8;
                 this.name = "Cultist";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 45;
                 setImg("npc\\trchar163.png"); // cultist
                 break;
             case 9 : 

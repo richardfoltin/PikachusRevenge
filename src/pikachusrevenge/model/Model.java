@@ -65,11 +65,29 @@ public class Model implements ActionListener {
         for (Level l : levels) if (l.getId() == id) level = l;
         
         if (level == null) {
-            level = new Level(this,id,time);
+            level = new Level(this,id,time,player.getLives());
             this.levels.add(level);
         }
         
         return level;
+    }
+    
+    public Level rebuildLevel(int id) {
+        Level level = null;
+        for (Level l : levels) if (l.getId() == id) level = l;
+
+        if (level != null) {
+            int livesAtBegining = level.getLivesAtBegining();
+            for (Pokemon p : actualLevel.getPokemons()) p.setNotFound();
+            this.levels.remove(level);
+            
+            level = new Level(this,id,0,livesAtBegining);
+            player.setLives(livesAtBegining);
+            this.levels.add(level);
+            return level;
+        } else {
+            return buildLevelIfNotExists(id, 0);
+        }
     }
     
     public void startGame(Level level, boolean forward) {
@@ -96,6 +114,7 @@ public class Model implements ActionListener {
         }
         
         player.setStartingPostion(actualLevel.getPlayerStartingPosition(forward));
+        player.getOutBall();
         for (NPC npc : actualLevel.getNpcs()) npc.startLooping();
         for (Pokemon p : actualLevel.getPokemons()) if (p.isFound()) p.restartFromStratingPoint();
         player.startLooping();
@@ -165,12 +184,14 @@ public class Model implements ActionListener {
     }
     
     public void stopGame() {
+        KeyPressHandler.clearPressedKeys();
         player.stopLooping();
         clock.stop();
         timer.stop();
     }
     
     public void restartGame() {
+        player.startLooping();
         clock.restart();
         timer.restart();
     }

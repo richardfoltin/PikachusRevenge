@@ -454,27 +454,31 @@
     <property name="Reverse" type="int" value="3"/>
     <property name="Wait0" type="int" value="50"/>
     <property name="Wait1" type="int" value="50"/>
-    <property name="Wait3" type="int" value="50"/>
+    <property name="Wait3" type="int" value="65"/>
    </properties>
    <polyline points="0,0 28,2.66667 33.3333,31.3333 53.3333,32.6667"/>
   </object>
   <object id="4" name="NPC" x="413.333" y="492">
    <properties>
     <property name="Level" type="int" value="8"/>
-    <property name="Wait3" type="int" value="50"/>
-    <property name="Wait4" type="int" value="50"/>
+    <property name="Start" type="int" value="3"/>
+    <property name="Wait0" type="int" value="100"/>
+    <property name="Wait4" type="int" value="90"/>
+    <property name="Wait5" type="int" value="50"/>
    </properties>
-   <polygon points="0,0 2,-61.3333 -12,-92 -19.3333,-112 -38,-112.667 -2.66667,-114"/>
+   <polygon points="-29.3333,-8.66667 2,-47.3333 -9.33333,-72.6667 -18,-111.333 -38,-112.667 -2.66667,-114"/>
   </object>
   <object id="5" name="NPC" x="503.333" y="284.667">
    <properties>
     <property name="Level" type="int" value="8"/>
     <property name="Reverse" type="int" value="5"/>
-    <property name="Wait1" type="int" value="50"/>
+    <property name="Start" type="int" value="0"/>
+    <property name="Wait0" type="int" value="50"/>
+    <property name="Wait1" type="int" value="100"/>
     <property name="Wait3" type="int" value="50"/>
     <property name="Wait5" type="int" value="150"/>
    </properties>
-   <polyline points="0,0 -16,25.3333 4.66667,26 0,71.3333 18.6667,79.3333 16.6667,133.333"/>
+   <polyline points="48.6667,20.6667 -16,25.3333 4.66667,26 0,71.3333 18.6667,79.3333 16.6667,133.333"/>
   </object>
   <object id="6" name="NPC" x="648" y="360.667">
    <properties>
@@ -491,7 +495,7 @@
     <property name="Wait2" type="int" value="50"/>
     <property name="Wait4" type="int" value="50"/>
    </properties>
-   <polygon points="0,0 -32.6667,4 -32.6667,48 -20.6667,24.6667 4.66667,25.3333"/>
+   <polygon points="0,0 -32.6667,4 -32.6667,48 -19.3334,28 4.66667,22.6666"/>
   </object>
   <object id="9" name="NPC" x="985" y="246.333">
    <properties>

@@ -707,6 +707,11 @@
    <property name="Bridge" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="542">
+  <properties>
+   <property name="Collision" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="553" terrain=",26,,"/>
  <tile id="554" terrain="26,26,,26"/>
  <tile id="556" terrain="26,26,26,"/>

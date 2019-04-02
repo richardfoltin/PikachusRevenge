@@ -128,6 +128,7 @@ public class Pokemon extends Unit {
     public int getId() {return id;}
     public TilePosition getTilePosition() {return tpos;}
     public boolean isFound() {return found;} 
+    public void setNotFound() {this.found = false;}
     public void setLabel(JLabel label) {this.label = label;}
     public void setDistance(int distance) {this.distance = distance;}
     

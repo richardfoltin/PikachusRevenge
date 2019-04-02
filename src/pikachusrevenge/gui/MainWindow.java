@@ -91,6 +91,7 @@ public class MainWindow extends JFrame {
         
         if (startPanel != null) {
             remove(startPanel);
+            if (statsPanel != null) remove(statsPanel);
 
             // stats
             statsPanel = new StatsPanel(WINDOW_WIDTH);
@@ -115,6 +116,15 @@ public class MainWindow extends JFrame {
             addKeyListener(keyAdapter);
         }
     }
+    
+    public void restartLevel() {
+        if (this.model != null) {
+            int id = model.getActualLevelId();
+            model.rebuildLevel(id);
+            loadLevel(id);
+        }
+    }
+    
     
     public void loadLevelWithNewModel(Model model, int id){
         if (this.model != null) this.model.stopGame();

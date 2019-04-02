@@ -186,10 +186,11 @@ public class GameMenu  extends JMenuBar {
         }
     }  
     
-    public static final ActionListener loadAction() {
+    public final ActionListener loadAction() {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                pause();
                 JFileChooser chooser = new JFileChooser();
                 chooser.setDialogTitle("Load Game");
                 chooser.setApproveButtonText("Load");
@@ -229,18 +230,21 @@ public class GameMenu  extends JMenuBar {
 
                     } catch (IllegalFileException ex) {
                         JOptionPane.showMessageDialog(MainWindow.getInstance(), "Not proper Pikachu's Revenge saved file.");
+                        resume();
                     } catch (FileNotFoundException ex) {
                         JOptionPane.showMessageDialog(MainWindow.getInstance(), "File not found!");
+                        resume();
                     }
                 }
             }
         };
     }
     
-    public static final ActionListener loadDbAction() {
+    public final ActionListener loadDbAction() {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                pause();
                 File chosenFile = null;
                 int dbId = 1;
                 if (chosenFile != null) {
@@ -277,8 +281,10 @@ public class GameMenu  extends JMenuBar {
 
                     } catch (IllegalFileException ex) {
                         JOptionPane.showMessageDialog(MainWindow.getInstance(), "Not proper Pikachu's Revenge saved file.");
+                        resume();
                     } catch (FileNotFoundException ex) {
                         JOptionPane.showMessageDialog(MainWindow.getInstance(), "File not found!");
+                        resume();
                     }
                 }
             }
@@ -297,7 +303,7 @@ public class GameMenu  extends JMenuBar {
      * @param game a játék ablaka
      * @param withExit true, ha a mentés után ki is kell lépni a játékból
      */
-    private static final void save(boolean withExit, String fileName){
+    private final void save(boolean withExit, String fileName){
         File file;
         if (fileName == null) {
             JFileChooser chooser = new JFileChooser();
@@ -344,7 +350,7 @@ public class GameMenu  extends JMenuBar {
         if (withExit) System.exit(0);
     }
     
-   private static final void saveToDb(boolean withExit, int dbId){
+   private final void saveToDb(boolean withExit, int dbId){
        File file = null;
         if (file != null) {
             try (PrintWriter pw = new PrintWriter(file)){
@@ -388,32 +394,38 @@ public class GameMenu  extends JMenuBar {
      * @param game a játék ablaka
      * @return a létrehozott eseménykezelő
      */
-    public static final ActionListener saveAsAction() {
+    public final ActionListener saveAsAction() {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                pause();
                 save(false,null);
+                resume();
             }
         };
     }
     
-    public static final ActionListener saveAction() {
+    public final ActionListener saveAction() {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                pause();
                 Model model = MainWindow.getInstance().getModel();
                 if (model.isSavedToDb()) saveToDb(false,model.getDbId());
                 else save(false,model.getFileName());
+                resume();
             }
         };
     }
     
-    public static final ActionListener saveDbAction() {
+    public final ActionListener saveDbAction() {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                pause();
                 Model model = MainWindow.getInstance().getModel();
                 saveToDb(false,model.getDbId());
+                resume();
             }
         };
     }
@@ -424,7 +436,7 @@ public class GameMenu  extends JMenuBar {
      * @param game a játék ablaka
      * @return a létrehozott eseménykezelő
      */
-    public static final ActionListener exitAndSaveAction() {
+    public final ActionListener exitAndSaveAction() {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -435,7 +447,7 @@ public class GameMenu  extends JMenuBar {
         };
     }
     
-    public static final ActionListener startLevelAction(final int level) {
+    public final ActionListener startLevelAction(final int level) {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -449,7 +461,7 @@ public class GameMenu  extends JMenuBar {
     private final Action restartAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainWindow.getInstance().loadLevel(MainWindow.getInstance().getModel().getActualLevelId());
+            MainWindow.getInstance().restartLevel();
         }
     };
     
@@ -470,20 +482,28 @@ public class GameMenu  extends JMenuBar {
     private final Action pauseAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainWindow.getInstance().getModel().stopGame();
-            resumeMenu.setEnabled(true);
-            pauseMenu.setEnabled(false);
+            pause();
         }
     };
     
     private final Action resumeAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainWindow.getInstance().getModel().restartGame();
-            resumeMenu.setEnabled(false);
-            pauseMenu.setEnabled(true);
+            resume();
         }
     };
+    
+    private void resume() {
+        MainWindow.getInstance().getModel().restartGame();
+        resumeMenu.setEnabled(false);
+        pauseMenu.setEnabled(true);  
+    }
+    
+    private void pause() {
+        MainWindow.getInstance().getModel().stopGame();
+        resumeMenu.setEnabled(true);
+        pauseMenu.setEnabled(false); 
+    }
     
     public final ActionListener openPokemon(int id) {
         return new ActionListener() {
@@ -504,8 +524,25 @@ public class GameMenu  extends JMenuBar {
         pokedexMenu.setEnabled(pokemonIds.size() > 0);
         pokedexMenu.removeAll();
         
+        ArrayList<JMenu> menus = new ArrayList<>();
+        int max = Pokemon.POKEMON_NAME.length;
+        int clusters = pokemonIds.size() / 20 + 1;
+        
+        if (clusters > 1) {
+            for (int i = 0; i < clusters; ++i){
+                int from = i * (max / clusters) + 1;
+                int to = (i == clusters - 1) ? max : (i + 1) * (max / clusters);
+                JMenu menu = new JMenu(String.format("%s - %s", from, to));
+                menu.setPreferredSize(new Dimension(MENUITEM_WIDTH / 2,MENUITEM_HEIGHT));
+                menus.add(menu);
+                pokedexMenu.add(menu);
+            }
+        } else {
+            menus.add(pokedexMenu);
+        }
+        
         for (int id : pokemonIds) {
-            if (id - 1  >= 0 && id - 1 < Pokemon.POKEMON_NAME.length) {
+            if (id  >= 1 && id <= Pokemon.POKEMON_NAME.length) {
                 BufferedImage image = null;
                 try {image = Resource.loadBufferedImage(String.format("pokemons\\icon%03d.png",id));} 
                 catch (IOException e) {System.err.println("Can't load file");} 
@@ -515,7 +552,7 @@ public class GameMenu  extends JMenuBar {
                 item.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
                 item.addActionListener(openPokemon(id));
                 
-                pokedexMenu.add(item);
+                menus.get(id / ((max / clusters) + 1)).add(item);
             }
         }
     }

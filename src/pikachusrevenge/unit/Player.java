@@ -55,7 +55,8 @@ public class Player extends Unit {
     private void restartOrGameOver() {
         if (lives  <= 0) {
             lives = 0;
-            model.gameOver();
+            //model.gameOver();
+            MainWindow.getInstance().restartLevel();
         } else {
             restartFromStratingPoint();
             for (Pokemon p : model.getMapPokemons()) {
@@ -65,9 +66,6 @@ public class Player extends Unit {
         caughtWait = 0;
     }
     
-    public boolean insideBall() {
-        return (caughtWait != 0);
-    }
     
     @Override
     public void loop() {
@@ -84,12 +82,6 @@ public class Player extends Unit {
             atCarry = model.checkCarry(pos);
         }
     }
-
-    @Override
-    public BufferedImage getImg() {
-        return insideBall() ? caughtImage : super.getImg();
-    }
-    
        
     @Override
     protected void loadNextPosition() {
@@ -116,9 +108,13 @@ public class Player extends Unit {
         nextPosition.y = pos.y;
         onCarry = null;
     }
+
+    @Override
+    public BufferedImage getImg() {return insideBall() ? caughtImage : super.getImg();}
     
     public void setLives(int lives) {this.lives = lives;}
-    
+    public void getOutBall() {this.caughtWait = 0;}
+    public boolean insideBall() {return (caughtWait != 0);}
     public boolean isAtSign() {return atSign;}
     public NPC isAtCarry() {return atCarry;}
     public boolean isOnCarry() {return onCarry != null;}
