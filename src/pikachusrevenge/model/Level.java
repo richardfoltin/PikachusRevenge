@@ -22,19 +22,20 @@ import pikachusrevenge.unit.Pokemon;
 public class Level {
     
     private final int id;
-    private final ArrayList<PokeBall> thrownBalls;
-    private final ArrayList<MovingSprite> cleanUp;
-    private final ArrayList<NPC> npcs;
-    private final ArrayList<Pokemon> pokemons;
-    private int time;
-    private Map map = null;
+    private final ArrayList<PokeBall> thrownBalls = new ArrayList<>();
+    private final ArrayList<MovingSprite> cleanUp = new ArrayList<>();
+    private final ArrayList<NPC> npcs = new ArrayList<>();
+    private final ArrayList<Pokemon> pokemons = new ArrayList<>();
     private final Model model;
     private final List<MapLayer> layers;
+    
+    private Map map = null;
+    private int time;
     private int maxPokemonCount;
     private int foundPokemonCount;
+    private int livesAtBegining;
     private Position playerStartingPosition;
     private Position playerBackStartingPosition;
-    private int livesAtBegining;
         
     //private static final String[] mapName = {"Teodora","MapTest2"};
     private static final String[] MAP_NAME = {"Level1","Level2","Level3","Level4","Level5","Level6","Level7","Level8","Level9","Level10"};
@@ -56,10 +57,6 @@ public class Level {
         }
         
         this.time = time;
-        this.pokemons = new ArrayList<>();
-        this.thrownBalls = new ArrayList<>();
-        this.cleanUp = new ArrayList<>();
-        this.npcs = new ArrayList<>();
         this.layers = map.getLayers();
         this.model = model;
         

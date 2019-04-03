@@ -19,15 +19,15 @@ import pikachusrevenge.resources.Resource;
 public class NPC extends Unit {
     
     private final int level;
+    private final BufferedImage exclamation;
+    
+    private HashMap<NPC_STATE,NpcState> states = new HashMap<>();
+    private List<NpcRoute> route = new ArrayList<>();
+    private Position targetPosition;
     private double throwDistance;
     private double throwSpeed;
-    private final BufferedImage exclamation;
-    private int startRoute;
-    private HashMap<NPC_STATE,NpcState> states;
-    
-    private List<NpcRoute> route;
     private int routeTarget;
-    private Position targetPosition;
+    private int startRoute;
     private boolean forward = true;
     private boolean carry;
     
@@ -151,7 +151,6 @@ public class NPC extends Unit {
     public boolean getCarry() {return carry;}
     
     private void loadRoute(Shape shape){
-        this.route = new ArrayList<>();
         PathIterator pi = shape.getPathIterator(null);
         
         while (!pi.isDone()) {
@@ -196,7 +195,6 @@ public class NPC extends Unit {
     }
     
     private HashMap<NPC_STATE,NpcState> getStateArray() {
-         HashMap<NPC_STATE,NpcState> states = new HashMap<>();
          states.put(NPC_STATE.STOP_LOOKOUT,new NpcState(0));
          states.put(NPC_STATE.STOP_EXCLAMATION,new NpcState(0));
          states.put(NPC_STATE.STOP_THROW,new NpcState(50));
@@ -211,9 +209,10 @@ public class NPC extends Unit {
                 this.speed = 0.8; 
                 this.throwDistance = 120; // 100 - easy, 200 - very hard
                 this.throwSpeed = 8;
-                this.name = "Green Girl";
+                this.name = "Blue Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 70;
-                setImg("npc\\trchar153.png"); // green girl
+                setImg("npc\\trchar007.png"); // blue hair girl
+                //setImg("npc\\trchar153.png"); // green girl
                 break;
             case 2 : 
                 this.speed = 1; 
@@ -443,7 +442,7 @@ public class NPC extends Unit {
                 break;
             case 31 : 
                 this.speed = 5.0; 
-                this.throwDistance = 60; // 100 - easy, 200 - very hard
+                this.throwDistance = 80; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "red/purple boy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
@@ -467,10 +466,10 @@ public class NPC extends Unit {
                 break;
             case 34 : 
                 this.speed = 1.0; 
-                this.throwDistance = 150; // 100 - easy, 200 - very hard
+                this.throwDistance = 160; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "Black Mage Girl";
-                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
+                this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
                 setImg("npc\\trchar275.png"); // Black Mage Girl
                 break;
             case 35 : 

@@ -26,22 +26,23 @@ import pikachusrevenge.unit.Pokemon;
 import static pikachusrevenge.unit.Unit.C_BOX_HEIGHT;
 import static pikachusrevenge.unit.Unit.C_BOX_WIDTH;
 
-public class Model implements ActionListener {
-        
-    private final HashMap<TilePosition,Pokemon> pokemons;
-    private final ArrayList<Level> levels;
-    private List<MapLayer> layers;
-    private Level actualLevel;
-    private final MainWindow mainWindow;
-    private final Player player;
-    private final Timer timer;
-    private final Timer clock;
-    public Rectangle mapRectangle;
-    private final String fileName;
-    private final int dbId;
+public final class Model implements ActionListener {
 
     private static final int MAIN_LOOP = 40;  
     
+    private final HashMap<TilePosition,Pokemon> pokemons = new HashMap<>();
+    private final ArrayList<Level> levels = new ArrayList<>();
+    private final Player player = new Player(this);
+    private final Timer timer = new Timer(MAIN_LOOP, this);
+    private final MainWindow mainWindow;
+    private final Timer clock;
+    private final String fileName;
+    private final int dbId;
+    
+    private List<MapLayer> layers;
+    private Level actualLevel;
+    
+    public Rectangle mapRectangle;
     
     public Model () {this(null, 0);}
     public Model (int dbId) {this(null, dbId);}
@@ -50,11 +51,7 @@ public class Model implements ActionListener {
     private Model (String fileName, int dbId){
         this.dbId = dbId;
         this.fileName = fileName;
-        this.pokemons = new HashMap<>();
-        this.levels = new ArrayList<>();
-        this.player = new Player(this);
         this.mainWindow = MainWindow.getInstance();
-        this.timer = new Timer(MAIN_LOOP, this);
         this.clock = new Timer(1000, (ActionEvent e) -> {
             mainWindow.getStats().updateTimeLabel(actualLevel.increaseTime());
         });
@@ -73,6 +70,7 @@ public class Model implements ActionListener {
     }
     
     public Level rebuildLevel(int id) {
+        stopGame();
         Level level = null;
         for (Level l : levels) if (l.getId() == id) level = l;
 
@@ -83,6 +81,7 @@ public class Model implements ActionListener {
             
             level = new Level(this,id,0,livesAtBegining);
             player.setLives(livesAtBegining);
+            player.restartFromStratingPoint();
             this.levels.add(level);
             return level;
         } else {
@@ -112,14 +111,12 @@ public class Model implements ActionListener {
             p.setLabel(label);
             if (p.isFound()) p.revealLabel();
         }
+        mainWindow.getStats().updateTimeLabel(actualLevel.getTime());
         
         player.setStartingPostion(actualLevel.getPlayerStartingPosition(forward));
-        player.getOutBall();
         for (NPC npc : actualLevel.getNpcs()) npc.startLooping();
         for (Pokemon p : actualLevel.getPokemons()) if (p.isFound()) p.restartFromStratingPoint();
-        player.startLooping();
-        clock.start();
-        timer.start();
+        resumeGame();
     }
     
     public boolean canMoveTo(Position from, Direction nextDirection, double speed){
@@ -174,12 +171,14 @@ public class Model implements ActionListener {
             if (shorePosition != null) {
                 player.getOffCarry(shorePosition);
             } else {
-                writeInfo("You can only get of near shore!");
+                writeInfo("You can only get off near shore!");
             }  
         }
     }
     
     public void gameOver(){
+        stopGame();
+        MainWindow.getInstance().showGameOverPane();
         System.out.println("Game over");
     }
     
@@ -190,7 +189,7 @@ public class Model implements ActionListener {
         timer.stop();
     }
     
-    public void restartGame() {
+    public void resumeGame() {
         player.startLooping();
         clock.restart();
         timer.restart();
@@ -207,6 +206,7 @@ public class Model implements ActionListener {
     }
     
     public NPC checkCarry(Position pos) {
+        if (actualLevel.getId() != 8) return null; // only level 8 has carry
         for (NPC npc : actualLevel.getNpcs()){
             if (npc.getCarry() && npc.getPosition().distanceFrom(pos) < 25) return npc;
         } 

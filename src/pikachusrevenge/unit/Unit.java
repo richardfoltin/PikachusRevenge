@@ -1,6 +1,5 @@
 package pikachusrevenge.unit;
 
-import pikachusrevenge.gui.Animation;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import static pikachusrevenge.gui.MapView.ZOOM;
@@ -31,7 +30,7 @@ public class Unit extends MovingSprite {
     }
     
     @Override
-    protected void setImg(String filePath){
+    protected final void setImg(String filePath){
         super.setImg(filePath);
         if (animated) {
             for (int i = 0; i < 4; ++i){
@@ -84,6 +83,8 @@ public class Unit extends MovingSprite {
         this.pos.y = startPosition.y;
         this.nextDirection = Direction.STOP;
         this.direction = Direction.STOP;
+        moveCollisionBoxTo(collisionBox, pos);
+        moveCollisionBoxTo(nextCollisionBox, pos);
         super.loadNextPosition();
         animation = walk[0];
         animation.stop();

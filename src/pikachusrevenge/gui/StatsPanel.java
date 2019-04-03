@@ -14,36 +14,29 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import pikachusrevenge.resources.Resource;
 
-public class StatsPanel extends JPanel {
+public final class StatsPanel extends JPanel {
 
-    private final JPanel livesPane;
-    private final JPanel pokemonPane;
-    private final JLabel timerLabel;
-    private final List<JLabel> lives;
-    private final List<JLabel> pokemons;
-    private final SimpleDateFormat timeFormat;
-    
     private static final int STATS_HEIGHT = 30;
     
+    private final JPanel livesPane = new JPanel();
+    private final JPanel pokemonPane = new JPanel();
+    private final JLabel timerLabel = new JLabel("00:00");
+    private final List<JLabel> lives = new ArrayList<>();
+    private final List<JLabel> pokemons = new ArrayList<>();
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("mm:ss");
+     
     public StatsPanel(int width) {
   
         setPreferredSize(new Dimension(width, STATS_HEIGHT));
-        
-        this.lives = new ArrayList<>();
-        this.livesPane = new JPanel();
-        this.timeFormat = new SimpleDateFormat("mm:ss");
-        
+
         livesPane.setPreferredSize(new Dimension(width/3,STATS_HEIGHT));
         livesPane.setLayout(new FlowLayout(FlowLayout.LEFT,0,0));
         add(livesPane);
         
-        this.pokemons = new ArrayList<>();
-        this.pokemonPane = new JPanel();
         pokemonPane.setPreferredSize(new Dimension(2*width/3-40,STATS_HEIGHT));
         pokemonPane.setLayout(new FlowLayout(FlowLayout.LEFT,0,0));
         add(pokemonPane);
         
-        this.timerLabel = new JLabel("00:00");
         timerLabel.setPreferredSize(new Dimension(40,30));
         timerLabel.setLayout(new FlowLayout(FlowLayout.RIGHT,0,0));
         add(timerLabel);
@@ -98,6 +91,7 @@ public class StatsPanel extends JPanel {
     }
     
     public void clearPane() {
+        
         for (JLabel label : pokemons){
             pokemonPane.remove(label);
         }

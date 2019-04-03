@@ -1,9 +1,9 @@
-package pikachusrevenge.gui;
+package pikachusrevenge.unit;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class Animation {
+public final class Animation {
 
     private int frameCount;
     private int frameDelay;

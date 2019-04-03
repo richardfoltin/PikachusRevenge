@@ -1,21 +1,19 @@
 package pikachusrevenge.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import pikachusrevenge.model.KeyPressHandler;
@@ -24,97 +22,75 @@ import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
 
-public class MainWindow extends JFrame {
+public final class MainWindow extends JFrame {
+
+    public static final int WINDOW_WIDTH = 448; // 28 tiles
+    public static final int WINDOW_HEIGHT = 352; // 22 tiles
+    public static final boolean TESTING = false;
     
     private static MainWindow instance = null;
+    private final HelpDialog helpDialog = new HelpDialog(this);
+    private final MenuBar menu = new MenuBar(this);
+    private final StatsPanel statsPanel = new StatsPanel(WINDOW_WIDTH);
+    private final FooterPanel footerPanel = new FooterPanel();
+    private final MainMenu mainMenuPanel = new MainMenu(this);
     
     private Model model;
     private MapView mapView;
-    private JScrollPane mainPanel;
-    private JPanel startPanel;
-    private GameMenu menu;
-    private StatsPanel statsPanel;
-    private FooterLabel footer;
-    private KeyAdapter keyAdapter;
-      
-    public static final int WINDOW_WIDTH = 448; // 28 tiles
-    public static final int WINDOW_HEIGHT = 352; // 22 tiles
+    private JScrollPane gamePanel;
 
     public class MapLoadingException extends Exception {}
     
     public static MainWindow getInstance() {
-        if (instance == null) return new MainWindow();
-        else return instance;
+        if (instance == null) instance = new MainWindow();
+        return instance;
     }
     
     private MainWindow(){
+        super("Pikachu's Revenge");
         
-        this.instance = this;
-        this.model = new Model();
-        
-        setTitle("Pikachu's Revenge");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         loadIcon("pikachu_small.png");
         
-        setPreferredSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT));
         addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowClosing(WindowEvent e) {
                 showExitConfirmation();
             }
-
         });
         
-        startPanel = new JPanel();
-        JButton startButton = new JButton("Start");
-        startButton.setPreferredSize(new Dimension(300,100));
-        startButton.addActionListener(new ActionListener() { 
-            @Override
-            public void actionPerformed(ActionEvent e) { 
-                MainWindow.this.startGameFrame();
-                MainWindow.this.loadLevel(1);
-            } 
-        } );
+        setLayout(new BorderLayout());
         
-        startPanel.add(startButton);
-        add(startPanel);
-        
-        
-        pack();
-        centerWindow(this);
         setResizable(false);
         setVisible(true);
     }
     
+    public void showMainMenu() {
+        stopGameFrame();
+        add(mainMenuPanel);
+        pack();
+        centerWindow();
+    }
+    
     public void startGameFrame() {
-        
-        if (startPanel != null) {
-            remove(startPanel);
-            if (statsPanel != null) remove(statsPanel);
+        remove(mainMenuPanel);
 
-            // stats
-            statsPanel = new StatsPanel(WINDOW_WIDTH);
+        footerPanel.setModel(model);
 
-            // footer
-            JPanel footerPanel = new JPanel();
-            footerPanel.setPreferredSize(new Dimension(WINDOW_WIDTH,25));
-            footer = new FooterLabel(model);
-            footerPanel.add(footer);
+        add(statsPanel, BorderLayout.NORTH);
+        add(footerPanel, BorderLayout.SOUTH);
 
-            // layout
-            setLayout(new BorderLayout());
-            add(statsPanel, BorderLayout.NORTH);
-            add(footerPanel, BorderLayout.SOUTH);
-
-            // menu
-            this.menu = new GameMenu();
-            setJMenuBar(menu);
-
-            // keylistener
-            this.keyAdapter = getKeyAdapter();
-            addKeyListener(keyAdapter);
-        }
+        setJMenuBar(menu);
+        addKeyListener(keyAdapter);
+    }
+    
+    public void stopGameFrame() {
+        if (model != null) this.model.stopGame();
+        if (gamePanel != null) remove(gamePanel);
+        remove(footerPanel);
+        remove(statsPanel);
+        setJMenuBar(null);
+        removeKeyListener(keyAdapter);     
     }
     
     public void restartLevel() {
@@ -125,14 +101,10 @@ public class MainWindow extends JFrame {
         }
     }
     
-    
     public void loadLevelWithNewModel(Model model, int id){
-        if (this.model != null) this.model.stopGame();
-        if (this.keyAdapter != null) removeKeyListener(keyAdapter);
-        
+        stopGameFrame();
         this.model = model;
         startGameFrame();
-        footer.setModel(model);
         loadLevel(id);
     }
      
@@ -140,16 +112,16 @@ public class MainWindow extends JFrame {
         boolean forward = (model.getActualLevelId() <= id);
         Level level = model.buildLevelIfNotExists(id,0);
         
-        if (mainPanel != null) remove(mainPanel);
+        if (gamePanel != null) remove(gamePanel);
         mapView = new MapView(level.getMap(),model);
-        mainPanel = new JScrollPane(mapView);
-        mainPanel.setBorder(null);
+        gamePanel = new JScrollPane(mapView);
+        gamePanel.setBorder(null);
         setPreferredSize(null);
-        mainPanel.setPreferredSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT));
-        mainPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        mainPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);   
+        gamePanel.setPreferredSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT));
+        gamePanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        gamePanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);   
         
-        add(mainPanel, BorderLayout.CENTER);
+        add(gamePanel, BorderLayout.CENTER);
         this.requestFocus();
         
         model.getPlayer().increaseAvailableLevels(id);
@@ -163,21 +135,21 @@ public class MainWindow extends JFrame {
     private void loadIcon(String filePath){
         try {
             BufferedImage image = Resource.loadBufferedImage(filePath);
-            setIconImage(image);
+            this.setIconImage(image);
         } catch (IOException ex) {
             System.err.println("Can't load file");
         }     
     }
       
-    private void centerWindow(JFrame window) {
-        int x = (Toolkit.getDefaultToolkit().getScreenSize().width - window.getWidth()) / 2;  
-        int y = (Toolkit.getDefaultToolkit().getScreenSize().height - window.getHeight()-100) / 2;  
+    private void centerWindow() {
+        int x = (Toolkit.getDefaultToolkit().getScreenSize().width - this.getWidth()) / 2;  
+        int y = (Toolkit.getDefaultToolkit().getScreenSize().height - this.getHeight()-60) / 2;  
   
-        window.setLocation(x, y);  
+        this.setLocation(x, y);  
     }
     
     public void scrollTo(Position position){
-        JViewport visible = mainPanel.getViewport();
+        JViewport visible = gamePanel.getViewport();
         int scrollX = scrollPostion(position.x, WINDOW_WIDTH, model.mapRectangle.width);
         int scrollY = scrollPostion(position.y, WINDOW_HEIGHT, model.mapRectangle.height);
         visible.setViewPosition(new Point(scrollX,scrollY));
@@ -189,36 +161,76 @@ public class MainWindow extends JFrame {
         else return (int)coord - visibleSize/2;
     }
     
-    private KeyAdapter getKeyAdapter() {
-        return new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent ke) {
-                KeyPressHandler.keyPressed(MainWindow.this.model, ke.getKeyCode());
-            }
-            
-            @Override
-            public void keyReleased(KeyEvent ke) {
-                KeyPressHandler.keyReleased(MainWindow.this.model, ke.getKeyCode());
-            }
-
-        };
-    }
+    private final KeyAdapter keyAdapter = new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent ke) {
+            KeyPressHandler.keyPressed(MainWindow.this.model, ke.getKeyCode());
+        }
+        
+        @Override
+        public void keyReleased(KeyEvent ke) {
+            KeyPressHandler.keyReleased(MainWindow.this.model, ke.getKeyCode());
+        }
+        
+    };
 
     public void repaintMap() {
         mapView.repaint();        
     }
 
     protected void showExitConfirmation() {
-        int n = JOptionPane.showConfirmDialog(this, "Are you sure you want to exit?",
-                "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (n == JOptionPane.YES_OPTION) {
-            System.exit(0);
+        if (model != null) model.stopGame();
+        
+        JOptionPane opt = new JOptionPane(new JLabel("Are you sure you want to exit?",JLabel.CENTER),JOptionPane.PLAIN_MESSAGE,JOptionPane.YES_NO_OPTION);
+        Dialog dialog = opt.createDialog(this, "Confirmation");
+        dialog.setModal(true);
+        dialog.setVisible(true);
+        
+        switch ((Integer) opt.getValue()) {
+            case JOptionPane.YES_OPTION: System.exit(0); break;
+            default: if (model != null) model.resumeGame(); break;
         }
     }
     
+    public void showGameOverPane() {     
+        
+        Object[] options = {"New Game","Restart Level","Main Menu"};
+        JOptionPane opt = new JOptionPane(new JLabel("<html>You have been caught by the vicious trainers!<br>What do you want to do?</html>",JLabel.CENTER),JOptionPane.PLAIN_MESSAGE,0,null,options);
+        Dialog dialog = opt.createDialog(this, "Game Over");
+        dialog.setModal(true);
+        dialog.setVisible(true);
+        
+        switch ((String)opt.getValue()) {
+            case "New Game": loadLevelWithNewModel(new Model(),1); break;
+            case "Restart Level": restartLevel(); break;
+            default: showMainMenu(); break;
+        }
+        
+    }
+    
+    public void showBackConfirmation() {    
+        model.stopGame();
+        
+        JOptionPane opt = new JOptionPane(new JLabel("Are you sure you want to go back to Main Menu?",JLabel.CENTER),JOptionPane.PLAIN_MESSAGE,JOptionPane.YES_NO_OPTION);
+        Dialog dialog = opt.createDialog(this, "Confirmation");
+        dialog.setModal(true);
+        dialog.setVisible(true);
+        
+        switch ((Integer) opt.getValue()) {
+            case JOptionPane.YES_OPTION: showMainMenu();; break;
+            default: model.resumeGame();; break;
+        }
+    }
+    
+    public void showHelp() {
+        model.stopGame();
+        helpDialog.showDialog();
+        model.resumeGame();
+    }
+    
     public StatsPanel getStats() {return statsPanel;}
-    public FooterLabel getFooter() {return footer;}
+    public FooterPanel getFooter() {return footerPanel;}
     public Model getModel() {return model;}
-    public GameMenu getGameMenu() {return menu;}
+    public MenuBar getGameMenu() {return menu;}
     public Level getActiveLevel() {return model.getActualLevel();}
 }

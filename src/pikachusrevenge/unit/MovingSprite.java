@@ -14,31 +14,24 @@ import static pikachusrevenge.unit.Unit.C_BOX_OFFSET_Y;
 
 public class MovingSprite {
     
-    protected Position pos;
-    protected Position startPosition;
-    protected Direction direction;
-    protected boolean animated;
-    protected Position nextPosition;
-    protected Direction nextDirection;
-    protected double speed;
-    private BufferedImage img;
     protected final Model model;
-    protected Rectangle collisionBox;
-    protected Rectangle nextCollisionBox;
-    private boolean looping;
+    
+    protected Position pos = new Position(0,0);
+    protected Position startPosition = new Position(0,0);
+    protected Position nextPosition = new Position(0,0);
+    protected Direction direction = Direction.STOP;
+    protected Direction nextDirection = Direction.STOP;
+    protected Rectangle collisionBox = new Rectangle();
+    protected Rectangle nextCollisionBox = new Rectangle();
+    
+    private BufferedImage img;
+    protected double speed;
+    protected boolean animated = true;
     protected boolean moving;
+    private boolean looping = false;
     
     public MovingSprite(Model model){
-        this.pos = new Position(0,0);
-        this.nextPosition = new Position(0,0);
-        this.startPosition = new Position(0,0);
-        this.collisionBox = new Rectangle();
-        this.nextCollisionBox = new Rectangle();
-        this.nextDirection = Direction.STOP;
-        this.direction = Direction.STOP;
-        this.model = model;     
-        this.animated = true;
-        this.looping = false;
+        this.model = model;    
     }
     
     protected void setImg(String filePath){
@@ -46,11 +39,11 @@ public class MovingSprite {
         catch (IOException e) {System.err.println("Can't load file: " + filePath);} 
     }
     
-    public void setStartingPostion(Position pos) {
+    public final void setStartingPostion(Position pos) {
         setStartingPostion(pos.x, pos.y);
     }
     
-    public void setStartingPostion(double x, double y){
+    public final void setStartingPostion(double x, double y){
         this.pos.x = x;
         this.pos.y = y;
         this.startPosition.x = x;

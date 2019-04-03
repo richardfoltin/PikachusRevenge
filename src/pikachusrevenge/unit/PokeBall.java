@@ -4,12 +4,12 @@ import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
 
-public class PokeBall extends MovingSprite {
+public final class PokeBall extends MovingSprite {
+
+    public final static int BALLSIZE = 16;
     
     private final NPC owner;
     private Position targetPosition;
-    
-    public final static int BALLSIZE = 16;
     
     public PokeBall(double x, double y, double speed, Model model, NPC owner) {
         super(model);

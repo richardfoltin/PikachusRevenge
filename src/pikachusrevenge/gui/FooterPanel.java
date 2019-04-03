@@ -1,29 +1,34 @@
 package pikachusrevenge.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import static pikachusrevenge.gui.MainWindow.WINDOW_WIDTH;
 import pikachusrevenge.model.Model;
 
-public class FooterLabel extends JLabel {
+public final class FooterPanel extends JPanel {
 
     private Model model;
+    private JLabel label = new JLabel();
     private int infoCounter;
     private boolean info;
     private final int INFO_MAX = 60;
     
-    public FooterLabel(Model model) {
-        this.model = model;
+    public FooterPanel() {
         this.info = false;
         
-        setForeground(Color.GRAY);
+        add(label);
+        setPreferredSize(new Dimension(WINDOW_WIDTH,25));
+        label.setForeground(Color.GRAY);
     }
 
     public void setHelpText() {
         if (model.getActualLevelId() == 10) {
-            setText("Interact with the fountain to finish the game!");
+            label.setText("Interact with the fountain to finish the game!");
         } else {
-            if (model.canMoveToNextLevel()) setText("Interact with the sign to move to the next level!");
-            else setText("Find pokeballs to free the pokémon!");
+            if (model.canMoveToNextLevel()) label.setText("Interact with the sign to move to the next level!");
+            else label.setText("Find pokeballs to free the pokémon!");
         }
     }
     
@@ -31,17 +36,17 @@ public class FooterLabel extends JLabel {
         if (!info) {
             if (model.getPlayer().isAtSign()) {
                 if (model.getActualLevelId() == 10) {
-                    setText("<html>Press <font color=black>SPACE</font> to finish the game!</html>");
+                    label.setText("<html>Press <font color=black>SPACE</font> to finish the game!</html>");
                 } else {
-                    if (model.canMoveToNextLevel()) setText("<html>Press <font color=black>SPACE</font> to move to the next level!</html>");
-                    else setText("<html>You have to find at least <font color=black>" + 
+                    if (model.canMoveToNextLevel()) label.setText("<html>Press <font color=black>SPACE</font> to move to the next level!</html>");
+                    else label.setText("<html>You have to find at least <font color=black>" + 
                             MainWindow.getInstance().getActiveLevel().minimumFoundPokemon() + 
                             " pokémon</font> to move to the next level!</html>");
                 }
             } else if (model.getPlayer().isAtCarry() != null) {
-                setText("<html>Press <font color=black>SPACE</font> to carry yourself!</html>");
+                label.setText("<html>Press <font color=black>SPACE</font> to carry yourself!</html>");
             } else if (model.getPlayer().isOnCarry()) {
-                setText("<html>Press <font color=black>SPACE</font> to leave carry!</html>");
+                label.setText("<html>Press <font color=black>SPACE</font> to leave carry!</html>");
             } else setHelpText();
         } else {
             infoCounter++;
@@ -54,7 +59,7 @@ public class FooterLabel extends JLabel {
     public void write(String str) {
         infoCounter = 0;
         info = true;
-        setText("<html>" + str + "</html>");
+        label.setText("<html>" + str + "</html>");
     }
     
     public void setModel(Model model) {this.model = model;}

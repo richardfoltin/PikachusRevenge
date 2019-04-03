@@ -5,7 +5,7 @@ import static java.lang.Math.signum;
 import java.util.ArrayList;
 import java.util.List;
 
-public  class KeyPressHandler {
+public final class KeyPressHandler {
 
     private static List<Direction> pressedKeys = new ArrayList<Direction>();;
     

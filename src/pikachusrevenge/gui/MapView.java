@@ -20,7 +20,7 @@ import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.PokeBall;
 import pikachusrevenge.unit.Pokemon;
 
-public class MapView extends JPanel {
+public final class MapView extends JPanel {
     
     private final Map map;
     private final Model model;
@@ -77,7 +77,6 @@ public class MapView extends JPanel {
 
     @Override
     public void paintComponent(Graphics g) {
-        //final Graphics2D g2d = (Graphics2D) g.create();
         Graphics2D g2d = (Graphics2D)g;
         final Rectangle clip = g2d.getClipBounds();
 

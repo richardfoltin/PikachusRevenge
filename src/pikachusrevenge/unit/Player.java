@@ -10,19 +10,20 @@ import pikachusrevenge.resources.Resource;
 
 public class Player extends Unit {
     
-    private int lives;
-    private int availableLevels;
-    private boolean atSign;
+    private BufferedImage caughtImage;
     private NPC atCarry;
     private NPC onCarry;
-    private BufferedImage caughtImage;
+    
+    private int lives;
+    private int availableLevels;
     private int caughtWait;
     private int caughtWaitMax;
+    private boolean atSign;
     
     public Player(Model model){
         super(model);
         
-        this.lives = 1;
+        this.lives = (MainWindow.getInstance().TESTING) ? 1 : 3;
         this.availableLevels = 1;
         this.speed = 3.0;
         this.name = "Pikachu";
@@ -55,8 +56,8 @@ public class Player extends Unit {
     private void restartOrGameOver() {
         if (lives  <= 0) {
             lives = 0;
-            //model.gameOver();
-            MainWindow.getInstance().restartLevel();
+            if (MainWindow.getInstance().TESTING) MainWindow.getInstance().restartLevel();
+            else model.gameOver();
         } else {
             restartFromStratingPoint();
             for (Pokemon p : model.getMapPokemons()) {
@@ -93,6 +94,12 @@ public class Player extends Unit {
         }
     }
     
+    @Override
+    public void restartFromStratingPoint() {
+        getOutBall();
+        super.restartFromStratingPoint();
+    }
+    
     public void increaseAvailableLevels(int level) {
         if (level > availableLevels) availableLevels = level;
     }
@@ -111,14 +118,14 @@ public class Player extends Unit {
 
     @Override
     public BufferedImage getImg() {return insideBall() ? caughtImage : super.getImg();}
-    
-    public void setLives(int lives) {this.lives = lives;}
-    public void getOutBall() {this.caughtWait = 0;}
     public boolean insideBall() {return (caughtWait != 0);}
     public boolean isAtSign() {return atSign;}
-    public NPC isAtCarry() {return atCarry;}
     public boolean isOnCarry() {return onCarry != null;}
+    public NPC isAtCarry() {return atCarry;}
     public int getLives() {return lives;}
     public int getAvailableLevels() {return availableLevels;}
     public double getSpeed() {return speed;}
+    
+    public void getOutBall() {this.caughtWait = 0;}
+    public void setLives(int lives) {this.lives = lives;}
 }

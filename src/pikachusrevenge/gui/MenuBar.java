@@ -32,34 +32,29 @@ import pikachusrevenge.resources.Resource;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.Pokemon;
 
-public class GameMenu  extends JMenuBar {
-
-    private final JMenuItem newGameMenu;
-    private final JMenuItem loadMenu;
-    private final JMenuItem loadDbMenu;
-    private final JMenuItem saveAsMenu;
-    private final JMenuItem saveMenu;
-    private final JMenuItem saveDbMenu;
-    private final JMenuItem exitSaveMenu;
-    private final JMenuItem exitMenu;
-    private final JMenu pokedexMenu;
-    private final JMenu levelSelect;
-    private final JMenuItem restartMenu;
-    private JMenuItem pauseMenu;
-    private JMenuItem resumeMenu;
+public final class MenuBar extends JMenuBar {
     
+    public static class IllegalFileException extends Exception {}
+ 
     private static final int MENUITEM_WIDTH = 180;
     private static final int MENUITEM_HEIGHT = 25;
-
-    public static class IllegalFileException extends Exception {}
     
-    public GameMenu() {
+    private final MainWindow window;
+    private final JMenu pokedexMenu;
+    private final JMenu levelSelect;
+    
+    private final JMenuItem saveMenu;
+    private final JMenuItem pauseMenu;
+    private final JMenuItem resumeMenu;
+    
+    public MenuBar(MainWindow window) {
+        this.window = window;
         
         JMenu menuFile = new JMenu("File");  
         menuFile.setMnemonic('F');
         
-        newGameMenu = new JMenuItem(newGameAction);
-        newGameMenu.setText("New Game");
+        JMenuItem newGameMenu = new JMenuItem(newGameAction);
+        newGameMenu.setText("Start New Game");
         newGameMenu.setMnemonic('N');
         newGameMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Event.CTRL_MASK));
         newGameMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
@@ -67,7 +62,7 @@ public class GameMenu  extends JMenuBar {
         
         menuFile.addSeparator();
         
-        loadMenu = new JMenuItem();
+        JMenuItem loadMenu = new JMenuItem();
         loadMenu.addActionListener(loadAction());
         loadMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Event.ALT_MASK));
         loadMenu.setText("Load...");
@@ -75,7 +70,7 @@ public class GameMenu  extends JMenuBar {
         loadMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(loadMenu);
         
-        loadDbMenu = new JMenuItem();
+        JMenuItem loadDbMenu = new JMenuItem();
         loadDbMenu.addActionListener(loadDbAction());
         loadDbMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Event.CTRL_MASK));
         loadDbMenu.setText("Load From Database...");
@@ -92,7 +87,7 @@ public class GameMenu  extends JMenuBar {
         saveMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(saveMenu);
         
-        saveAsMenu = new JMenuItem();
+        JMenuItem saveAsMenu = new JMenuItem();
         saveAsMenu.addActionListener(saveAsAction());
         saveAsMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.ALT_MASK));
         saveAsMenu.setText("Save As...");
@@ -100,7 +95,7 @@ public class GameMenu  extends JMenuBar {
         saveAsMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(saveAsMenu);
         
-        saveDbMenu = new JMenuItem();
+        JMenuItem saveDbMenu = new JMenuItem();
         saveDbMenu.addActionListener(saveDbAction());
         saveDbMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Event.CTRL_MASK));
         saveDbMenu.setText("Save To Database");
@@ -109,15 +104,20 @@ public class GameMenu  extends JMenuBar {
         menuFile.add(saveDbMenu);
         
         menuFile.addSeparator();
+
+        JMenuItem backMenu = new JMenuItem(backAction);
+        backMenu.setText("Back to Main Menu");
+        backMenu.setMnemonic('B');    
+        backMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
+        menuFile.add(backMenu);        
         
-        exitSaveMenu = new JMenuItem(exitAction);
+        JMenuItem exitSaveMenu = new JMenuItem(exitAction);
         exitSaveMenu.setText("Exit and Save");
         exitSaveMenu.setMnemonic('E');    
         exitSaveMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(exitSaveMenu);  
         
-        
-        exitMenu = new JMenuItem(exitAction);
+        JMenuItem exitMenu = new JMenuItem(exitAction);
         exitMenu.setText("Exit Without Saving");
         exitMenu.setMnemonic('x');    
         exitMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
@@ -128,7 +128,7 @@ public class GameMenu  extends JMenuBar {
         JMenu menuGame = new JMenu("Game");  
         menuGame.setMnemonic('G');
         
-        restartMenu = new JMenuItem(restartAction);
+        JMenuItem restartMenu = new JMenuItem(restartAction);
         restartMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Event.CTRL_MASK)); 
         restartMenu.setText("Restart Level");
         restartMenu.setMnemonic('R'); 
@@ -157,7 +157,16 @@ public class GameMenu  extends JMenuBar {
         resumeMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         resumeMenu.setEnabled(false);
         menuGame.add(resumeMenu);
-
+        
+        menuGame.addSeparator();
+        
+        JMenuItem infoMenu = new JMenuItem(helpAction);
+        infoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0)); 
+        infoMenu.setText("Help");
+        infoMenu.setMnemonic('H');  
+        infoMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
+        menuGame.add(infoMenu);
+        
         add(menuGame);
         
         pokedexMenu = new JMenu("Pokédex");  
@@ -169,8 +178,7 @@ public class GameMenu  extends JMenuBar {
     
     public void setAvailableLevels(int maxLevel){
         for (int i = 0; i < levelSelect.getItemCount(); ++i){
-            levelSelect.getItem(i).setEnabled(i < maxLevel-1);
-            levelSelect.getItem(i).setEnabled(true); // testing
+            levelSelect.getItem(i).setEnabled(i < maxLevel || MainWindow.TESTING);
         }
     }
     
@@ -187,123 +195,114 @@ public class GameMenu  extends JMenuBar {
     }  
     
     public final ActionListener loadAction() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pause();
-                JFileChooser chooser = new JFileChooser();
-                chooser.setDialogTitle("Load Game");
-                chooser.setApproveButtonText("Load");
-                chooser.setApproveButtonMnemonic('L');
-                File chosenFile = (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFile() : null;
-                if (chosenFile != null) {
-                    try (Scanner sc = new Scanner(chosenFile)){
-                        Model model = new Model(chosenFile.getAbsolutePath());
-                        Player player = model.getPlayer();
-                        HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
-                        
-                        int actualLevel = loadInt(sc);
-                        player.setLives(loadInt(sc));
-                        player.getPosition().x = (double)loadInt(sc);
-                        player.getPosition().y = (double)loadInt(sc); 
-
-                        int pokemonCount = loadInt(sc);      
-                        for (int i = 0; i < pokemonCount; i++) {
-                            int level = loadInt(sc);
-                            int x = loadInt(sc);
-                            int y = loadInt(sc);
-                            int id = loadInt(sc);
-                            boolean found = sc.nextBoolean();
-                            TilePosition tpos = new TilePosition(x,y,level);
-                            Pokemon p = new Pokemon(model,tpos,id,found);
-                            pokemons.put(tpos,p);
-                        }
-                        
-                        int levelCount = loadInt(sc);
-                        for (int i = 0; i < levelCount; i++){
-                            int id = loadInt(sc);
-                            int time = loadInt(sc);
-                            model.buildLevelIfNotExists(id,time);
-                        }
-                        
-                        MainWindow.getInstance().loadLevelWithNewModel(model, actualLevel);
-
-                    } catch (IllegalFileException ex) {
-                        JOptionPane.showMessageDialog(MainWindow.getInstance(), "Not proper Pikachu's Revenge saved file.");
-                        resume();
-                    } catch (FileNotFoundException ex) {
-                        JOptionPane.showMessageDialog(MainWindow.getInstance(), "File not found!");
-                        resume();
-                    }
-                }
-            }
+        return (ActionEvent e) -> {
+            pause();
+            if (!load()) resume();
         };
     }
     
     public final ActionListener loadDbAction() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pause();
-                File chosenFile = null;
-                int dbId = 1;
-                if (chosenFile != null) {
-                    try (Scanner sc = new Scanner(chosenFile)){
-                        Model model = new Model(dbId);
-                        Player player = model.getPlayer();
-                        HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
-                        
-                        int actualLevel = loadInt(sc);
-                        player.setLives(loadInt(sc));
-                        player.getPosition().x = (double)loadInt(sc);
-                        player.getPosition().y = (double)loadInt(sc); 
-
-                        int pokemonCount = loadInt(sc);      
-                        for (int i = 0; i < pokemonCount; i++) {
-                            int level = loadInt(sc);
-                            int x = loadInt(sc);
-                            int y = loadInt(sc);
-                            int id = loadInt(sc);
-                            boolean found = sc.nextBoolean();
-                            TilePosition tpos = new TilePosition(x,y,level);
-                            Pokemon p = new Pokemon(model,tpos,id,found);
-                            pokemons.put(tpos,p);
-                        }
-                        
-                        int levelCount = loadInt(sc);
-                        for (int i = 0; i < levelCount; i++){
-                            int id = loadInt(sc);
-                            int time = loadInt(sc);
-                            model.buildLevelIfNotExists(id,time);
-                        }
-                        
-                        MainWindow.getInstance().loadLevelWithNewModel(model, actualLevel);
-
-                    } catch (IllegalFileException ex) {
-                        JOptionPane.showMessageDialog(MainWindow.getInstance(), "Not proper Pikachu's Revenge saved file.");
-                        resume();
-                    } catch (FileNotFoundException ex) {
-                        JOptionPane.showMessageDialog(MainWindow.getInstance(), "File not found!");
-                        resume();
-                    }
-                }
-            }
+        return (ActionEvent e) -> {
+            pause();
+            if (!load()) resume();
         };
     }
     
-    private static final int loadInt(Scanner sc) throws IllegalFileException {
+    public static boolean load() {
+        MainWindow window = MainWindow.getInstance();
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Load Game");
+        chooser.setApproveButtonText("Load");
+        chooser.setApproveButtonMnemonic('L');
+        File chosenFile = (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFile() : null;
+        if (chosenFile != null) {
+            try (final Scanner sc = new Scanner(chosenFile)) {
+                Model model = new Model(chosenFile.getAbsolutePath());
+                Player player = model.getPlayer();
+                HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
+                int actualLevel = loadInt(sc);
+                player.setLives(loadInt(sc));
+                player.getPosition().x = (double)loadInt(sc);
+                player.getPosition().y = (double)loadInt(sc);
+                int pokemonCount = loadInt(sc);
+                for (int i = 0; i < pokemonCount; i++) {
+                    int level = loadInt(sc);
+                    int x1 = loadInt(sc);
+                    int y1 = loadInt(sc);
+                    int id = loadInt(sc);
+                    boolean found = sc.nextBoolean();
+                    TilePosition tpos = new TilePosition(x1, y1, level);
+                    Pokemon p = new Pokemon(model,tpos,id,found);
+                    pokemons.put(tpos,p);
+                }
+                int levelCount = loadInt(sc);
+                player.increaseAvailableLevels(levelCount);
+                for (int i = 0; i < levelCount; i++){
+                    int id = loadInt(sc);
+                    int time = loadInt(sc);
+                    model.buildLevelIfNotExists(id,time);
+                }
+                window.loadLevelWithNewModel(model, actualLevel);
+            }catch (IllegalFileException ex) {
+                JOptionPane.showMessageDialog(window, "Not proper Pikachu's Revenge saved file.");
+                return false;
+            }catch (FileNotFoundException ex) {
+                JOptionPane.showMessageDialog(window, "File not found!");
+                return false;
+            }
+        }  
+        return true;
+    }
+    
+    public static boolean loadFromDb() {
+        MainWindow window = MainWindow.getInstance();
+        File chosenFile = null;
+        int dbId = 1;
+        if (chosenFile != null) {
+            try (final Scanner sc = new Scanner(chosenFile)) {
+                Model model = new Model(dbId);
+                Player player = model.getPlayer();
+                HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
+                int actualLevel = loadInt(sc);
+                player.setLives(loadInt(sc));
+                player.getPosition().x = (double)loadInt(sc);
+                player.getPosition().y = (double)loadInt(sc);
+                int pokemonCount = loadInt(sc);
+                for (int i = 0; i < pokemonCount; i++) {
+                    int level = loadInt(sc);
+                    int x1 = loadInt(sc);
+                    int y1 = loadInt(sc);
+                    int id = loadInt(sc);
+                    boolean found = sc.nextBoolean();
+                    TilePosition tpos = new TilePosition(x1, y1, level);
+                    Pokemon p = new Pokemon(model,tpos,id,found);
+                    pokemons.put(tpos,p);
+                }
+                int levelCount = loadInt(sc);
+                for (int i = 0; i < levelCount; i++){
+                    int id = loadInt(sc);
+                    int time = loadInt(sc);
+                    model.buildLevelIfNotExists(id,time);
+                }
+                window.loadLevelWithNewModel(model, actualLevel);
+            }catch (IllegalFileException ex) {
+                JOptionPane.showMessageDialog(window, "Not proper Pikachu's Revenge saved file.");
+                return false;
+            }catch (FileNotFoundException ex) {
+                JOptionPane.showMessageDialog(window, "File not found!");
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
+    private static int loadInt(Scanner sc) throws IllegalFileException {
         if (sc.hasNextInt()) return sc.nextInt();
         else throw new IllegalFileException();    
     }
     
-    /**
-     * A mentéshez szükséges metódus. Feldob egy file-választó ablakot 
-     * és a kiválasztott file-ba elmenti a játékot
-     * 
-     * @param game a játék ablaka
-     * @param withExit true, ha a mentés után ki is kell lépni a játékból
-     */
-    private final void save(boolean withExit, String fileName){
+    private void save(boolean withExit, String fileName){
         File file;
         if (fileName == null) {
             JFileChooser chooser = new JFileChooser();
@@ -316,7 +315,7 @@ public class GameMenu  extends JMenuBar {
         }
         if (file != null) {
             try (PrintWriter pw = new PrintWriter(file)){
-                Model model = MainWindow.getInstance().getModel();
+                Model model = window.getModel();
                 Player player = model.getPlayer();
                 HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
                 ArrayList<Level> levels = model.getLevels();
@@ -343,7 +342,7 @@ public class GameMenu  extends JMenuBar {
                 }
 
             } catch (FileNotFoundException ex) {
-                JOptionPane.showMessageDialog(MainWindow.getInstance(), "File not found!");
+                JOptionPane.showMessageDialog(window, "File not found!");
             }
         }  
         
@@ -354,7 +353,7 @@ public class GameMenu  extends JMenuBar {
        File file = null;
         if (file != null) {
             try (PrintWriter pw = new PrintWriter(file)){
-                Model model = MainWindow.getInstance().getModel();
+                Model model = window.getModel();
                 Player player = model.getPlayer();
                 HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
                 ArrayList<Level> levels = model.getLevels();
@@ -381,7 +380,7 @@ public class GameMenu  extends JMenuBar {
                 }
 
             } catch (FileNotFoundException ex) {
-                JOptionPane.showMessageDialog(MainWindow.getInstance(), "File not found!");
+                JOptionPane.showMessageDialog(window, "File not found!");
             }
         }  
         
@@ -410,7 +409,7 @@ public class GameMenu  extends JMenuBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pause();
-                Model model = MainWindow.getInstance().getModel();
+                Model model = window.getModel();
                 if (model.isSavedToDb()) saveToDb(false,model.getDbId());
                 else save(false,model.getFileName());
                 resume();
@@ -423,7 +422,7 @@ public class GameMenu  extends JMenuBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pause();
-                Model model = MainWindow.getInstance().getModel();
+                Model model = window.getModel();
                 saveToDb(false,model.getDbId());
                 resume();
             }
@@ -437,45 +436,46 @@ public class GameMenu  extends JMenuBar {
      * @return a létrehozott eseménykezelő
      */
     public final ActionListener exitAndSaveAction() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Model model = MainWindow.getInstance().getModel();
-                if (model.isSavedToDb()) saveToDb(true,model.getDbId());
-                else save(true,model.getFileName());
-            }
+        return (ActionEvent e) -> {
+            Model model = window.getModel();
+            if (model.isSavedToDb()) saveToDb(true,model.getDbId());
+            else save(true,model.getFileName());
         };
     }
     
     public final ActionListener startLevelAction(final int level) {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Model model = MainWindow.getInstance().getModel();
-                if (model != null) model.stopGame();
-                MainWindow.getInstance().loadLevel(level);
-            }
+        return (ActionEvent e) -> {
+            Model model = window.getModel();
+            if (model != null) model.stopGame();
+            window.loadLevel(level);
         };
     } 
     
     private final Action restartAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainWindow.getInstance().restartLevel();
+            window.restartLevel();
         }
     };
     
     private final Action newGameAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainWindow.getInstance().loadLevelWithNewModel(new Model(), 1);
+            window.loadLevelWithNewModel(new Model(), 1);
         }
     };
     
     private final Action exitAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainWindow.getInstance().showExitConfirmation();
+            window.showExitConfirmation();
+        }
+    };
+    
+    private final Action backAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            window.showBackConfirmation();
         }
     };
     
@@ -493,27 +493,31 @@ public class GameMenu  extends JMenuBar {
         }
     };
     
+    private final Action helpAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            window.showHelp();
+        }
+    };
+    
     private void resume() {
-        MainWindow.getInstance().getModel().restartGame();
+        window.getModel().resumeGame();
         resumeMenu.setEnabled(false);
         pauseMenu.setEnabled(true);  
     }
     
     private void pause() {
-        MainWindow.getInstance().getModel().stopGame();
+        window.getModel().stopGame();
         resumeMenu.setEnabled(true);
         pauseMenu.setEnabled(false); 
     }
     
-    public final ActionListener openPokemon(int id) {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Desktop.getDesktop().browse(new URI("https://pokedex.org/#/pokemon/" + id));
-                } catch (Exception ex) {
-                    System.err.println("Can't open pokedex entry");;
-                }
+    private final ActionListener openPokemon(int id) {
+        return (ActionEvent e) -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://pokedex.org/#/pokemon/" + id));
+            } catch (Exception ex) {
+                System.err.println("Can't open pokedex entry");;
             }
         };
     }
@@ -532,10 +536,10 @@ public class GameMenu  extends JMenuBar {
             for (int i = 0; i < clusters; ++i){
                 int from = i * (max / clusters) + 1;
                 int to = (i == clusters - 1) ? max : (i + 1) * (max / clusters);
-                JMenu menu = new JMenu(String.format("%s - %s", from, to));
-                menu.setPreferredSize(new Dimension(MENUITEM_WIDTH / 2,MENUITEM_HEIGHT));
-                menus.add(menu);
-                pokedexMenu.add(menu);
+                JMenu subMenu = new JMenu(String.format("%s - %s", from, to));
+                subMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH / 2,MENUITEM_HEIGHT));
+                menus.add(subMenu);
+                pokedexMenu.add(subMenu);
             }
         } else {
             menus.add(pokedexMenu);
