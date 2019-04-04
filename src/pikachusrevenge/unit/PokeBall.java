@@ -19,6 +19,7 @@ public final class PokeBall extends MovingSprite {
         this.moving = true;
         setImg("object_ball.png");
         setStartingPostion(x, y);
+        putToPosition(startPosition);
         
         this.targetPosition = new Position(model.getPlayer().getPosition());
         this.nextDirection = Direction.getDirection(pos,targetPosition);

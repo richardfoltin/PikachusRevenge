@@ -19,13 +19,14 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import static pikachusrevenge.gui.MainWindow.WINDOW_HEIGHT;
 import static pikachusrevenge.gui.MainWindow.WINDOW_WIDTH;
+import pikachusrevenge.model.Database;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.resources.Resource;
 
 public final class MainMenu extends JPanel {
 
-    private static final int BUTTON_WIDTH = 200;
-    private static final int BUTTON_HEIGHT = 35;
+    private static final int BUTTON_WIDTH = 160;
+    private static final int BUTTON_HEIGHT = 20;
     private static final Color BUTTON_FONT_COLOR = new Color(225, 67, 25);
     private static final Color BUTTON_FOCUS_COLOR = new Color(220, 220, 220);
             
@@ -36,7 +37,7 @@ public final class MainMenu extends JPanel {
         this.window = frame;
         
         setPreferredSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT)); 
-        setBorder(BorderFactory.createEmptyBorder(160, 260, 0, 0));
+        setBorder(BorderFactory.createEmptyBorder(150, 250, 0, 0));
         //setLayout(new GridBagLayout());
         
         try {backgroundImage = Resource.loadBufferedImage("main.png");} 
@@ -48,17 +49,21 @@ public final class MainMenu extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         //panel.setBorder(BorderFactory.createLineBorder(Color.red,2));
 
-        JButton startButton = new MenuButton("Start New Game", panel);
+        JButton startButton = new MenuButton("Start New Game", panel, true);
         startButton.addActionListener(startAction());
-        panel.add(Box.createRigidArea(new Dimension(0,90)));
+        panel.add(Box.createRigidArea(new Dimension(0,80)));
         startButton.requestFocus();
             
-        JButton loadButton = new MenuButton("Load From File...", panel);
+        JButton loadButton = new MenuButton("Load From File...", panel, false);
         loadButton.addActionListener(loadAction());
-        panel.add(Box.createRigidArea(new Dimension(0,8)));
+        panel.add(Box.createRigidArea(new Dimension(0,7)));
             
-        JButton loadDbButton = new MenuButton("Load From Database...", panel);
+        JButton loadDbButton = new MenuButton("Load From Database...", panel, false);
         loadDbButton.addActionListener(loadDbAction());
+        panel.add(Box.createRigidArea(new Dimension(0,7)));
+            
+        JButton highscoreButton = new MenuButton("Highscores", panel, false);
+        highscoreButton.addActionListener(highscoreAction());
         
     }
     
@@ -71,9 +76,11 @@ public final class MainMenu extends JPanel {
     
     private final class MenuButton extends JButton{
     
-        public MenuButton(String title, JPanel panel) {
+        public MenuButton(String title, JPanel panel, boolean big) {
             super(title);
-            setMaximumSize(new Dimension(BUTTON_WIDTH,BUTTON_HEIGHT));
+            Dimension size = (big) ? new Dimension(BUTTON_WIDTH + 20,BUTTON_HEIGHT + 20) : new Dimension(BUTTON_WIDTH,BUTTON_HEIGHT);
+            setPreferredSize(size);
+            setMaximumSize(size);
             setAlignmentX(Component.CENTER_ALIGNMENT);  
             setForeground(BUTTON_FONT_COLOR);
             setBackground(Color.WHITE);
@@ -111,6 +118,12 @@ public final class MainMenu extends JPanel {
         };
     }
     
+     private final ActionListener highscoreAction() {
+        return (ActionEvent e) -> {
+            window.showHighscores();
+        };
+    }
+     
     private final ActionListener loadAction() {
         return (ActionEvent e) -> {
             MenuBar.load();
@@ -119,7 +132,7 @@ public final class MainMenu extends JPanel {
         
     private final ActionListener loadDbAction() {
         return (ActionEvent e) -> {
-            MenuBar.loadFromDb();
+            Database.loadSelection();
         };
     }
 }

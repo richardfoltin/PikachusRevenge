@@ -188,6 +188,7 @@ public class NPC extends Unit {
         if (startRoute >= route.size()) startRoute = 0;
         if (startRoute == -1) startRoute = new Random().nextInt(route.size()-1);
         setStartingPostion(route.get(startRoute).pos.x, route.get(startRoute).pos.y);
+        putToPosition(startPosition);
         this.targetPosition = route.get(startRoute + 1).pos;
         routeTarget = startRoute + 1;
         

@@ -28,6 +28,8 @@ import javax.swing.KeyStroke;
 import pikachusrevenge.model.Level;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.TilePosition;
+import pikachusrevenge.model.Database;
+import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.Pokemon;
@@ -65,7 +67,7 @@ public final class MenuBar extends JMenuBar {
         JMenuItem loadMenu = new JMenuItem();
         loadMenu.addActionListener(loadAction());
         loadMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Event.ALT_MASK));
-        loadMenu.setText("Load...");
+        loadMenu.setText("Load From File...");
         loadMenu.setMnemonic('o');
         loadMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(loadMenu);
@@ -90,7 +92,7 @@ public final class MenuBar extends JMenuBar {
         JMenuItem saveAsMenu = new JMenuItem();
         saveAsMenu.addActionListener(saveAsAction());
         saveAsMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.ALT_MASK));
-        saveAsMenu.setText("Save As...");
+        saveAsMenu.setText("Save To File As...");
         saveAsMenu.setMnemonic('A');
         saveAsMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(saveAsMenu);
@@ -140,6 +142,13 @@ public final class MenuBar extends JMenuBar {
         levelSelect.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuGame.add(levelSelect); 
         addLevels(levelSelect);
+        
+        JMenuItem highscoreMenu = new JMenuItem(highscoreAction);
+        highscoreMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Event.CTRL_MASK)); 
+        highscoreMenu.setText("Highscores");
+        highscoreMenu.setMnemonic('H'); 
+        highscoreMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
+        menuGame.add(highscoreMenu); 
         
         menuGame.addSeparator();
         
@@ -197,14 +206,16 @@ public final class MenuBar extends JMenuBar {
     public final ActionListener loadAction() {
         return (ActionEvent e) -> {
             pause();
-            if (!load()) resume();
+            load();
+            resume();
         };
     }
     
     public final ActionListener loadDbAction() {
         return (ActionEvent e) -> {
             pause();
-            if (!load()) resume();
+            Database.loadSelection();
+            resume();
         };
     }
     
@@ -222,8 +233,9 @@ public final class MenuBar extends JMenuBar {
                 HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
                 int actualLevel = loadInt(sc);
                 player.setLives(loadInt(sc));
-                player.getPosition().x = (double)loadInt(sc);
-                player.getPosition().y = (double)loadInt(sc);
+                double x = (double)loadInt(sc);
+                double y = (double)loadInt(sc);
+                
                 int pokemonCount = loadInt(sc);
                 for (int i = 0; i < pokemonCount; i++) {
                     int level = loadInt(sc);
@@ -242,7 +254,7 @@ public final class MenuBar extends JMenuBar {
                     int time = loadInt(sc);
                     model.buildLevelIfNotExists(id,time);
                 }
-                window.loadLevelWithNewModel(model, actualLevel);
+                window.loadLevelWithNewModel(model, actualLevel, new Position(x,y));
             }catch (IllegalFileException ex) {
                 JOptionPane.showMessageDialog(window, "Not proper Pikachu's Revenge saved file.");
                 return false;
@@ -253,49 +265,6 @@ public final class MenuBar extends JMenuBar {
         }  
         return true;
     }
-    
-    public static boolean loadFromDb() {
-        MainWindow window = MainWindow.getInstance();
-        File chosenFile = null;
-        int dbId = 1;
-        if (chosenFile != null) {
-            try (final Scanner sc = new Scanner(chosenFile)) {
-                Model model = new Model(dbId);
-                Player player = model.getPlayer();
-                HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
-                int actualLevel = loadInt(sc);
-                player.setLives(loadInt(sc));
-                player.getPosition().x = (double)loadInt(sc);
-                player.getPosition().y = (double)loadInt(sc);
-                int pokemonCount = loadInt(sc);
-                for (int i = 0; i < pokemonCount; i++) {
-                    int level = loadInt(sc);
-                    int x1 = loadInt(sc);
-                    int y1 = loadInt(sc);
-                    int id = loadInt(sc);
-                    boolean found = sc.nextBoolean();
-                    TilePosition tpos = new TilePosition(x1, y1, level);
-                    Pokemon p = new Pokemon(model,tpos,id,found);
-                    pokemons.put(tpos,p);
-                }
-                int levelCount = loadInt(sc);
-                for (int i = 0; i < levelCount; i++){
-                    int id = loadInt(sc);
-                    int time = loadInt(sc);
-                    model.buildLevelIfNotExists(id,time);
-                }
-                window.loadLevelWithNewModel(model, actualLevel);
-            }catch (IllegalFileException ex) {
-                JOptionPane.showMessageDialog(window, "Not proper Pikachu's Revenge saved file.");
-                return false;
-            }catch (FileNotFoundException ex) {
-                JOptionPane.showMessageDialog(window, "File not found!");
-                return false;
-            }
-        }
-        return true;
-    }
-    
     
     private static int loadInt(Scanner sc) throws IllegalFileException {
         if (sc.hasNextInt()) return sc.nextInt();
@@ -340,7 +309,9 @@ public final class MenuBar extends JMenuBar {
                     pw.println(level.getId() + " " +
                                level.getTime());
                 }
-
+                
+                window.saveSuccessful("Game saved sucessfully to " + file.getName() + ".");
+                model.setFileName(fileName);
             } catch (FileNotFoundException ex) {
                 JOptionPane.showMessageDialog(window, "File not found!");
             }
@@ -350,40 +321,7 @@ public final class MenuBar extends JMenuBar {
     }
     
    private final void saveToDb(boolean withExit, int dbId){
-       File file = null;
-        if (file != null) {
-            try (PrintWriter pw = new PrintWriter(file)){
-                Model model = window.getModel();
-                Player player = model.getPlayer();
-                HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
-                ArrayList<Level> levels = model.getLevels();
-                int actualLevel = model.getActualLevelId();
-
-                pw.println(actualLevel + " " + 
-                           player.getLives() + " " + 
-                           (int)player.getPosition().x + " " + 
-                           (int)player.getPosition().y);
-                pw.println(pokemons.size());
-                
-                for (HashMap.Entry<TilePosition,Pokemon> p : pokemons.entrySet()) {
-                    pw.println(p.getKey().getLevel() + " " + 
-                               p.getKey().getX() + " " + 
-                               p.getKey().getY() + " " + 
-                               p.getValue().getId() + " " + 
-                               p.getValue().isFound());
-                }
-                
-                pw.println(levels.size());
-                for (Level level : levels){
-                    pw.println(level.getId() + " " +
-                               level.getTime());
-                }
-
-            } catch (FileNotFoundException ex) {
-                JOptionPane.showMessageDialog(window, "File not found!");
-            }
-        }  
-        
+        if (Database.save(dbId,window.getModel())) window.saveSuccessful("Game saved sucessfully to database.");
         if (withExit) System.exit(0);
     }
    
@@ -455,6 +393,13 @@ public final class MenuBar extends JMenuBar {
         @Override
         public void actionPerformed(ActionEvent e) {
             window.restartLevel();
+        }
+    };
+    
+    private final Action highscoreAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            window.showHighscores();
         }
     };
     

@@ -44,12 +44,15 @@ public class MovingSprite {
     }
     
     public final void setStartingPostion(double x, double y){
-        this.pos.x = x;
-        this.pos.y = y;
         this.startPosition.x = x;
         this.startPosition.y = y;
-        this.nextPosition.x = x;
-        this.nextPosition.y = y;
+    }
+    
+    public final void putToPosition(Position pos) {
+        this.pos.x = pos.x;
+        this.pos.y = pos.y;   
+        this.nextPosition.x = pos.x;
+        this.nextPosition.y = pos.y;
     }
     
     protected void loadNextPosition(){
@@ -85,6 +88,7 @@ public class MovingSprite {
     public double getY() {return pos.y;}
     public BufferedImage getImg() {return img;}
     public Position getPosition() {return pos;}
+    public Position getStartPosition() {return startPosition;}
     public boolean isLooping() {return looping;}
     
     

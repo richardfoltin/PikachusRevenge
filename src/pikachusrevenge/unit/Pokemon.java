@@ -32,6 +32,7 @@ public class Pokemon extends Unit {
         super(model);
         
         this.id = (id == 0) ? newRandomId() : id;
+        this.name = POKEMON_NAME[this.id-1];
         this.found = false;
         this.tpos = tpos;
         this.speed = model.getPlayer().getSpeed();
@@ -42,7 +43,8 @@ public class Pokemon extends Unit {
     public void found() {
         this.found = true;
         revealLabel();
-        restartFromStratingPoint();
+        putToPosition(TilePosition.tileCenter(tpos));
+        startLooping();
     }
     
     public void revealLabel(){
@@ -55,12 +57,6 @@ public class Pokemon extends Unit {
 
             label.setIcon(new ImageIcon(image));
         }
-    }
-    
-    public void putNextToPlayer() {
-        pos = model.getPlayer().getPosition();
-        nextPosition = pos;
-        nextDirection = Direction.STOP;
     }
     
     private void setIdImg() {
@@ -116,15 +112,7 @@ public class Pokemon extends Unit {
         }
         super.startLooping();
     }
-    
-    @Override
-    public void restartFromStratingPoint() {
-        startLooping();
-        Position playerPosition = model.getPlayer().getPosition();
-        setStartingPostion(playerPosition.x, playerPosition.y);
-        super.restartFromStratingPoint();  
-    }
-    
+
     public int getId() {return id;}
     public TilePosition getTilePosition() {return tpos;}
     public boolean isFound() {return found;} 

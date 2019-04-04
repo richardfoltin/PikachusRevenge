@@ -100,17 +100,19 @@ public final class MainWindow extends JFrame {
             loadLevel(id);
         }
     }
-    
-    public void loadLevelWithNewModel(Model model, int id){
+    public void loadLevelWithNewModel(Model model, int id) {loadLevelWithNewModel(model,id,null);}
+    public void loadLevelWithNewModel(Model model, int id, Position start){
         stopGameFrame();
         this.model = model;
         startGameFrame();
-        loadLevel(id);
+        loadLevel(id, start);
     }
-     
-    public void loadLevel(int id) {
+    
+    public void loadLevel(int id) {loadLevel(id,null);} 
+    public void loadLevel(int id, Position start) {
         boolean forward = (model.getActualLevelId() <= id);
-        Level level = model.buildLevelIfNotExists(id,0);
+        Level level = model.buildLevelIfNotExists(id,0); 
+        model.getPlayer().setStartingPostion(level.getPlayerStartingPosition(forward));
         
         if (gamePanel != null) remove(gamePanel);
         mapView = new MapView(level.getMap(),model);
@@ -127,7 +129,7 @@ public final class MainWindow extends JFrame {
         model.getPlayer().increaseAvailableLevels(id);
         menu.setAvailableLevels(model.getPlayer().getAvailableLevels());
         
-        model.startGame(level,forward);   
+        model.startGame(level,start);   
         scrollTo(model.getPlayer().getPosition());  
         pack();
     }
@@ -192,6 +194,24 @@ public final class MainWindow extends JFrame {
         }
     }
     
+    public void showHighscores() {
+        
+        
+    }
+    
+    public String getSaveName() {
+        String name = JOptionPane.showInputDialog(this, "What is your name?", "Saving..",JOptionPane.QUESTION_MESSAGE);
+        return name;
+    }
+    
+    public void showDbError(String error) {
+        JOptionPane.showMessageDialog(this,error,"Database Error",JOptionPane.ERROR_MESSAGE);
+    }
+    
+    public void saveSuccessful(String msg) {
+        JOptionPane.showMessageDialog(this,msg,"Success",JOptionPane.INFORMATION_MESSAGE);
+    }
+    
     public void showGameOverPane() {     
         
         Object[] options = {"New Game","Restart Level","Main Menu"};
@@ -205,7 +225,6 @@ public final class MainWindow extends JFrame {
             case "Restart Level": restartLevel(); break;
             default: showMainMenu(); break;
         }
-        
     }
     
     public void showBackConfirmation() {    

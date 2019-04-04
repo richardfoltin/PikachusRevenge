@@ -36,8 +36,8 @@ public final class Model implements ActionListener {
     private final Timer timer = new Timer(MAIN_LOOP, this);
     private final MainWindow mainWindow;
     private final Timer clock;
-    private final String fileName;
-    private final int dbId;
+    private String fileName;
+    private int dbId;
     
     private List<MapLayer> layers;
     private Level actualLevel;
@@ -89,7 +89,7 @@ public final class Model implements ActionListener {
         }
     }
     
-    public void startGame(Level level, boolean forward) {
+    public void startGame(Level level, Position start) {
 
         this.actualLevel = level; 
         Map map = level.getMap();
@@ -113,9 +113,14 @@ public final class Model implements ActionListener {
         }
         mainWindow.getStats().updateTimeLabel(actualLevel.getTime());
         
-        player.setStartingPostion(actualLevel.getPlayerStartingPosition(forward));
         for (NPC npc : actualLevel.getNpcs()) npc.startLooping();
-        for (Pokemon p : actualLevel.getPokemons()) if (p.isFound()) p.restartFromStratingPoint();
+        for (Pokemon p : actualLevel.getPokemons()) {
+            if (p.isFound()) {
+                p.putToPosition((start == null) ? p.getStartPosition() : start);
+                p.startLooping();
+            }
+        }
+        player.putToPosition((start == null) ? player.getStartPosition() : start);
         resumeGame();
     }
     
@@ -199,7 +204,7 @@ public final class Model implements ActionListener {
         for (MapLayer l : layers){
             if (l instanceof TileLayer){
                 Tile t = ((TileLayer)l).getTileAt(TilePosition.tileCoordFromMapCoord(pos.x),TilePosition.tileCoordFromMapCoord(pos.y));
-                if (actualLevel.hasProperty(t,"Sign")) return true;
+                if (Level.hasProperty(t,"Sign")) return true;
             } 
         } 
         return false;
@@ -243,7 +248,7 @@ public final class Model implements ActionListener {
                 if (pokemons.containsKey(tpos)) {
                     Pokemon p = pokemons.get(tpos);
                     if (!p.isFound()) {
-                        writeInfo("You have found <font color=black>" + Pokemon.POKEMON_NAME[p.getId()-1] + "</font>");
+                        writeInfo("You have found <font color=black>" + p.getName() + "</font>");
                         actualLevel.clearTileWithProperty("Ball", tpos);
                         actualLevel.increaseFoundPokemonCount();
                         p.found();
@@ -253,6 +258,23 @@ public final class Model implements ActionListener {
             }
             pi.next();
         }  
+    }
+    
+    public int getScore() {
+        int score = 0;
+        for (Level l : levels) {
+            if (l.canAdvanceToNextLevel()) {
+                int time = l.getTime();
+                if (time <= 30) score = 333;
+                else score = (int)10000/time;
+            }
+        }
+        for (Pokemon p : pokemons.values()) {
+            if (p.isFound()) {
+                score += 100;
+            }
+        }
+        return score;
     }
 
     @Override
@@ -288,7 +310,10 @@ public final class Model implements ActionListener {
     public ArrayList<Level> getLevels() {return levels;}
     public int getActualLevelId() {return (actualLevel == null) ? 0 :actualLevel.getId();}
     public Level getActualLevel() {return actualLevel;}
+    
     public String getFileName() {return fileName;}
     public int getDbId() {return dbId;}
+    public void setFileName(String fileName) {this.fileName = fileName;}
+    public void setDbId(int id) {this.dbId = id;}
     public boolean isSavedToDb() {return (dbId != 0 && fileName == null);}
 }
