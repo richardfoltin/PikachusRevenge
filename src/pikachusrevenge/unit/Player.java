@@ -10,6 +10,8 @@ import pikachusrevenge.resources.Resource;
 
 public class Player extends Unit {
     
+    public static final String DEFAULTNAME = "Pikachu";
+    
     private BufferedImage caughtImage;
     private NPC atCarry;
     private NPC onCarry;
@@ -26,7 +28,7 @@ public class Player extends Unit {
         this.lives = (MainWindow.getInstance().TESTING) ? 1 : 3;
         this.availableLevels = 1;
         this.speed = 3.0;
-        this.name = "Pikachu";
+        this.name = DEFAULTNAME;
         this.caughtWaitMax = 30;
         
         setImg("pokemons\\025.png");

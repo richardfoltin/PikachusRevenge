@@ -58,8 +58,8 @@ public class NPC extends Unit {
     private void throwBall() {
         System.out.println("Ball thrown");
         states.get(NPC_STATE.STOP_THROW).active = true;
-        states.get(NPC_STATE.STOP_EXCLAMATION).active = false;
-        states.get(NPC_STATE.WALKING_CAUTIOUS).active = false;
+        states.get(NPC_STATE.STOP_EXCLAMATION).reset();
+        states.get(NPC_STATE.WALKING_CAUTIOUS).reset();
         model.ballThrow(pos, throwSpeed, this);
     }
     
@@ -535,6 +535,11 @@ public class NPC extends Unit {
 
         public NpcState(int max) {
             this.max = max;
+        }
+        
+        public void reset() {
+            active = false;
+            counter = 0;
         }
         
         // returns true if reached max

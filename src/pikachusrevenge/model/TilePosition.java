@@ -45,7 +45,6 @@ public class TilePosition {
         return "TilePosition{" + "x=" + x + ", y=" + y + ", level=" + level + '}';
     }
 
-
     @Override
     public int hashCode() {
         int hash = 7;

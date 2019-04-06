@@ -17,13 +17,13 @@ import pikachusrevenge.resources.Resource;
 public final class StatsPanel extends JPanel {
 
     private static final int STATS_HEIGHT = 30;
+    public static final SimpleDateFormat TIMEFORMAT = new SimpleDateFormat("mm:ss");
     
     private final JPanel livesPane = new JPanel();
     private final JPanel pokemonPane = new JPanel();
     private final JLabel timerLabel = new JLabel("00:00");
     private final List<JLabel> lives = new ArrayList<>();
     private final List<JLabel> pokemons = new ArrayList<>();
-    private final SimpleDateFormat timeFormat = new SimpleDateFormat("mm:ss");
      
     public StatsPanel(int width) {
   
@@ -72,21 +72,25 @@ public final class StatsPanel extends JPanel {
     
     public void updateTimeLabel(int time) {
         Date date = new Date(time * 1000);
-        timerLabel.setText(timeFormat.format(date));
+        timerLabel.setText(TIMEFORMAT.format(date));
     }
     
     public JLabel addBall() {
+        JLabel label = getBallLabel();
+        pokemons.add(label);
+        pokemonPane.add(label);
         
+        return label;
+    }
+    
+    public static JLabel getBallLabel() {
         Image image = null;
         try {image = Resource.loadImage("ball.png");} 
         catch (IOException e) {System.err.println("Can't load file");} 
         image = Resource.getScaledImage(image, 15, 15);
         
         JLabel label = new JLabel(new ImageIcon(image),JLabel.CENTER);
-        label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));    
-        pokemons.add(label);
-        pokemonPane.add(label);
-        
+        label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));  
         return label;
     }
     

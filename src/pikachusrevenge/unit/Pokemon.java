@@ -42,12 +42,12 @@ public class Pokemon extends Unit {
     
     public void found() {
         this.found = true;
-        revealLabel();
+        revealLabel(this.label);
         putToPosition(TilePosition.tileCenter(tpos));
         startLooping();
     }
     
-    public void revealLabel(){
+    public void revealLabel(JLabel label){
         if (label != null) {
             BufferedImage image = null;
             try {image = Resource.loadBufferedImage(String.format("pokemons\\icon%03d.png",this.id));} 

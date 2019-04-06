@@ -91,5 +91,6 @@ public class Unit extends MovingSprite {
     }
     
     public String getName() {return name;}
+    public void setName(String name) {this.name = name;}
 
 }

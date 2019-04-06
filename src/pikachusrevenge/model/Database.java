@@ -24,6 +24,8 @@ public class Database {
     
     private Database(){}
     
+    public static class NoResultException extends Exception{};
+    
     public static Connection getConnection() throws ClassNotFoundException, SQLException{
         MainWindow window = MainWindow.getInstance();
         if (connPool == null){
@@ -35,29 +37,10 @@ public class Database {
             connPool.setUser(USER);
             connPool.setPassword(PASSWORD);
         }
-        
         Connection conn = connPool.getPooledConnection().getConnection();
-        
         if (!tableCreated) {
-            try (Statement stmt = conn.createStatement()){
-                StringBuilder contentBuilder = new StringBuilder();
-                URL url = Database.class.getResource("createDatabase.sql");
-                try (BufferedReader br = new BufferedReader(new FileReader(url.getPath()))){
-                    String line;
-                    while ((line = br.readLine()) != null){
-                        contentBuilder.append(line);
-                        if (contentBuilder.length() > 0 && contentBuilder.charAt(contentBuilder.length()-1) == ';') {
-                            stmt.addBatch(contentBuilder.toString());
-                            contentBuilder = new StringBuilder();
-                        } else {
-                            contentBuilder.append("\n");
-                        }
-                    }
-                }catch (IOException e){
-                    System.err.println("Cannot read .sql file to create database.");
-                    throw new Exception();
-                }
-                stmt.executeBatch();
+            try {
+                runBatchFile("createDatabase.sql", conn);
                 tableCreated = true;
             } catch (Exception e){
                 window.showDbError("Cannot create database");
@@ -67,13 +50,74 @@ public class Database {
         return conn;
     }
     
-    public static boolean loadSelection() {
-        int id = 0;
+    public static void runBatchFile(String fileName, Connection conn) throws ClassNotFoundException, SQLException {
+        Statement stmt = conn.createStatement();
+        StringBuilder contentBuilder = new StringBuilder();
+        URL url = Database.class.getResource(fileName);
+        try (BufferedReader br = new BufferedReader(new FileReader(url.getPath()))){
+            String line;
+            while ((line = br.readLine()) != null){
+                contentBuilder.append(line);
+                if (contentBuilder.length() > 0 && contentBuilder.charAt(contentBuilder.length()-1) == ';') {
+                    stmt.addBatch(contentBuilder.toString());
+                    contentBuilder = new StringBuilder();
+                } else {
+                    contentBuilder.append("\n");
+                }
+            }
+        }catch (IOException e){
+            System.err.println("Cannot read .sql file to create database.");
+            throw new SQLException();
+        }
+        stmt.executeBatch();
+    }
+    
+    public static ArrayList<SaveData> loadAllSaveData() throws NoResultException, SQLException {
+        ArrayList<SaveData> data = new ArrayList<>();
         
-        return load(id);
+        try (Statement stmt = getConnection().createStatement()){
+            String query =  "SELECT \n" +
+                            "	 p.id as 'id',\n" +
+                            "    p.name as 'name',\n" +
+                            "    p.life as 'life',\n" +
+                            "    p.actualLevel as 'actualLevel',\n" +
+                            "    p.maxLevel as 'maxLevel',\n" +
+                            "    p.score as 'score',\n" +
+                            "    p.updated as 'updated',\n" +
+                            "    count(case pok.found when 1 then 1 else NULL end) as 'foundPokemon',\n" +
+                            "    count(pok.pokemon_id) as 'maxPokemon'\n" +
+                            "FROM pikachusrevenge.player p\n" +
+                            "LEFT JOIN pikachusrevenge.pokemon pok ON p.id = pok.player_id\n" +
+                            "GROUP BY\n" +
+                            "	 p.id, p.name, p.life, p.actualLevel, p.maxLevel, p.score";
+            ResultSet rs = stmt.executeQuery(query);
+            if (!rs.isBeforeFirst()) throw new NoResultException();
+            while (rs.next()){
+                SaveData s = new SaveData();
+                s.id = rs.getInt("id");
+                s.name = rs.getString("name");
+                s.life = rs.getInt("life");
+                s.actualLevel = rs.getInt("actualLevel");
+                s.maxLevel = rs.getInt("maxLevel");
+                s.score = rs.getInt("score");
+                s.foundPokemon = rs.getInt("foundPokemon");
+                s.maxPokemon = rs.getInt("maxPokemon");
+                s.updated = rs.getTimestamp("updated");
+                data.add(s);
+            }
+        } catch (SQLException e) {
+            System.err.println("Cannot load saved games data!\n" + e);
+            throw new SQLException(e);
+        } catch (ClassNotFoundException e) {
+            System.err.println("Cannot load saved games data!\n" + e);
+            throw new SQLException(e);
+        }
+        
+        return data;
     }
     
     public static boolean load(int id) {
+        if (id == 0) return false;
         Model model = new Model(id);
         String query;
         int actualLevel = 0;
@@ -82,10 +126,11 @@ public class Database {
         //player
         Player player = model.getPlayer();
         try (Statement stmt = getConnection().createStatement()){
-            query = String.format("SELECT life,actualLevel,maxLevel,x,y FROM %s.player WHERE id = %d",DB,id);
+            query = String.format("SELECT life,name,actualLevel,maxLevel,x,y FROM %s.player WHERE id = %d",DB,id);
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()){
                 player.setLives(rs.getInt("life"));
+                player.setName(rs.getString("name"));
                 actualLevel = rs.getInt("actualLevel");
                 player.increaseAvailableLevels(rs.getInt("maxLevel"));
                 start = new Position(rs.getInt("x"),rs.getInt("y"));
@@ -97,7 +142,7 @@ public class Database {
         }
         
         //pokémon
-        HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
+        HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
         try (Statement stmt = getConnection().createStatement()){
             query = String.format("SELECT pokemon_id,level_id,x,y,found FROM %s.pokemon WHERE player_id = %d",DB,id);
             ResultSet rs = stmt.executeQuery(query);
@@ -138,7 +183,6 @@ public class Database {
         String name = null;
         if (id == 0) {
             name = MainWindow.getInstance().getSaveName();
-            if (name == null || name.equals("")) return false;
             try (Statement stmt = getConnection().createStatement()){
                 int maxId = 0;
                 query = String.format("SELECT max(id) as 'id' FROM %s.player",DB);
@@ -168,7 +212,7 @@ public class Database {
         }
         
         Player player = model.getPlayer();
-        HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
+        HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
         ArrayList<Level> levels = model.getLevels();
         int actualLevel = model.getActualLevelId();
         int score = model.getScore();    
@@ -176,8 +220,8 @@ public class Database {
         String comma;
         
         //player
-        query = String.format("REPLACE INTO %s.player (id,name,life,x,y,actualLevel,maxLevel,score)\n" + 
-                                     "VALUES (%d,'%s',%d,%d,%d,%d,%d,%d)", 
+        query = String.format("REPLACE INTO %s.player (id,name,life,x,y,actualLevel,maxLevel,score,updated)\n" + 
+                                     "VALUES (%d,'%s',%d,%d,%d,%d,%d,%d,now())", 
                                      DB,
                                      id,
                                      name,
@@ -192,9 +236,9 @@ public class Database {
         //pokémon
         queryBuilder = new StringBuilder();
         comma = "";
-        queryBuilder.append(String.format("REPLACE INTO %s.pokemon (player_id,pokemon_id,level_id,name,found,x,y)\nVALUES\n",DB));
+        queryBuilder.append(String.format("REPLACE INTO %s.pokemon (player_id,pokemon_id,level_id,name,found,x,y,updated)\nVALUES\n",DB));
         for (HashMap.Entry<TilePosition,Pokemon> p : pokemons.entrySet()) {
-            queryBuilder.append(String.format("%s(%d,%d,%d,'%s',%d,%d,%d)\n",
+            queryBuilder.append(String.format("%s(%d,%d,%d,'%s',%d,%d,%d,now())\n",
                                               comma,
                                               id,
                                               p.getValue().getId(),
@@ -210,9 +254,9 @@ public class Database {
         //levels
         queryBuilder = new StringBuilder();
         comma = "";
-        queryBuilder.append(String.format("REPLACE INTO %s.level (player_id,level_id,time)\nVALUES\n",DB));
+        queryBuilder.append(String.format("REPLACE INTO %s.level (player_id,level_id,time,updated)\nVALUES\n",DB));
         for (Level level : levels){
-            queryBuilder.append(String.format("%s(%d,%d,%d)\n",
+            queryBuilder.append(String.format("%s(%d,%d,%d,now())\n",
                                               comma,
                                               id,
                                               level.getId(),
@@ -221,6 +265,7 @@ public class Database {
         }
         if (!sqlQuery(queryBuilder.toString(),"Cannot save to level table!")) return false;
         
+        player.setName(name);
         model.setDbId(id);
         return true;
     }

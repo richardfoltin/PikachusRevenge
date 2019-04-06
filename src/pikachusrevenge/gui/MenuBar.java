@@ -45,7 +45,8 @@ public final class MenuBar extends JMenuBar {
     private final JMenu pokedexMenu;
     private final JMenu levelSelect;
     
-    private final JMenuItem saveMenu;
+    private final JMenuItem saveToFile;
+    private final JMenuItem saveToDb;
     private final JMenuItem pauseMenu;
     private final JMenuItem resumeMenu;
     
@@ -64,64 +65,63 @@ public final class MenuBar extends JMenuBar {
         
         menuFile.addSeparator();
         
-        JMenuItem loadMenu = new JMenuItem();
-        loadMenu.addActionListener(loadAction());
+        JMenuItem loadMenu = new JMenuItem(loadAction);
         loadMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Event.ALT_MASK));
         loadMenu.setText("Load From File...");
-        loadMenu.setMnemonic('o');
+        loadMenu.setMnemonic('L');
         loadMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(loadMenu);
         
-        JMenuItem loadDbMenu = new JMenuItem();
-        loadDbMenu.addActionListener(loadDbAction());
+        saveToFile = new JMenuItem(saveToFileAction);
+        saveToFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.ALT_MASK));
+        saveToFile.setText("Save To File");
+        saveToFile.setMnemonic('S');
+        saveToFile.setEnabled(false);
+        saveToFile.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
+        menuFile.add(saveToFile);
+        
+        JMenuItem saveAsMenu = new JMenuItem(saveToFileAsAction);
+        saveAsMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.ALT_MASK));
+        saveAsMenu.setText("Save To File As...");
+        saveAsMenu.setMnemonic('v');
+        saveAsMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
+        menuFile.add(saveAsMenu); 
+        
+        menuFile.addSeparator();
+        
+        JMenuItem loadDbMenu = new JMenuItem(loadDbAction);
         loadDbMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Event.CTRL_MASK));
         loadDbMenu.setText("Load From Database...");
-        loadDbMenu.setMnemonic('L');
+        loadDbMenu.setMnemonic('O');
         loadDbMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(loadDbMenu);
-
-        saveMenu = new JMenuItem();
-        saveMenu.addActionListener(saveAction());
-        saveMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK));
-        saveMenu.setText("Save");
-        saveMenu.setMnemonic('S');
-        saveMenu.setEnabled(false);
-        saveMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
-        menuFile.add(saveMenu);
         
-        JMenuItem saveAsMenu = new JMenuItem();
-        saveAsMenu.addActionListener(saveAsAction());
-        saveAsMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.ALT_MASK));
-        saveAsMenu.setText("Save To File As...");
-        saveAsMenu.setMnemonic('A');
-        saveAsMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
-        menuFile.add(saveAsMenu);
+        saveToDb = new JMenuItem(saveDbAction);
+        saveToDb.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK));
+        saveToDb.setText("Save To Database");
+        saveToDb.setEnabled(false);
+        saveToDb.setMnemonic('D');
+        saveToDb.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
+        menuFile.add(saveToDb);
         
-        JMenuItem saveDbMenu = new JMenuItem();
-        saveDbMenu.addActionListener(saveDbAction());
-        saveDbMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Event.CTRL_MASK));
-        saveDbMenu.setText("Save To Database");
-        saveDbMenu.setMnemonic('D');
-        saveDbMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
-        menuFile.add(saveDbMenu);
+        JMenuItem saveDbAsMenu = new JMenuItem(saveDbAsAction);
+        saveDbAsMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK));
+        saveDbAsMenu.setText("New Save To Database");
+        saveDbAsMenu.setMnemonic('W');
+        saveDbAsMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
+        menuFile.add(saveDbAsMenu);
         
         menuFile.addSeparator();
 
-        JMenuItem backMenu = new JMenuItem(backAction);
+        JMenuItem backMenu = new JMenuItem(backToMainMenuAction);
         backMenu.setText("Back to Main Menu");
         backMenu.setMnemonic('B');    
         backMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(backMenu);        
         
-        JMenuItem exitSaveMenu = new JMenuItem(exitAction);
-        exitSaveMenu.setText("Exit and Save");
-        exitSaveMenu.setMnemonic('E');    
-        exitSaveMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
-        menuFile.add(exitSaveMenu);  
-        
         JMenuItem exitMenu = new JMenuItem(exitAction);
-        exitMenu.setText("Exit Without Saving");
-        exitMenu.setMnemonic('x');    
+        exitMenu.setText("Exit");
+        exitMenu.setMnemonic('E');    
         exitMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
         menuFile.add(exitMenu);
         
@@ -143,13 +143,6 @@ public final class MenuBar extends JMenuBar {
         menuGame.add(levelSelect); 
         addLevels(levelSelect);
         
-        JMenuItem highscoreMenu = new JMenuItem(highscoreAction);
-        highscoreMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Event.CTRL_MASK)); 
-        highscoreMenu.setText("Highscores");
-        highscoreMenu.setMnemonic('H'); 
-        highscoreMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
-        menuGame.add(highscoreMenu); 
-        
         menuGame.addSeparator();
         
         pauseMenu = new JMenuItem(pauseAction);
@@ -168,6 +161,20 @@ public final class MenuBar extends JMenuBar {
         menuGame.add(resumeMenu);
         
         menuGame.addSeparator();
+
+        JMenuItem highscoreMenu = new JMenuItem(highscoreAction);
+        highscoreMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Event.CTRL_MASK)); 
+        highscoreMenu.setText("Highscores");
+        highscoreMenu.setMnemonic('H'); 
+        highscoreMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
+        menuGame.add(highscoreMenu); 
+        
+        JMenuItem statisticsMenu = new JMenuItem(statisticsAction);
+        statisticsMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.ALT_MASK)); 
+        statisticsMenu.setText("Game Statistics");
+        statisticsMenu.setMnemonic('S'); 
+        statisticsMenu.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
+        menuGame.add(statisticsMenu); 
         
         JMenuItem infoMenu = new JMenuItem(helpAction);
         infoMenu.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0)); 
@@ -184,38 +191,162 @@ public final class MenuBar extends JMenuBar {
         add(pokedexMenu);
         
     }
-    
-    public void setAvailableLevels(int maxLevel){
-        for (int i = 0; i < levelSelect.getItemCount(); ++i){
-            levelSelect.getItem(i).setEnabled(i < maxLevel || MainWindow.TESTING);
-        }
-    }
-    
-    private void addLevels(JMenu menu){
-        
-        for (int i = 1; i <= 10; ++i){
-            JMenuItem menuItem = new JMenuItem();
-            menuItem.addActionListener(startLevelAction(i));
-            menuItem.setText("Level " + i);
-            menuItem.setEnabled(false);
-            menuItem.setPreferredSize(new Dimension(MENUITEM_WIDTH / 2,MENUITEM_HEIGHT));
-            menu.add(menuItem); 
-        }
-    }  
-    
-    public final ActionListener loadAction() {
-        return (ActionEvent e) -> {
+
+    public final Action loadAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
             pause();
             load();
             resume();
-        };
+        }
+    };
+    
+    public final Action saveToFileAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pause();
+            save(window.getModel().getFileName());
+            resume();
+        }
+    };
+    
+    public final Action saveToFileAsAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pause();
+            if (save(null)) saveToFile.setEnabled(true);
+            resume();
+        }
+    };
+    
+    public final Action loadDbAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pause();
+            MainWindow.getInstance().showLoadSelection();
+            resume();
+        }
+    };
+    
+    public final Action saveDbAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pause();
+            int dbId = window.getModel().getDbId();
+            if (Database.save(dbId,window.getModel())) window.saveSuccessful("Game saved sucessfully to database.");
+            resume();
+        }
+    };
+    
+    public final Action saveDbAsAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pause();
+            if (Database.save(0,window.getModel())) {
+                window.saveSuccessful("Game saved sucessfully to database.");
+                saveToDb.setEnabled(true);
+            }
+            resume();
+        }
+    };
+    
+    private final Action restartAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            window.restartLevel();
+        }
+    };
+    
+    private final Action highscoreAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pause();
+            window.showHighscores();
+            resume();
+        }
+    };
+    
+    private final Action statisticsAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pause();
+            window.showStatistics();
+            resume();
+        }
+    };
+    
+    private final Action newGameAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            window.loadLevelWithNewModel(new Model(), 1);
+        }
+    };
+    
+    private final Action exitAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            window.showExitConfirmation();
+        }
+    };
+    
+    private final Action backToMainMenuAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            window.showBackToMainMenuConfirmation();
+        }
+    };
+    
+    private final Action pauseAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pause();
+        }
+    };
+    
+    private final Action resumeAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            resume();
+        }
+    };
+    
+    private final Action helpAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pause();
+            window.showHelp();
+            resume();
+        }
+    };
+    
+    private void resume() {
+        window.getModel().resumeGame();
+        resumeMenu.setEnabled(false);
+        pauseMenu.setEnabled(true);  
     }
     
-    public final ActionListener loadDbAction() {
+    private void pause() {
+        window.getModel().stopGame();
+        resumeMenu.setEnabled(true);
+        pauseMenu.setEnabled(false); 
+    }
+
+    
+    public final ActionListener startLevelAction(final int level) {
         return (ActionEvent e) -> {
-            pause();
-            Database.loadSelection();
-            resume();
+            Model model = window.getModel();
+            if (model != null) model.stopGame();
+            window.loadLevel(level);
+        };
+    } 
+    
+    private final ActionListener openPokemon(int id) {
+        return (ActionEvent e) -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://pokedex.org/#/pokemon/" + id));
+            } catch (Exception ex) {
+                System.err.println("Can't open pokedex entry");;
+            }
         };
     }
     
@@ -230,7 +361,7 @@ public final class MenuBar extends JMenuBar {
             try (final Scanner sc = new Scanner(chosenFile)) {
                 Model model = new Model(chosenFile.getAbsolutePath());
                 Player player = model.getPlayer();
-                HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
+                HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
                 int actualLevel = loadInt(sc);
                 player.setLives(loadInt(sc));
                 double x = (double)loadInt(sc);
@@ -271,7 +402,7 @@ public final class MenuBar extends JMenuBar {
         else throw new IllegalFileException();    
     }
     
-    private void save(boolean withExit, String fileName){
+    private boolean save(String fileName){
         File file;
         if (fileName == null) {
             JFileChooser chooser = new JFileChooser();
@@ -286,7 +417,7 @@ public final class MenuBar extends JMenuBar {
             try (PrintWriter pw = new PrintWriter(file)){
                 Model model = window.getModel();
                 Player player = model.getPlayer();
-                HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemons();
+                HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
                 ArrayList<Level> levels = model.getLevels();
                 int actualLevel = model.getActualLevelId();
 
@@ -314,157 +445,10 @@ public final class MenuBar extends JMenuBar {
                 model.setFileName(fileName);
             } catch (FileNotFoundException ex) {
                 JOptionPane.showMessageDialog(window, "File not found!");
+                return false;
             }
-        }  
-        
-        if (withExit) System.exit(0);
-    }
-    
-   private final void saveToDb(boolean withExit, int dbId){
-        if (Database.save(dbId,window.getModel())) window.saveSuccessful("Game saved sucessfully to database.");
-        if (withExit) System.exit(0);
-    }
-   
-    /**
-     * A játék mentéséhez szükséges eseménykezelőt hoz létre
-     * 
-     * @param game a játék ablaka
-     * @return a létrehozott eseménykezelő
-     */
-    public final ActionListener saveAsAction() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pause();
-                save(false,null);
-                resume();
-            }
-        };
-    }
-    
-    public final ActionListener saveAction() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pause();
-                Model model = window.getModel();
-                if (model.isSavedToDb()) saveToDb(false,model.getDbId());
-                else save(false,model.getFileName());
-                resume();
-            }
-        };
-    }
-    
-    public final ActionListener saveDbAction() {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pause();
-                Model model = window.getModel();
-                saveToDb(false,model.getDbId());
-                resume();
-            }
-        };
-    }
-    
-    /**
-     * A játék mentéséhez és kilépéshez szükséges eseménykezelőt hoz létre
-     * 
-     * @param game a játék ablaka
-     * @return a létrehozott eseménykezelő
-     */
-    public final ActionListener exitAndSaveAction() {
-        return (ActionEvent e) -> {
-            Model model = window.getModel();
-            if (model.isSavedToDb()) saveToDb(true,model.getDbId());
-            else save(true,model.getFileName());
-        };
-    }
-    
-    public final ActionListener startLevelAction(final int level) {
-        return (ActionEvent e) -> {
-            Model model = window.getModel();
-            if (model != null) model.stopGame();
-            window.loadLevel(level);
-        };
-    } 
-    
-    private final Action restartAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            window.restartLevel();
         }
-    };
-    
-    private final Action highscoreAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            window.showHighscores();
-        }
-    };
-    
-    private final Action newGameAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            window.loadLevelWithNewModel(new Model(), 1);
-        }
-    };
-    
-    private final Action exitAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            window.showExitConfirmation();
-        }
-    };
-    
-    private final Action backAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            window.showBackConfirmation();
-        }
-    };
-    
-    private final Action pauseAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            pause();
-        }
-    };
-    
-    private final Action resumeAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            resume();
-        }
-    };
-    
-    private final Action helpAction = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            window.showHelp();
-        }
-    };
-    
-    private void resume() {
-        window.getModel().resumeGame();
-        resumeMenu.setEnabled(false);
-        pauseMenu.setEnabled(true);  
-    }
-    
-    private void pause() {
-        window.getModel().stopGame();
-        resumeMenu.setEnabled(true);
-        pauseMenu.setEnabled(false); 
-    }
-    
-    private final ActionListener openPokemon(int id) {
-        return (ActionEvent e) -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://pokedex.org/#/pokemon/" + id));
-            } catch (Exception ex) {
-                System.err.println("Can't open pokedex entry");;
-            }
-        };
+        return true;
     }
     
     public void buildPokedexMenu(Model model) {
@@ -506,6 +490,24 @@ public final class MenuBar extends JMenuBar {
         }
     }
     
+    public void setAvailableLevels(int maxLevel){
+        for (int i = 0; i < levelSelect.getItemCount(); ++i){
+            levelSelect.getItem(i).setEnabled(i < maxLevel || MainWindow.TESTING);
+        }
+    }
     
-    public JMenuItem getSaveMenu() {return saveMenu;}
+    private void addLevels(JMenu menu){
+        
+        for (int i = 1; i <= 10; ++i){
+            JMenuItem menuItem = new JMenuItem();
+            menuItem.addActionListener(startLevelAction(i));
+            menuItem.setText("Level " + i);
+            menuItem.setEnabled(false);
+            menuItem.setPreferredSize(new Dimension(MENUITEM_WIDTH / 2,MENUITEM_HEIGHT));
+            menu.add(menuItem); 
+        }
+    }  
+    
+    public JMenuItem getSaveMenu() {return saveToFile;}
+    public JMenuItem getSaveDbMenu() {return saveToDb;}
 }

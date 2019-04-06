@@ -74,15 +74,15 @@ public class Level {
                             maxPokemonCount++;
                             TilePosition tpos = new TilePosition(i,j,id);
                             Pokemon p;
-                            if (model.getAllPokemons().containsKey(tpos)) {
-                                p = model.getAllPokemons().get(tpos);
+                            if (model.getAllPokemonsWithPosition().containsKey(tpos)) {
+                                p = model.getAllPokemonsWithPosition().get(tpos);
                                 if (p.isFound()) {
                                     clearTileWithProperty("Ball",tpos);
                                     foundPokemonCount++;
                                 }
                             } else {
                                 p = new Pokemon(model,tpos,0);
-                                model.getAllPokemons().put(tpos,p);
+                                model.getAllPokemonsWithPosition().put(tpos,p);
                             }
                             pokemons.add(p);
                         }                  

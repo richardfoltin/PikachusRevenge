@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS pikachusrevenge.player (
     actualLevel INT,
     maxLevel    INT,
     score       INT,
+    updated     DATETIME,
     PRIMARY KEY(id)
 );
 
@@ -20,6 +21,7 @@ CREATE TABLE IF NOT EXISTS pikachusrevenge.pokemon (
     found      BIT,
     x          INT,
     y          INT,
+    updated     DATETIME,
     PRIMARY KEY(player_id,pokemon_id,level_id)
 );
 
@@ -27,5 +29,6 @@ CREATE TABLE IF NOT EXISTS pikachusrevenge.level (
     player_id   INT NOT NULL,
     level_id    INT NOT NULL,
     time        INT,
+    updated     DATETIME,
     PRIMARY KEY(player_id,level_id)
 );

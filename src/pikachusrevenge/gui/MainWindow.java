@@ -16,11 +16,17 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
+import pikachusrevenge.gui.dialog.HighscoreDialog;
+import pikachusrevenge.gui.dialog.HelpDialog;
+import pikachusrevenge.gui.dialog.LoadDialog;
+import pikachusrevenge.gui.dialog.StatisticsDialog;
+import pikachusrevenge.model.Database;
 import pikachusrevenge.model.KeyPressHandler;
 import pikachusrevenge.model.Level;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
+import pikachusrevenge.unit.Player;
 
 public final class MainWindow extends JFrame {
 
@@ -179,6 +185,13 @@ public final class MainWindow extends JFrame {
     public void repaintMap() {
         mapView.repaint();        
     }
+    
+    public String getSaveName() {
+        String playerName = model.getPlayer().getName();
+        String name = (String)JOptionPane.showInputDialog(this, "What is your name?", "Saving..",JOptionPane.QUESTION_MESSAGE,null,null,playerName);
+        if (name == null || name.equals("")) name = Player.DEFAULTNAME;
+        return name;
+    }
 
     protected void showExitConfirmation() {
         if (model != null) model.stopGame();
@@ -192,16 +205,6 @@ public final class MainWindow extends JFrame {
             case JOptionPane.YES_OPTION: System.exit(0); break;
             default: if (model != null) model.resumeGame(); break;
         }
-    }
-    
-    public void showHighscores() {
-        
-        
-    }
-    
-    public String getSaveName() {
-        String name = JOptionPane.showInputDialog(this, "What is your name?", "Saving..",JOptionPane.QUESTION_MESSAGE);
-        return name;
     }
     
     public void showDbError(String error) {
@@ -227,7 +230,7 @@ public final class MainWindow extends JFrame {
         }
     }
     
-    public void showBackConfirmation() {    
+    public void showBackToMainMenuConfirmation() {    
         model.stopGame();
         
         JOptionPane opt = new JOptionPane(new JLabel("Are you sure you want to go back to Main Menu?",JLabel.CENTER),JOptionPane.PLAIN_MESSAGE,JOptionPane.YES_NO_OPTION);
@@ -242,9 +245,36 @@ public final class MainWindow extends JFrame {
     }
     
     public void showHelp() {
-        model.stopGame();
         helpDialog.showDialog();
-        model.resumeGame();
+    }
+    
+    public void showHighscores() {
+        HighscoreDialog dialog = new HighscoreDialog(this);
+        String msg = dialog.getLoadMessage();
+        if (msg != null) showDbError(msg);
+        else dialog.showDialog();
+    }
+    
+    public void showStatistics() {
+        if (model != null) {
+            String name = "Game Statistics - " + model.getPlayer().getName() + " - Score: " + model.getScore();
+            StatisticsDialog dialog = new StatisticsDialog(this, name);
+            String msg = dialog.getLoadMessage();
+            if (msg != null) showDbError(msg);
+            else dialog.showDialog();
+        }
+    }
+        
+    public boolean showLoadSelection() {
+        LoadDialog dialog = new LoadDialog(this);
+        String msg = dialog.getLoadMessage();
+        if (msg != null) {
+            showDbError(msg);
+            return false;
+        } else {
+            dialog.showDialog();
+            return Database.load(dialog.getSelectedId());
+        }
     }
     
     public StatsPanel getStats() {return statsPanel;}

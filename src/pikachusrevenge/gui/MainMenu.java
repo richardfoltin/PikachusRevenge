@@ -19,7 +19,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import static pikachusrevenge.gui.MainWindow.WINDOW_HEIGHT;
 import static pikachusrevenge.gui.MainWindow.WINDOW_WIDTH;
-import pikachusrevenge.model.Database;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.resources.Resource;
 
@@ -38,7 +37,6 @@ public final class MainMenu extends JPanel {
         
         setPreferredSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT)); 
         setBorder(BorderFactory.createEmptyBorder(150, 250, 0, 0));
-        //setLayout(new GridBagLayout());
         
         try {backgroundImage = Resource.loadBufferedImage("main.png");} 
         catch (IOException e) {System.err.println("Can't load file: main.png");} 
@@ -47,20 +45,19 @@ public final class MainMenu extends JPanel {
         panel.setOpaque(false);
         add(panel);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        //panel.setBorder(BorderFactory.createLineBorder(Color.red,2));
 
         JButton startButton = new MenuButton("Start New Game", panel, true);
         startButton.addActionListener(startAction());
         panel.add(Box.createRigidArea(new Dimension(0,80)));
-        startButton.requestFocus();
+        //startButton.requestFocus();
             
         JButton loadButton = new MenuButton("Load From File...", panel, false);
         loadButton.addActionListener(loadAction());
-        panel.add(Box.createRigidArea(new Dimension(0,7)));
+        panel.add(Box.createRigidArea(new Dimension(0,5)));
             
         JButton loadDbButton = new MenuButton("Load From Database...", panel, false);
         loadDbButton.addActionListener(loadDbAction());
-        panel.add(Box.createRigidArea(new Dimension(0,7)));
+        panel.add(Box.createRigidArea(new Dimension(0,5)));
             
         JButton highscoreButton = new MenuButton("Highscores", panel, false);
         highscoreButton.addActionListener(highscoreAction());
@@ -112,27 +109,27 @@ public final class MainMenu extends JPanel {
         
     }
     
-    private final ActionListener startAction() {
+    private ActionListener startAction() {
         return (ActionEvent e) -> {
             window.loadLevelWithNewModel(new Model(),1);
         };
     }
     
-     private final ActionListener highscoreAction() {
+     private ActionListener highscoreAction() {
         return (ActionEvent e) -> {
             window.showHighscores();
         };
     }
      
-    private final ActionListener loadAction() {
+    private ActionListener loadAction() {
         return (ActionEvent e) -> {
             MenuBar.load();
         };
     }
         
-    private final ActionListener loadDbAction() {
+    private ActionListener loadDbAction() {
         return (ActionEvent e) -> {
-            Database.loadSelection();
+            window.showLoadSelection();
         };
     }
 }

@@ -97,8 +97,8 @@ public final class Model implements ActionListener {
         this.mapRectangle = new Rectangle(0, 0, map.getWidth() * GRIDSIZE, map.getHeight() * GRIDSIZE);       
          
         // MenuBar
-        boolean canBeSaved = (dbId != 0 || fileName != null);
-        mainWindow.getGameMenu().getSaveMenu().setEnabled(canBeSaved);
+        mainWindow.getGameMenu().getSaveMenu().setEnabled(fileName != null);
+        mainWindow.getGameMenu().getSaveDbMenu().setEnabled(dbId != 0);
         mainWindow.getGameMenu().buildPokedexMenu(this);
         
         mainWindow.getStats().clearPane();
@@ -109,7 +109,7 @@ public final class Model implements ActionListener {
         for (Pokemon p : actualLevel.getPokemons()) {
             JLabel label = mainWindow.getStats().addBall();
             p.setLabel(label);
-            if (p.isFound()) p.revealLabel();
+            if (p.isFound()) p.revealLabel(label);
         }
         mainWindow.getStats().updateTimeLabel(actualLevel.getTime());
         
@@ -302,7 +302,7 @@ public final class Model implements ActionListener {
     
     public ArrayList<NPC> getNpcs() {return actualLevel.getNpcs();}
     public ArrayList<Pokemon> getMapPokemons() {return actualLevel.getPokemons();}
-    public HashMap<TilePosition,Pokemon> getAllPokemons() {return pokemons;}
+    public HashMap<TilePosition,Pokemon> getAllPokemonsWithPosition() {return pokemons;}
     public ArrayList<PokeBall> getThrownBalls() {return actualLevel.getThrownBalls();}
     public Player getPlayer() {return player;}
     public Collection<Integer> getAllIds() {return pokemons.values().stream().map(p -> p.getId()).collect(Collectors.toList());}
