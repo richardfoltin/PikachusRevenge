@@ -47,21 +47,24 @@ public class Unit extends MovingSprite {
 
     @Override
     public void loop() { 
-        if (nextDirection == direction) {
-            switch (nextDirection) {
-                case UP : animation = walk[3]; break;
-                case LEFT :
-                case UPLEFT :
-                case DOWNLEFT : animation = walk[1]; break;
-                case DOWN : animation = walk[0]; break;
-                case RIGHT :
-                case DOWNRIGHT :
-                case UPRIGHT : animation = walk[2]; break;
-            }
+        switch (getFacingDirection()) {
+            case UP : animation = walk[3]; break;
+            case LEFT :
+            case UPLEFT :
+            case DOWNLEFT : animation = walk[1]; break;
+            case DOWN : animation = walk[0]; break;
+            case RIGHT :
+            case DOWNRIGHT :
+            case UPRIGHT : animation = walk[2]; break;
         }
         if (moving) animation.update();
         super.loop();
     }
+    
+    public Direction getFacingDirection(){
+        //return (nextDirection == direction) ? nextDirection : direction;
+        return direction;
+   }
     
     public void startWalking(){
         animation.start();

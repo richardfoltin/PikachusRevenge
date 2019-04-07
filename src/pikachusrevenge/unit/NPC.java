@@ -25,6 +25,7 @@ public class NPC extends Unit {
     private HashMap<NPC_STATE,NpcState> states = new HashMap<>();
     private List<NpcRoute> route = new ArrayList<>();
     private Position targetPosition;
+    private Position fromPosition;
     private double throwDistance;
     private double throwSpeed;
     private int routeTarget;
@@ -32,8 +33,11 @@ public class NPC extends Unit {
     private boolean forward = true;
     private boolean carry;
     private Arc2D los;
+    private Arc2D instantLos;
+    private Direction facingDirection;
     
     public static final int EXCLAMATION_SIZE = 40;
+    public static final double INSTANT_THROW_DISTANCE = 0.6;
     
     private enum NPC_STATE {
         STOP_LOOKOUT,
@@ -47,6 +51,7 @@ public class NPC extends Unit {
         this.level = level;
         this.states = getStateArray();
         this.los = new Arc2D.Double(0, 0, throwDistance, throwDistance, 0, 135, Arc2D.PIE);
+        this.instantLos = new Arc2D.Double(0, 0, throwDistance * INSTANT_THROW_DISTANCE, throwDistance * INSTANT_THROW_DISTANCE, 0, 135, Arc2D.PIE);
         
         Image image = null;
         try {image = Resource.loadImage("exclamation.png");} 
@@ -93,12 +98,20 @@ public class NPC extends Unit {
         // ha épp befejeződött az álló várakozás akkor még ne induljon el
         if (states.get(NPC_STATE.STOP_EXCLAMATION).increase()) {
             states.get(NPC_STATE.WALKING_CAUTIOUS).active = true;
-            stopWalking();
+            //stopWalking();
         }
         if (!states.get(NPC_STATE.STOP_LOOKOUT).active) {
             nextDirection = Direction.getDirection(pos,targetPosition);
+            
+            // change facing after lookout
+            if (fromPosition != targetPosition) {
+                facingDirection = Direction.getDirection(fromPosition, targetPosition);
+                fromPosition = targetPosition;
+            }
         }
-        System.out.println(String.format("%s\n%s\n%s",nextDirection,pos,targetPosition));
+        
+        
+        //System.out.println(String.format("%s\n%s\n%s",nextDirection,pos,targetPosition));
         super.loadNextPosition();
     }
     
@@ -129,7 +142,7 @@ public class NPC extends Unit {
         if (!states.get(NPC_STATE.STOP_THROW).active &&                         // nem éppen dob
             !model.getPlayer().insideBall() &&                                  // player nincs már elkapva
             playerDistance < throwDistance &&                                   // player dobási távolságon belül van
-            Direction.isInDirectionOfSight(direction, playerDirection) &&       // player a megfelelő irányban van
+            Direction.isInDirectionOfSight(facingDirection, playerDirection) &&       // player a megfelelő irányban van
             model.getActualLevel().isInLineOfSight(pos,playerPostion) &&        // player LOS-ban van
             !model.getPlayer().isOnCarry()){                                    // player nem épp carry-n van
             //System.out.println(String.format("Player is in LOS : %s - %s (%.0f)",direction,playerDirection.name(),distance));
@@ -140,11 +153,16 @@ public class NPC extends Unit {
             } else {
                 // egyébként indítson el egy várakozót és ha még közelebb jön dobjon
                 states.get(NPC_STATE.STOP_EXCLAMATION).active = true;
-                if (playerDistance < throwDistance*0.6) throwBall();
+                if (playerDistance < throwDistance*INSTANT_THROW_DISTANCE) throwBall();
             }
             
        }
         super.loop();
+    }
+    
+    @Override
+    public Direction getFacingDirection() {
+        return facingDirection;
     }
     
     public boolean seesPlayer() {return states.get(NPC_STATE.STOP_EXCLAMATION).active || 
@@ -152,10 +170,21 @@ public class NPC extends Unit {
                                         states.get(NPC_STATE.STOP_THROW).active;}
     public BufferedImage getExclamation() {return exclamation;}
     public boolean getCarry() {return carry;}
+    
     public Arc2D getLos() {
         los.setFrame(pos.x - throwDistance, pos.y - throwDistance, throwDistance * 2, throwDistance * 2);
-        los.setAngleStart(Direction.directionAngleStart(direction));
+        los.setAngleStart(Direction.directionAngleStart(facingDirection));
         return los;
+    }
+    
+    public Arc2D getInstantLos() {
+        if (states.get(NPC_STATE.WALKING_CAUTIOUS).active || states.get(NPC_STATE.STOP_THROW).active) return getLos();
+        instantLos.setFrame(pos.x - throwDistance * INSTANT_THROW_DISTANCE, 
+                     pos.y - throwDistance * INSTANT_THROW_DISTANCE, 
+                     throwDistance * 2 * INSTANT_THROW_DISTANCE,
+                     throwDistance * 2 * INSTANT_THROW_DISTANCE);
+        instantLos.setAngleStart(Direction.directionAngleStart(facingDirection));
+        return instantLos;
     }
     
     private void loadRoute(Shape shape){
@@ -198,6 +227,8 @@ public class NPC extends Unit {
         setStartingPostion(route.get(startRoute).pos.x, route.get(startRoute).pos.y);
         putToPosition(startPosition);
         this.targetPosition = route.get(startRoute + 1).pos;
+        this.fromPosition = route.get(startRoute).pos;
+        this.facingDirection = Direction.getDirection(fromPosition, targetPosition);
         routeTarget = startRoute + 1;
         
         loadNextPosition();
@@ -475,7 +506,7 @@ public class NPC extends Unit {
                 break;
             case 34 : 
                 this.speed = 1.0; 
-                this.throwDistance = 160; // 100 - easy, 200 - very hard
+                this.throwDistance = 170; // 100 - easy, 200 - very hard
                 this.throwSpeed = 10;
                 this.name = "Black Mage Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;

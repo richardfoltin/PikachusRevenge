@@ -47,14 +47,7 @@ public final class MapView extends JPanel {
         }
         
         for (NPC npc : model.getNpcs()){
-            
-            Arc2D arc = npc.getLos();
-            Color c = MainWindow.PIKACHU_RED;
-            g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 100));
-            g.draw(arc);
-            g.setColor(new Color(255,255,255,50));
-            g.fill(arc);
-            
+                  
             Position pos = npc.getPosition();
             int size = (int) ((double)SPRITE_SIZE*ZOOM);
             g.drawImage(npc.getImg(), (int)pos.x - size/2, (int)pos.y - size/2, size , size,null);
@@ -76,6 +69,21 @@ public final class MapView extends JPanel {
     
     private void paintBubbles(Graphics2D g){  
         for (NPC npc : model.getNpcs()){
+            
+            // no line of sight at level 9
+            if (model.getDifficulty() == Model.Difficulty.CASUAL && model.getActualLevelId() != 9) {
+                Arc2D arc = npc.getLos();
+                Color c = MainWindow.PIKACHU_RED;
+                g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 100));
+                g.draw(arc);
+                g.setColor(new Color(255,255,255,50));
+                g.fill(arc);
+
+                Arc2D instantArc = npc.getInstantLos();
+                g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 30));
+                g.fill(instantArc);
+            }
+            
             if (npc.seesPlayer()) {
                 Position pos = npc.getPosition();
             int size = (int) ((double)SPRITE_SIZE*ZOOM);

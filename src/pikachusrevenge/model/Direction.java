@@ -33,9 +33,6 @@ public enum Direction {
     public static Direction getDirection(Position from, Position to){
         double dx = to.x - from.x;
         double dy = to.y - from.y;
-        //if ((int)dx == 0 && (int)dy == 0) return Direction.STOP;
-        //double radian = Math.atan2(-dy, dx);
-        //int eighth = (int)Math.toDegrees(radian) / 8;
         int eighth = (int)floor(Math.abs(Math.atan(dy/dx)) / (Math.PI / 8));
         switch (eighth) {
             case 0 : return getDirection(signum(dx),0);

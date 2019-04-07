@@ -22,7 +22,6 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import pikachusrevenge.gui.MainWindow;
 import pikachusrevenge.model.Database;
-import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.model.SaveData;
 
@@ -43,7 +42,7 @@ public final class LoadDialog extends GameDialog {
             
             table.setFillsViewportHeight(true);
             table.getColumnModel().removeColumn(table.getColumnModel().getColumn(0));
-            table.getColumnModel().removeColumn(table.getColumnModel().getColumn(6));
+            table.getColumnModel().removeColumn(table.getColumnModel().getColumn(5));
             TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
             List<RowSorter.SortKey> sortKeys = new ArrayList<>();
             sortKeys.add(new RowSorter.SortKey(2, SortOrder.DESCENDING));
@@ -61,6 +60,7 @@ public final class LoadDialog extends GameDialog {
             table.setRowHeight(ROW_HEIGHT);
             table.getColumnModel().getColumn(0).setPreferredWidth(140);
             table.getColumnModel().getColumn(1).setPreferredWidth(140);
+            table.getColumnModel().getColumn(2).setPreferredWidth(50);
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
             centerRenderer.setHorizontalAlignment(JLabel.CENTER);
             table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);

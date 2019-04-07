@@ -872,7 +872,7 @@
   <object id="2" name="Back" x="678.667" y="147.333">
    <point/>
   </object>
-  <object id="3" name="NPC" x="479" y="769">
+  <object id="3" name="NPC" x="479" y="769" visible="0">
    <properties>
     <property name="Carry" type="bool" value="true"/>
     <property name="Level" type="int" value="91"/>
@@ -884,8 +884,8 @@
     <property name="Level" type="int" value="34"/>
     <property name="Reverse" type="int" value="7"/>
     <property name="Start" type="int" value="2"/>
-    <property name="Wait0" type="int" value="50"/>
-    <property name="Wait3" type="int" value="150"/>
+    <property name="Wait0" type="int" value="150"/>
+    <property name="Wait3" type="int" value="50"/>
     <property name="Wait7" type="int" value="150"/>
    </properties>
    <polyline points="0,0 0.666667,-19.3333 -39.3333,-49.3333 -69.3333,-30.6667 -64.6667,-82.6667 -148,-82.6667 -159.333,-45.3333 -142.667,-30.6667"/>

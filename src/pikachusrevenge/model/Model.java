@@ -118,6 +118,7 @@ public final class Model implements ActionListener {
         for (NPC npc : actualLevel.getNpcs()) npc.startLooping();
         for (Pokemon p : actualLevel.getPokemons()) {
             if (p.isFound()) {
+                p.setStartingPostion(player.getStartPosition());
                 p.putToPosition((start == null) ? p.getStartPosition() : start);
                 p.startLooping();
             }

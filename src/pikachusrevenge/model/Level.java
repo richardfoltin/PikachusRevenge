@@ -1,7 +1,5 @@
 package pikachusrevenge.model;
 
-import java.io.File;
-import java.io.InputStream;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.signum;
