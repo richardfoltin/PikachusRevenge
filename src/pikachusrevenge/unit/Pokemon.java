@@ -50,7 +50,7 @@ public class Pokemon extends Unit {
     public void revealLabel(JLabel label){
         if (label != null) {
             BufferedImage image = null;
-            try {image = Resource.loadBufferedImage(String.format("pokemons\\icon%03d.png",this.id));} 
+            try {image = Resource.loadBufferedImage(String.format("pokemons/icon%03d.png",this.id));} 
             catch (IOException e) {System.err.println("Can't load file");} 
             image = Resource.getSprite(image, 0, 0);
             image = Resource.getScaledImage(image, 30, 30);

@@ -31,7 +31,7 @@ public class Player extends Unit {
         this.name = DEFAULTNAME;
         this.caughtWaitMax = 30;
         
-        setImg("pokemons\\025.png");
+        setImg("pokemons/025.png");
         
         try {this.caughtImage = Resource.loadBufferedImage("ball_shadow.png");} 
         catch (IOException e) {System.err.println("Can't load file: ball_shadow.png");} 

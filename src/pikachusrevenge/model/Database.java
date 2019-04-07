@@ -183,6 +183,7 @@ public class Database {
         String name = null;
         if (id == 0) {
             name = MainWindow.getInstance().getSaveName();
+            if (name == null) return false;
             try (Statement stmt = getConnection().createStatement()){
                 int maxId = 0;
                 query = String.format("SELECT max(id) as 'id' FROM %s.player",DB);

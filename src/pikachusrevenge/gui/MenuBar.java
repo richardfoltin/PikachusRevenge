@@ -25,6 +25,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import pikachusrevenge.model.Level;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.TilePosition;
@@ -40,6 +41,8 @@ public final class MenuBar extends JMenuBar {
  
     private static final int MENUITEM_WIDTH = 180;
     private static final int MENUITEM_HEIGHT = 25;
+    private static final String SAVEFILE_EXTENSION = "pikasave";
+    private static final String SAVEFILE_DESCRIPTION = "Pikachu's Revenge Save File";
     
     private final MainWindow window;
     private final JMenu pokedexMenu;
@@ -353,6 +356,8 @@ public final class MenuBar extends JMenuBar {
     public static boolean load() {
         MainWindow window = MainWindow.getInstance();
         JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(SAVEFILE_DESCRIPTION,SAVEFILE_EXTENSION);
+        chooser.setFileFilter(filter);
         chooser.setDialogTitle("Load Game");
         chooser.setApproveButtonText("Load");
         chooser.setApproveButtonMnemonic('L');
@@ -406,10 +411,12 @@ public final class MenuBar extends JMenuBar {
         File file;
         if (fileName == null) {
             JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(SAVEFILE_DESCRIPTION,SAVEFILE_EXTENSION);
+            chooser.setFileFilter(filter);
             chooser.setDialogTitle("Save Game");
             chooser.setApproveButtonText("Save");
             chooser.setApproveButtonMnemonic('S');
-            file = (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFile() : null;
+            file = (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) ? new File(chooser.getSelectedFile() + "." + SAVEFILE_EXTENSION) : null;
         } else {
             file = new File(fileName);
         }
@@ -441,7 +448,7 @@ public final class MenuBar extends JMenuBar {
                                level.getTime());
                 }
                 
-                window.saveSuccessful("Game saved sucessfully to " + file.getName() + ".");
+                window.saveSuccessful("Game saved sucessfully to " + file.getName());
                 model.setFileName(fileName);
             } catch (FileNotFoundException ex) {
                 JOptionPane.showMessageDialog(window, "File not found!");
@@ -477,7 +484,7 @@ public final class MenuBar extends JMenuBar {
         for (int id : pokemonIds) {
             if (id  >= 1 && id <= Pokemon.POKEMON_NAME.length) {
                 BufferedImage image = null;
-                try {image = Resource.loadBufferedImage(String.format("pokemons\\icon%03d.png",id));} 
+                try {image = Resource.loadBufferedImage(String.format("pokemons/icon%03d.png",id));} 
                 catch (IOException e) {System.err.println("Can't load file");} 
                 image = Resource.getSprite(image, 0, 0);
                 image = Resource.getScaledImage(image, MENUITEM_HEIGHT, MENUITEM_HEIGHT);

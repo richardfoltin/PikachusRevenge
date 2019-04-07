@@ -46,7 +46,7 @@ public final class HelpDialog extends GameDialog {
         trainer.setAlignmentX(LEFT_ALIGNMENT);
         trainer.setText("<html>Try to avoid vengeful trainers! They catch you instantly when you go very close in their line of sight!</html>");
         BufferedImage trainerImage = null;
-        try {trainerImage = Resource.loadBufferedImage("npc\\trchar035.png");} 
+        try {trainerImage = Resource.loadBufferedImage("npc/trchar035.png");} 
         catch (IOException e) {System.err.println("Can't load file");} 
         trainerImage = Resource.getSprite(trainerImage, 0, 0);
         trainerImage = Resource.getScaledImage(trainerImage, IMAGE_SIZE, IMAGE_SIZE);

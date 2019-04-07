@@ -189,7 +189,8 @@ public final class MainWindow extends JFrame {
     public String getSaveName() {
         String playerName = model.getPlayer().getName();
         String name = (String)JOptionPane.showInputDialog(this, "What is your name?", "Saving..",JOptionPane.QUESTION_MESSAGE,null,null,playerName);
-        if (name == null || name.equals("")) name = Player.DEFAULTNAME;
+        if (name == null) return null;
+        if (name.equals("")) name = Player.DEFAULTNAME;
         return name;
     }
 
@@ -209,6 +210,10 @@ public final class MainWindow extends JFrame {
     
     public void showDbError(String error) {
         JOptionPane.showMessageDialog(this,error,"Database Error",JOptionPane.ERROR_MESSAGE);
+    }
+    
+    public void showError(String error) {
+        JOptionPane.showMessageDialog(this,error,"Error",JOptionPane.ERROR_MESSAGE);
     }
     
     public void saveSuccessful(String msg) {

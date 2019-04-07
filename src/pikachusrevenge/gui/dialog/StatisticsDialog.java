@@ -93,7 +93,9 @@ public final class StatisticsDialog extends GameDialog {
                 JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
                 panel.setBackground(Color.white);
                 panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-                for(Pokemon p : (ArrayList<Pokemon>)value){
+                ArrayList<?> pokemons = (ArrayList<?>)value;
+                for(Object o : pokemons){
+                    Pokemon p = (Pokemon)o;
                     JLabel label = StatsPanel.getBallLabel();
                     if (p.isFound()) p.revealLabel(label);
                     label.setPreferredSize(new Dimension(ROW_HEIGHT,ROW_HEIGHT));

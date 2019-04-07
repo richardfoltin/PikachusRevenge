@@ -212,8 +212,8 @@ public class NPC extends Unit {
                 this.throwSpeed = 8;
                 this.name = "Blue Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 70;
-                setImg("npc\\trchar007.png"); // blue hair girl
-                //setImg("npc\\trchar153.png"); // green girl
+                setImg("npc/trchar007.png"); // blue hair girl
+                //setImg("npc/trchar153.png"); // green girl
                 break;
             case 2 : 
                 this.speed = 1; 
@@ -221,7 +221,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 8;
                 this.name = "Blonde Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 70;
-                setImg("npc\\trchar066.png"); // blonde girl
+                setImg("npc/trchar066.png"); // blonde girl
                 break;
             case 3 : 
                 this.speed = 1; 
@@ -229,8 +229,8 @@ public class NPC extends Unit {
                 this.throwSpeed = 8;
                 this.name = "Farmer";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                //setImg("npc\\trchar026.png"); // green hat boy
-                setImg("npc\\HGSS_229.png"); // Farmer
+                //setImg("npc/trchar026.png"); // green hat boy
+                setImg("npc/HGSS_229.png"); // Farmer
                 break;
             case 4 : 
                 this.speed = 0.6; 
@@ -238,7 +238,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 6;
                 this.name = "Old Fart";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 70;
-                setImg("npc\\trchar060.png"); // old boy
+                setImg("npc/trchar060.png"); // old boy
                 break;
             case 5 : 
                 this.speed = 1; 
@@ -246,7 +246,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 8;
                 this.name = "Red Hat Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\trchar035.png"); // red hat girl
+                setImg("npc/trchar035.png"); // red hat girl
                 break;
             case 6 : 
                 this.speed = 1; 
@@ -254,7 +254,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 8;
                 this.name = "Blue Cap Boy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\trchar040.png"); // blue hat boy
+                setImg("npc/trchar040.png"); // blue hat boy
                 break;
             case 7 : 
                 this.speed = 1.2; 
@@ -262,7 +262,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 12;
                 this.name = "Ginger Boy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\trchar075.png"); // red boy
+                setImg("npc/trchar075.png"); // red boy
                 break;
             case 8 : 
                 this.speed = 0.8; 
@@ -270,7 +270,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 8;
                 this.name = "Cultist";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 45;
-                setImg("npc\\trchar163.png"); // cultist
+                setImg("npc/trchar163.png"); // cultist
                 break;
             case 9 : 
                 this.speed = 1.0; 
@@ -278,7 +278,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 12;
                 this.name = "Cultist Boss";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\trchar164.png"); // boss cultist
+                setImg("npc/trchar164.png"); // boss cultist
                 break;
             case 10 : 
                 this.speed = 2.6; 
@@ -286,7 +286,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 12;
                 this.name = "Snowboard Boy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 10;
-                setImg("npc\\trchar013.png"); // snowboard boy
+                setImg("npc/trchar013.png"); // snowboard boy
                 break;
             case 11 : 
                 this.speed = 2.2; 
@@ -294,7 +294,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 12;
                 this.name = "Ski Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 10;
-                setImg("npc\\trchar014.png"); // ski girl
+                setImg("npc/trchar014.png"); // ski girl
                 break;
             case 12 : 
                 this.speed = 2.5; 
@@ -302,7 +302,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 12;
                 this.name = "Snowboard Boy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 10;
-                setImg("npc\\trchar013_mod.png"); // snowboard boy 2
+                setImg("npc/trchar013_mod.png"); // snowboard boy 2
                 break;
             case 13 : 
                 this.speed = 2.2; 
@@ -310,7 +310,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 12;
                 this.name = "Ski Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 10;
-                setImg("npc\\trchar014_mod.png"); // ski girl 2
+                setImg("npc/trchar014_mod.png"); // ski girl 2
                 break;
             case 14 : 
                 this.speed = 1.0; 
@@ -318,7 +318,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Fat Evil Guy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
-                setImg("npc\\Leader_Chuck.png"); // at Evil Guy
+                setImg("npc/Leader_Chuck.png"); // at Evil Guy
                 break;
             case 15 : 
                 this.speed = 1.0; 
@@ -326,7 +326,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "White Hair Evil Guy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
-                setImg("npc\\Leader_Damian.png"); // White Hair Evil Guy
+                setImg("npc/Leader_Damian.png"); // White Hair Evil Guy
                 break;
             case 16 : 
                 this.speed = 1.0; 
@@ -334,7 +334,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Purple Hair Evil Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
-                setImg("npc\\Leader_Janine.png"); // Purple Hair Evil Girl
+                setImg("npc/Leader_Janine.png"); // Purple Hair Evil Girl
                 break;
             case 17 : 
                 this.speed = 1.3; 
@@ -342,7 +342,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Purple Evil Skirt Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
-                setImg("npc\\Leader_Fantina.png"); // Purple Evil Skirt Girl
+                setImg("npc/Leader_Fantina.png"); // Purple Evil Skirt Girl
                 break;
             case 18 : 
                 this.speed = 1.0; 
@@ -350,7 +350,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Old Evil Guy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
-                setImg("npc\\Leader_Pryce.png"); // Old Evil Guy
+                setImg("npc/Leader_Pryce.png"); // Old Evil Guy
                 break;
             case 19 : 
                 this.speed = 1.3; 
@@ -358,7 +358,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Epic Fat Evil Guy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
-                setImg("npc\\Leader_Wake.png"); // Epic Fat Evil Guy
+                setImg("npc/Leader_Wake.png"); // Epic Fat Evil Guy
                 break;
             case 20 : 
                 this.speed = 1.0; 
@@ -366,7 +366,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Monopoly Guy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\Leader_Blaine.png"); // Monopoly Guy
+                setImg("npc/Leader_Blaine.png"); // Monopoly Guy
                 break;
             case 21 : 
                 this.speed = 2.0; 
@@ -374,7 +374,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 12;
                 this.name = "Motor Guy with Hat";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\trchar058.png"); // Motor Guy
+                setImg("npc/trchar058.png"); // Motor Guy
                 break;
             case 22 : 
                 this.speed = 1.0; 
@@ -382,7 +382,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Cameraman";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 60;
-                setImg("npc\\trchar069_0.png"); // Cameraman
+                setImg("npc/trchar069_0.png"); // Cameraman
                 break;
             case 23 : 
                 this.speed = 0.8; 
@@ -390,7 +390,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Navy Guy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\trchar027.png"); // Navy Guy
+                setImg("npc/trchar027.png"); // Navy Guy
                 break;
             case 24 : 
                 this.speed = 1.0; 
@@ -398,7 +398,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Policeman";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\trchar062.png"); // Policeman
+                setImg("npc/trchar062.png"); // Policeman
                 break;
             case 25 : 
                 this.speed = 1.0; 
@@ -406,7 +406,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 8;
                 this.name = "Little Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 60;
-                setImg("npc\\trchar051.png"); // Little Girl
+                setImg("npc/trchar051.png"); // Little Girl
                 break;
             case 26 : 
                 this.speed = 0.8; 
@@ -414,7 +414,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 8;
                 this.name = "Old Monk";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\NPC_10.png"); // Old Monk
+                setImg("npc/NPC_10.png"); // Old Monk
                 break;
             case 27 : 
                 this.speed = 2.7; 
@@ -422,7 +422,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 12;
                 this.name = "Blonde Motor Guy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\trchar008.png"); // Blonde Motor Guy
+                setImg("npc/trchar008.png"); // Blonde Motor Guy
                 break;
             case 28 : 
                 this.speed = 1.0; 
@@ -430,7 +430,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Green Girl With a Ball";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\trchar069_1.png"); // Green Girl With a Ball
+                setImg("npc/trchar069_1.png"); // Green Girl With a Ball
                 break;
                 //////
             case 30 : 
@@ -439,7 +439,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Light Blue Hair Guy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
-                setImg("npc\\trchar081.png"); // Light Blue Hair Guy
+                setImg("npc/trchar081.png"); // Light Blue Hair Guy
                 break;
             case 31 : 
                 this.speed = 5.0; 
@@ -447,7 +447,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "red/purple boy";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 20;
-                setImg("npc\\trchar183.png"); // red/purple boy
+                setImg("npc/trchar183.png"); // red/purple boy
                 break;
             case 32 : 
                 this.speed = 1.0; 
@@ -455,7 +455,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Pink Hair Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\Leader_Whitney.png"); // Pink Hair Girl
+                setImg("npc/Leader_Whitney.png"); // Pink Hair Girl
                 break;
             case 33 : 
                 this.speed = 1.0; 
@@ -463,7 +463,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Black Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 50;
-                setImg("npc\\trchar272.png"); // Black Girl
+                setImg("npc/trchar272.png"); // Black Girl
                 break;
             case 34 : 
                 this.speed = 1.0; 
@@ -471,7 +471,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Black Mage Girl";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\trchar275.png"); // Black Mage Girl
+                setImg("npc/trchar275.png"); // Black Mage Girl
                 break;
             case 35 : 
                 this.speed = 1.2; 
@@ -479,7 +479,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Island Cultist 1";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\trchar167.png"); // Island Cultist 1
+                setImg("npc/trchar167.png"); // Island Cultist 1
                 break;
             case 36 : 
                 this.speed = 1.2; 
@@ -487,7 +487,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Island Cultist 2";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\trchar172.png"); // Island Cultist 2
+                setImg("npc/trchar172.png"); // Island Cultist 2
                 break;
             case 37 : 
                 this.speed = 1.2; 
@@ -495,7 +495,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Island Cultist 3";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\trchar174.png"); // Island Cultist 3
+                setImg("npc/trchar174.png"); // Island Cultist 3
                 break;
             case 90 : 
                 this.speed = 0.8; 
@@ -503,7 +503,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 10;
                 this.name = "Ice Yeti";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 40;
-                setImg("npc\\delta_regice.png"); // Ice Yeti
+                setImg("npc/delta_regice.png"); // Ice Yeti
                 break;
             case 91 : 
                 this.speed = 0.8; 
@@ -511,7 +511,7 @@ public class NPC extends Unit {
                 this.throwSpeed = 0;
                 this.name = "Lapras";
                 this.states.get(NPC_STATE.STOP_EXCLAMATION).max = 0;
-                setImg("npc\\HGSS_002.png"); // Lapras
+                setImg("npc/HGSS_002.png"); // Lapras
                 break;
         }
     }

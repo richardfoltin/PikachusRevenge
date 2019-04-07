@@ -1,8 +1,11 @@
 package pikachusrevenge.model;
 
+import java.io.File;
+import java.io.InputStream;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.signum;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import org.mapeditor.core.Map;
@@ -13,7 +16,9 @@ import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 import org.mapeditor.io.TMXMapReader;
+import pikachusrevenge.gui.MainWindow;
 import static pikachusrevenge.model.TilePosition.tileCoordFromMapCoord;
+import pikachusrevenge.resources.Resource;
 import pikachusrevenge.unit.MovingSprite;
 import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.PokeBall;
@@ -27,7 +32,7 @@ public class Level {
     private final ArrayList<NPC> npcs = new ArrayList<>();
     private final ArrayList<Pokemon> pokemons = new ArrayList<>();
     private final Model model;
-    private final List<MapLayer> layers;
+    private List<MapLayer> layers;
     
     private Map map = null;
     private int time;
@@ -37,12 +42,13 @@ public class Level {
     private Position playerStartingPosition;
     private Position playerBackStartingPosition;
         
-    //private static final String[] mapName = {"Teodora","MapTest2"};
     private static final String[] MAP_NAME = {"Level1","Level2","Level3","Level4","Level5","Level6","Level7","Level8","Level9","Level10"};
     
     public Level(Model model, int id, int time, int lives) {
         this.id = id;
         this.livesAtBegining = lives;
+        this.model = model;
+        this.time = time;
         
         if (MAP_NAME.length < id) {
             System.err.println("No Level");
@@ -51,17 +57,19 @@ public class Level {
         
         try {
             TMXMapReader mapReader = new TMXMapReader();
-            this.map = mapReader.readMap("src\\pikachusrevenge\\resources\\level\\" + MAP_NAME[id-1] + ".tmx");
+            //InputStream mapStream = Resource.loadResource("level/" + MAP_NAME[id-1] + ".tmx");
+            //this.map = mapReader.readMap(mapStream);
+            URL mapURL = Resource.class.getResource("level/" + MAP_NAME[id-1] + ".tmx");
+            this.map = mapReader.readMap(mapURL.getPath());
+            this.layers = map.getLayers();
+
+            findPokemonsOnMap();
+            findUnitsOnMap();
         } catch (Exception e) {
             System.out.println("Error while reading the map:\n" + e.getMessage());
+            e.printStackTrace();
+            MainWindow.getInstance().showError("Can't load map!");
         }
-        
-        this.time = time;
-        this.layers = map.getLayers();
-        this.model = model;
-        
-        findPokemonsOnMap();
-        findUnitsOnMap();
     }
 
     private void findPokemonsOnMap() {
