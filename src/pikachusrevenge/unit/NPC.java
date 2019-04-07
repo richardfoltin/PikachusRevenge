@@ -3,6 +3,7 @@ package pikachusrevenge.unit;
 import java.awt.Image;
 import pikachusrevenge.model.Position;
 import java.awt.Shape;
+import java.awt.geom.Arc2D;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class NPC extends Unit {
     private int startRoute;
     private boolean forward = true;
     private boolean carry;
+    private Arc2D los;
     
     public static final int EXCLAMATION_SIZE = 40;
     
@@ -44,6 +46,7 @@ public class NPC extends Unit {
         super(model);
         this.level = level;
         this.states = getStateArray();
+        this.los = new Arc2D.Double(0, 0, throwDistance, throwDistance, 0, 135, Arc2D.PIE);
         
         Image image = null;
         try {image = Resource.loadImage("exclamation.png");} 
@@ -95,7 +98,7 @@ public class NPC extends Unit {
         if (!states.get(NPC_STATE.STOP_LOOKOUT).active) {
             nextDirection = Direction.getDirection(pos,targetPosition);
         }
-        
+        System.out.println(String.format("%s\n%s\n%s",nextDirection,pos,targetPosition));
         super.loadNextPosition();
     }
     
@@ -149,6 +152,11 @@ public class NPC extends Unit {
                                         states.get(NPC_STATE.STOP_THROW).active;}
     public BufferedImage getExclamation() {return exclamation;}
     public boolean getCarry() {return carry;}
+    public Arc2D getLos() {
+        los.setFrame(pos.x - throwDistance, pos.y - throwDistance, throwDistance * 2, throwDistance * 2);
+        los.setAngleStart(Direction.directionAngleStart(direction));
+        return los;
+    }
     
     private void loadRoute(Shape shape){
         PathIterator pi = shape.getPathIterator(null);

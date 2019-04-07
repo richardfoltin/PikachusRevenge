@@ -49,10 +49,12 @@ public class Player extends Unit {
     }
     
     public void playerCaught() {
-        lives--;
-        MainWindow.getInstance().getStats().removeLife();
-        System.out.println("Ball hit! " + lives);
-        caughtWait = 1;
+        if (!insideBall()) {
+            lives--;
+            MainWindow.getInstance().getStats().removeLife();
+            System.out.println("Ball hit! " + lives);
+            caughtWait = 1;
+        }
     }
     
     private void restartOrGameOver() {

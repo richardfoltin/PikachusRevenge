@@ -17,16 +17,17 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import static pikachusrevenge.gui.MainWindow.PIKACHU_RED;
 import static pikachusrevenge.gui.MainWindow.WINDOW_HEIGHT;
 import static pikachusrevenge.gui.MainWindow.WINDOW_WIDTH;
 import pikachusrevenge.model.Model;
+import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.resources.Resource;
 
 public final class MainMenu extends JPanel {
 
     private static final int BUTTON_WIDTH = 160;
     private static final int BUTTON_HEIGHT = 20;
-    private static final Color BUTTON_FONT_COLOR = new Color(225, 67, 25);
     private static final Color BUTTON_FOCUS_COLOR = new Color(220, 220, 220);
             
     private final MainWindow window;
@@ -79,7 +80,7 @@ public final class MainMenu extends JPanel {
             setPreferredSize(size);
             setMaximumSize(size);
             setAlignmentX(Component.CENTER_ALIGNMENT);  
-            setForeground(BUTTON_FONT_COLOR);
+            setForeground(PIKACHU_RED);
             setBackground(Color.WHITE);
             setFocusPainted(false);
             //setOpaque(false);
@@ -111,7 +112,8 @@ public final class MainMenu extends JPanel {
     
     private ActionListener startAction() {
         return (ActionEvent e) -> {
-            window.loadLevelWithNewModel(new Model(),1);
+            Difficulty d = window.showDifficultySelector();
+            if (d != null) window.loadLevelWithNewModel(new Model(d),1);
         };
     }
     

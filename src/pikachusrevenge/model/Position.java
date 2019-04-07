@@ -35,7 +35,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return "Position{" + "x=" + x + ", y=" + y + '}';
+        return String.format("(%.1f,%.1f)",x,y);
     }
 
 }

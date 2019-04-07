@@ -22,12 +22,15 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import pikachusrevenge.gui.MainWindow;
 import pikachusrevenge.model.Database;
+import pikachusrevenge.model.Model;
+import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.model.SaveData;
 
 public final class LoadDialog extends GameDialog {
         
     private JTable table;
     private int selectedId;
+    private Difficulty selectedDifficulty;
     
     public LoadDialog(MainWindow frame){
         super(frame, "Select Saved Game...");   
@@ -40,6 +43,7 @@ public final class LoadDialog extends GameDialog {
             
             table.setFillsViewportHeight(true);
             table.getColumnModel().removeColumn(table.getColumnModel().getColumn(0));
+            table.getColumnModel().removeColumn(table.getColumnModel().getColumn(6));
             TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
             List<RowSorter.SortKey> sortKeys = new ArrayList<>();
             sortKeys.add(new RowSorter.SortKey(2, SortOrder.DESCENDING));
@@ -97,6 +101,7 @@ public final class LoadDialog extends GameDialog {
     @Override
     public void showDialog() {
         this.selectedId = 0;
+        this.selectedDifficulty = Difficulty.CASUAL;
         super.showDialog();
     }
     
@@ -104,16 +109,18 @@ public final class LoadDialog extends GameDialog {
         return (ActionEvent e) -> {
             int modelRow = table.convertRowIndexToModel(table.getSelectedRow());
             selectedId = (Integer)table.getModel().getValueAt(modelRow,0);
+            selectedDifficulty = (Difficulty)table.getModel().getValueAt(modelRow,6);
             LoadDialog.this.setVisible(false); 
         };
     }
 
     public int getSelectedId() {return selectedId;}
+    public Difficulty getSelectedDifficulty() {return selectedDifficulty;}
     
     public class LoadTableModel extends AbstractTableModel  {
 
         private final ArrayList<SaveData> data;
-        private final String[] colName = new String[]{"ID", "Name", "Date", "Level", "Pokémon", "Score"}; 
+        private final String[] colName = new String[]{"ID", "Name", "Date", "Level", "Pokémon", "Score", "Difficulty"}; 
         
         public LoadTableModel() throws Database.NoResultException, SQLException {
             this.data = Database.loadAllSaveData();
@@ -135,11 +142,12 @@ public final class LoadDialog extends GameDialog {
             
             switch (columnIndex) {
                 case 0 : return s.id;
-                case 1 : return s.name; 
+                case 1 : return (s.difficulty == Difficulty.HARDCORE) ? s.name + " @90s" : s.name; 
                 case 2 : return new SimpleDateFormat("yyyy.MM.dd hh:mm").format(s.updated);
                 case 3 : return s.maxLevel; 
                 case 4 : return String.format("%d%%",(int)(((double)s.foundPokemon/(double)s.maxPokemon)*100));
                 case 5 : return s.score; 
+                case 6 : return s.difficulty; 
                 default: return null;
             }
         }

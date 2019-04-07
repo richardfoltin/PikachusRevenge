@@ -33,6 +33,9 @@ public enum Direction {
     public static Direction getDirection(Position from, Position to){
         double dx = to.x - from.x;
         double dy = to.y - from.y;
+        //if ((int)dx == 0 && (int)dy == 0) return Direction.STOP;
+        //double radian = Math.atan2(-dy, dx);
+        //int eighth = (int)Math.toDegrees(radian) / 8;
         int eighth = (int)floor(Math.abs(Math.atan(dy/dx)) / (Math.PI / 8));
         switch (eighth) {
             case 0 : return getDirection(signum(dx),0);
@@ -61,6 +64,13 @@ public enum Direction {
         if (from == STOP || to == STOP) return false;
         if (Math.abs(from.x - to.x) + Math.abs(from.y - to.y) <= 1) return true;
         return false;
+    }
+    
+    public static int directionAngleStart(Direction d) {
+        double radian = Math.atan2(-d.y, d.x);
+        int degree = (int)Math.toDegrees(radian);
+        // System.out.println(String.format("%s : %.2f : %d", d, radian, degree));
+        return (degree + 360 - 68) % 360 ;
     }
     
     public static Direction randomMove() {

@@ -19,6 +19,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import pikachusrevenge.gui.MainWindow;
 import pikachusrevenge.model.Database;
+import pikachusrevenge.model.Model;
 import pikachusrevenge.model.SaveData;
 
 public final class HighscoreDialog extends GameDialog {
@@ -103,7 +104,7 @@ public final class HighscoreDialog extends GameDialog {
             SaveData s = data.get(rowIndex);
             
             switch (columnIndex) {
-                case 0 : return s.name;
+                case 0 : return (s.difficulty == Model.Difficulty.HARDCORE) ? s.name + " @90s" : s.name; 
                 case 1 : return s.maxLevel; 
                 case 2 : return String.format("%d%%",(int)(((double)s.foundPokemon/(double)s.maxPokemon)*100));
                 case 3 : return s.score; 

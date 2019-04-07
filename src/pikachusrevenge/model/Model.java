@@ -36,6 +36,7 @@ public final class Model implements ActionListener {
     private final Timer timer = new Timer(MAIN_LOOP, this);
     private final MainWindow mainWindow;
     private final Timer clock;
+    private final Difficulty difficulty;
     private String fileName;
     private int dbId;
     
@@ -44,12 +45,13 @@ public final class Model implements ActionListener {
     
     public Rectangle mapRectangle;
     
-    public Model () {this(null, 0);}
-    public Model (int dbId) {this(null, dbId);}
-    public Model (String fileName) {this(fileName, 0);}
+    public Model (Difficulty difficulty) {this(null, 0, difficulty);}
+    public Model (int dbId, Difficulty difficulty) {this(null, dbId, difficulty);}
+    public Model (String fileName, Difficulty difficulty) {this(fileName, 0, difficulty);}
     
-    private Model (String fileName, int dbId){
+    private Model (String fileName, int dbId, Difficulty difficulty){
         this.dbId = dbId;
+        this.difficulty = difficulty;
         this.fileName = fileName;
         this.mainWindow = MainWindow.getInstance();
         this.clock = new Timer(1000, (ActionEvent e) -> {
@@ -271,7 +273,7 @@ public final class Model implements ActionListener {
         }
         for (Pokemon p : pokemons.values()) {
             if (p.isFound()) {
-                score += 100;
+                score += (difficulty == Difficulty.CASUAL) ? 100 : 150;
             }
         }
         return score;
@@ -310,10 +312,34 @@ public final class Model implements ActionListener {
     public ArrayList<Level> getLevels() {return levels;}
     public int getActualLevelId() {return (actualLevel == null) ? 0 :actualLevel.getId();}
     public Level getActualLevel() {return actualLevel;}
+    public Difficulty getDifficulty() {return difficulty;}
     
     public String getFileName() {return fileName;}
     public int getDbId() {return dbId;}
     public void setFileName(String fileName) {this.fileName = fileName;}
     public void setDbId(int id) {this.dbId = id;}
     public boolean isSavedToDb() {return (dbId != 0 && fileName == null);}
+    
+    public enum Difficulty {
+        HARDCORE(1, "90s challange"),
+        CASUAL(0, "Casual");
+
+        public int id;
+        public String name;
+        
+        private Difficulty(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+        
+        public static Difficulty fromId(int id) {
+            for (Difficulty d : Difficulty.values()) if (d.id == id) return d;
+            return CASUAL;
+        }
+        
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 }

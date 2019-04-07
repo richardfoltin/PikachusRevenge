@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import pikachusrevenge.gui.MainWindow;
+import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.Pokemon;
 
@@ -84,6 +85,7 @@ public class Database {
                             "    p.maxLevel as 'maxLevel',\n" +
                             "    p.score as 'score',\n" +
                             "    p.updated as 'updated',\n" +
+                            "    p.difficulty as 'difficulty',\n" +
                             "    count(case pok.found when 1 then 1 else NULL end) as 'foundPokemon',\n" +
                             "    count(pok.pokemon_id) as 'maxPokemon'\n" +
                             "FROM pikachusrevenge.player p\n" +
@@ -103,6 +105,7 @@ public class Database {
                 s.foundPokemon = rs.getInt("foundPokemon");
                 s.maxPokemon = rs.getInt("maxPokemon");
                 s.updated = rs.getTimestamp("updated");
+                s.difficulty = Difficulty.fromId(rs.getInt("difficulty"));
                 data.add(s);
             }
         } catch (SQLException e) {
@@ -116,9 +119,9 @@ public class Database {
         return data;
     }
     
-    public static boolean load(int id) {
+    public static boolean load(int id, Difficulty difficulty) {
         if (id == 0) return false;
-        Model model = new Model(id);
+        Model model = new Model(id, difficulty);
         String query;
         int actualLevel = 0;
         Position start = null;
@@ -216,13 +219,14 @@ public class Database {
         HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
         ArrayList<Level> levels = model.getLevels();
         int actualLevel = model.getActualLevelId();
-        int score = model.getScore();    
+        int score = model.getScore();   
+        int difficulty = model.getDifficulty().id;
         StringBuilder queryBuilder;
         String comma;
         
         //player
-        query = String.format("REPLACE INTO %s.player (id,name,life,x,y,actualLevel,maxLevel,score,updated)\n" + 
-                                     "VALUES (%d,'%s',%d,%d,%d,%d,%d,%d,now())", 
+        query = String.format("REPLACE INTO %s.player (id,name,life,x,y,actualLevel,maxLevel,score,difficulty,updated)\n" + 
+                                     "VALUES (%d,'%s',%d,%d,%d,%d,%d,%d,%d,now())", 
                                      DB,
                                      id,
                                      name,
@@ -231,7 +235,8 @@ public class Database {
                                      (int)player.getPosition().y,
                                      actualLevel,
                                      levels.size(),
-                                     score);
+                                     score,
+                                     difficulty);
         if (!sqlQuery(query,"Cannot save to player table!")) return false;   
         
         //pokémon

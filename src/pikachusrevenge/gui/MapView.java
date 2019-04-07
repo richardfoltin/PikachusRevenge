@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.geom.Arc2D;
 import javax.swing.JPanel;
 import org.mapeditor.core.Map;
 import org.mapeditor.core.MapLayer;
@@ -46,9 +47,18 @@ public final class MapView extends JPanel {
         }
         
         for (NPC npc : model.getNpcs()){
+            
+            Arc2D arc = npc.getLos();
+            Color c = MainWindow.PIKACHU_RED;
+            g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 100));
+            g.draw(arc);
+            g.setColor(new Color(255,255,255,50));
+            g.fill(arc);
+            
             Position pos = npc.getPosition();
             int size = (int) ((double)SPRITE_SIZE*ZOOM);
-            g.drawImage(npc.getImg(),(int)pos.x - size/2, (int)pos.y - size/2, size , size,null);
+            g.drawImage(npc.getImg(), (int)pos.x - size/2, (int)pos.y - size/2, size , size,null);
+            
         }
         
         for (Pokemon p : model.getMapPokemons()){

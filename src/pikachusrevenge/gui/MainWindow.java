@@ -1,6 +1,7 @@
 package pikachusrevenge.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -24,6 +25,7 @@ import pikachusrevenge.model.Database;
 import pikachusrevenge.model.KeyPressHandler;
 import pikachusrevenge.model.Level;
 import pikachusrevenge.model.Model;
+import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
 import pikachusrevenge.unit.Player;
@@ -32,6 +34,7 @@ public final class MainWindow extends JFrame {
 
     public static final int WINDOW_WIDTH = 448; // 28 tiles
     public static final int WINDOW_HEIGHT = 352; // 22 tiles
+    public static final Color PIKACHU_RED = new Color(225, 67, 25);
     public static final boolean TESTING = false;
     
     private static MainWindow instance = null;
@@ -227,12 +230,24 @@ public final class MainWindow extends JFrame {
         Dialog dialog = opt.createDialog(this, "Game Over");
         dialog.setModal(true);
         dialog.setVisible(true);
+        Difficulty difficulty = model.getDifficulty();
         
         switch ((String)opt.getValue()) {
-            case "New Game": loadLevelWithNewModel(new Model(),1); break;
+            case "New Game": loadLevelWithNewModel(new Model(difficulty),1); break;
             case "Restart Level": restartLevel(); break;
             default: showMainMenu(); break;
         }
+    }
+    
+    public Difficulty showDifficultySelector() {     
+        
+        Object[] options = {Difficulty.HARDCORE,Difficulty.CASUAL};
+        JOptionPane opt = new JOptionPane(new JLabel("<html>Please select difficulty!</html>",JLabel.CENTER),JOptionPane.PLAIN_MESSAGE,0,null,options);
+        Dialog dialog = opt.createDialog(this, "Start Game");
+        dialog.setModal(true);
+        dialog.setVisible(true);
+        
+        return (Difficulty)opt.getValue();
     }
     
     public void showBackToMainMenuConfirmation() {    
@@ -262,7 +277,7 @@ public final class MainWindow extends JFrame {
     
     public void showStatistics() {
         if (model != null) {
-            String name = "Game Statistics - " + model.getPlayer().getName() + " - Score: " + model.getScore();
+            String name = "Game Statistics - " + model.getPlayer().getName() + " [" + model.getDifficulty() + "] - Score: " + model.getScore();
             StatisticsDialog dialog = new StatisticsDialog(this, name);
             String msg = dialog.getLoadMessage();
             if (msg != null) showDbError(msg);
@@ -278,7 +293,7 @@ public final class MainWindow extends JFrame {
             return false;
         } else {
             dialog.showDialog();
-            return Database.load(dialog.getSelectedId());
+            return Database.load(dialog.getSelectedId(), dialog.getSelectedDifficulty());
         }
     }
     

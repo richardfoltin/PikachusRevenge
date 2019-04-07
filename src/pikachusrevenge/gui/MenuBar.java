@@ -28,6 +28,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import pikachusrevenge.model.Level;
 import pikachusrevenge.model.Model;
+import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.model.TilePosition;
 import pikachusrevenge.model.Database;
 import pikachusrevenge.model.Position;
@@ -281,7 +282,8 @@ public final class MenuBar extends JMenuBar {
     private final Action newGameAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            window.loadLevelWithNewModel(new Model(), 1);
+            Difficulty d = window.showDifficultySelector();
+            if (d != null) window.loadLevelWithNewModel(new Model(d),1);
         }
     };
     
@@ -357,6 +359,7 @@ public final class MenuBar extends JMenuBar {
         MainWindow window = MainWindow.getInstance();
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(SAVEFILE_DESCRIPTION,SAVEFILE_EXTENSION);
+        chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         chooser.setFileFilter(filter);
         chooser.setDialogTitle("Load Game");
         chooser.setApproveButtonText("Load");
@@ -364,7 +367,8 @@ public final class MenuBar extends JMenuBar {
         File chosenFile = (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFile() : null;
         if (chosenFile != null) {
             try (final Scanner sc = new Scanner(chosenFile)) {
-                Model model = new Model(chosenFile.getAbsolutePath());
+                Difficulty difficulty = Difficulty.fromId(loadInt(sc));
+                Model model = new Model(chosenFile.getAbsolutePath(), difficulty);
                 Player player = model.getPlayer();
                 HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
                 int actualLevel = loadInt(sc);
@@ -412,6 +416,7 @@ public final class MenuBar extends JMenuBar {
         if (fileName == null) {
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(SAVEFILE_DESCRIPTION,SAVEFILE_EXTENSION);
+            chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
             chooser.setFileFilter(filter);
             chooser.setDialogTitle("Save Game");
             chooser.setApproveButtonText("Save");
@@ -427,8 +432,10 @@ public final class MenuBar extends JMenuBar {
                 HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
                 ArrayList<Level> levels = model.getLevels();
                 int actualLevel = model.getActualLevelId();
+                int difficulty = model.getDifficulty().id;
 
-                pw.println(actualLevel + " " + 
+                pw.println(difficulty + " " +
+                           actualLevel + " " + 
                            player.getLives() + " " + 
                            (int)player.getPosition().x + " " + 
                            (int)player.getPosition().y);

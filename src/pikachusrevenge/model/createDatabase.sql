@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS pikachusrevenge.player (
     actualLevel INT,
     maxLevel    INT,
     score       INT,
+    difficulty  INT,
     updated     DATETIME,
     PRIMARY KEY(id)
 );
