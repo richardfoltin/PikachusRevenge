@@ -17,6 +17,10 @@ import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.resources.Resource;
 
+/**
+ * A pályákon található ellenfeleket leíró osztály
+ * @author Csaba Foltin
+ */
 public class NPC extends Unit {
     
     private final int level;
@@ -63,6 +67,10 @@ public class NPC extends Unit {
         loadNpcRoutePorperties(obj);
     }
     
+    /**
+     * Az NPC megáll egy labda eldobásával elkapja a játékost. Továbbá visszaállítja
+     * a többi állapotát kezdőértékre.
+     */
     private void throwBall() {
         System.out.println("Ball thrown");
         states.get(NPC_STATE.STOP_THROW).active = true;
@@ -71,6 +79,17 @@ public class NPC extends Unit {
         model.ballThrow(pos, throwSpeed, this);
     }
     
+    /**
+     * A játék fő ciklusában meghívódik a következő pozíció betöltése. Ilyenkor
+     * az NPC-k esetén több dolog is történik:
+     * - ha a következő lépéssel elér az útvonalán egy fordulóponthoz, akkor
+     * betölti a következő célpontot az útvonalon. Ha ennél a fordulónál várakozni
+     * is kell, akkor várakozik.
+     * - az NPC különböző állapotait tovább loopolja
+     * - ha nem kell állnia (vagy azért mert forduló ponton áll, vagy azért mert
+     * felkészül dobásra, vagy azért meg dob) akkor haladjon
+     * - beállítja az NPC fodulási irányát az útvonalon a következő célpont felé
+     */
     @Override
     protected void loadNextPosition() {
         
@@ -115,6 +134,12 @@ public class NPC extends Unit {
         super.loadNextPosition();
     }
     
+    /**
+     * Kiszámolja, hogy az útvonalon mi a következő célpont. Vannak olyan NPC-k
+     * amik körútvonalon járnak, vannak amik megfordulnak az útvonal végén, és
+     * vannak olyanok is, amik a végén a kezdeti pontba teleportálnak.
+     * @return a következő célpont
+     */
     private Position nextRouteTarget() {
         boolean teleport = route.get(routeTarget).teleportToNext;
         if (route.get(routeTarget).reverse) forward = !forward;
@@ -134,6 +159,10 @@ public class NPC extends Unit {
         return route.get(routeTarget).pos;
     }
     
+    /**
+     * A játék fő ciklusában az NPC ellenőrzi, hogy el tudja-e kapni a játékost,
+     * vagy megálljon-e hogy elindítsa a dobásra a felkészülést.
+     */
     @Override
     public void loop() {
         Position playerPostion = model.getPlayer().getPosition();
@@ -142,7 +171,7 @@ public class NPC extends Unit {
         if (!states.get(NPC_STATE.STOP_THROW).active &&                         // nem éppen dob
             !model.getPlayer().insideBall() &&                                  // player nincs már elkapva
             playerDistance < throwDistance &&                                   // player dobási távolságon belül van
-            Direction.isInDirectionOfSight(facingDirection, playerDirection) &&       // player a megfelelő irányban van
+            Direction.isInDirectionOfSight(facingDirection, playerDirection) && // player a megfelelő irányban van
             model.getActualLevel().isInLineOfSight(pos,playerPostion) &&        // player LOS-ban van
             !model.getPlayer().isOnCarry()){                                    // player nem épp carry-n van
             //System.out.println(String.format("Player is in LOS : %s - %s (%.0f)",direction,playerDirection.name(),distance));
@@ -171,12 +200,20 @@ public class NPC extends Unit {
     public BufferedImage getExclamation() {return exclamation;}
     public boolean getCarry() {return carry;}
     
+    /**
+     * Visszaadja az NPC látószögének körcikkét.
+     * @return Arc2D
+     */
     public Arc2D getLos() {
         los.setFrame(pos.x - throwDistance, pos.y - throwDistance, throwDistance * 2, throwDistance * 2);
         los.setAngleStart(Direction.directionAngleStart(facingDirection));
         return los;
     }
     
+    /**
+     * Visszaadja azt a körcikket az NPC látószögében, ahol már biztosan dobni fog.
+     * @return Arc2D
+     */
     public Arc2D getInstantLos() {
         if (states.get(NPC_STATE.WALKING_CAUTIOUS).active || states.get(NPC_STATE.STOP_THROW).active) return getLos();
         instantLos.setFrame(pos.x - throwDistance * INSTANT_THROW_DISTANCE, 
@@ -187,6 +224,10 @@ public class NPC extends Unit {
         return instantLos;
     }
     
+    /**
+     * A pálya információiból betölti az NPC útvonalán lévő pozíciókat
+     * @param shape A pályában lévő útvonalobjektum
+     */
     private void loadRoute(Shape shape){
         PathIterator pi = shape.getPathIterator(null);
         
@@ -203,6 +244,11 @@ public class NPC extends Unit {
         }
     }
     
+    /**
+     * A pálya útvonalának tulajdonságaiból kiszámolja a tényleges {@link NpcRoute}
+     * tulajdonságokat.
+     * @param obj MapObject
+     */
     private void loadNpcRoutePorperties(MapObject obj){
         Properties prop = obj.getProperties();
         
@@ -241,7 +287,10 @@ public class NPC extends Unit {
          states.put(NPC_STATE.WALKING_CAUTIOUS,new NpcState(100));
          return states;
     }
-        
+    
+    /**
+     * A különböző NPC-k tulajdonságai
+     */
     private void loadNpcProperties() {
         switch (level) {
             default:
@@ -555,18 +604,25 @@ public class NPC extends Unit {
         }
     }
     
+    /**
+     * Az NPC útvonalán található fodulópontok tulajdonságai
+     */
     private class NpcRoute{
-        public boolean reverse;
-        public Position pos;
-        public int wait;
-        public boolean teleportToNext;
+        public boolean reverse;          // visszafordít?
+        public Position pos;             // a pozíció
+        public int wait;                 // mennyit kell itt várakozni
+        public boolean teleportToNext;   // a következőre teleportájon?
 
         public NpcRoute(Position pos) {
             this.pos = pos;
         }
         
     }
-        
+    
+    /**
+     * Ahhoz hogy az NPC egy-egy állapotának lejárati idejét mérjük, ezt a segédosztályt
+     * használjuk.
+     */
     private class NpcState{
         public boolean active;
         private int counter;
@@ -581,13 +637,15 @@ public class NPC extends Unit {
             counter = 0;
         }
         
-        // returns true if reached max
+        /**
+         * A játék főciklusában meghívandó metódus, ami egyel növeli a számlálót.
+         * @return true, ha elérte a számláló a maximumot és lennulázódik
+         */
         public boolean increase() {
             if (active) {
                 counter++;
                 if (counter == max) {
-                    active = false;
-                    counter = 0;
+                    reset();
                     return true;
                 }
             }

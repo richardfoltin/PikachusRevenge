@@ -3,6 +3,10 @@ package pikachusrevenge.unit;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+/**
+ * Az egységek mozgása során az animációért felelős osztály
+ * @author StackOverflow
+ */
 public final class Animation {
 
     private int frameCount;

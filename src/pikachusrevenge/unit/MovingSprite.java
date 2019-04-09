@@ -11,8 +11,11 @@ import pikachusrevenge.resources.Resource;
 import static pikachusrevenge.unit.Unit.C_BOX_OFFSET_X;
 import static pikachusrevenge.unit.Unit.C_BOX_OFFSET_Y;
 
-
-public class MovingSprite {
+/**
+ * A játékban a térképen mozgó sprite-ok absztrakt osztálya
+ * @author Csaba Foltin
+ */
+public abstract class MovingSprite {
     
     protected final Model model;
     
@@ -48,6 +51,10 @@ public class MovingSprite {
         this.startPosition.y = y;
     }
     
+    /**
+     * A megadott pozícióra helyezi a sprite-ot
+     * @param pos a pozíció
+     */
     public final void putToPosition(Position pos) {
         this.pos.x = pos.x;
         this.pos.y = pos.y;   
@@ -55,16 +62,30 @@ public class MovingSprite {
         this.nextPosition.y = pos.y;
     }
     
+    /**
+     * Kiszámolja a következő pozíciót, és a következő helyzetét a collisionboxnak
+     * az éppen aktuális irány alapján.
+     */
     protected void loadNextPosition(){
         nextPosition.x = pos.x + nextDirection.x * speed;
         nextPosition.y = pos.y + nextDirection.y * speed;
         moveCollisionBoxTo(nextCollisionBox,nextPosition);
     }
     
+    /**
+     * Átrakja a collisionboxot a megadott pozícióba
+     * @param box a collisionbox
+     * @param pos a célpozíció
+     */
     public static void moveCollisionBoxTo(Rectangle box, Position pos){
         box.setLocation((int)(pos.x + C_BOX_OFFSET_X*ZOOM - box.width/2), (int)(pos.y + C_BOX_OFFSET_Y*ZOOM - box.height/2));
     }
     
+    /**
+     * A játék főciklusában meghívott metódus.
+     * Beállítja az aktuális pozíciót és collisionboxot a következő pozícióra és
+     * collisionboxra és meghívja a {@link #loadNextPosition()} metódust.
+     */
     public void loop() {
         //System.out.println(String.format("Move (%.0f,%.0f): %s",nextPosition.x,nextPosition.y,new SimpleDateFormat("mm:ss.SSS").format(new Date())));   
         if (moving) {
@@ -76,10 +97,16 @@ public class MovingSprite {
         loadNextPosition();
     }
     
+    /**
+     * Elindítja az objektum minden ciklikus tevékenységét
+     */
     public void startLooping() {
         looping = true;
     }
     
+    /**
+     * Megállítja az objektum minden ciklikus tevékenységét
+     */
     public void stopLooping() {
         looping = false;
     }

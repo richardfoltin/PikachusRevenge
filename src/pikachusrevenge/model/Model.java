@@ -26,6 +26,10 @@ import pikachusrevenge.unit.Pokemon;
 import static pikachusrevenge.unit.Unit.C_BOX_HEIGHT;
 import static pikachusrevenge.unit.Unit.C_BOX_WIDTH;
 
+/**
+ * A játék logikáját kezelő model.
+ * @author Csaba Foltin
+ */
 public final class Model implements ActionListener {
 
     private static final int MAIN_LOOP = 40;  
@@ -59,6 +63,13 @@ public final class Model implements ActionListener {
         });
     }
     
+    /**
+     * Létrehoz egy új {@link Level} objektumot, ha még az adott sorszámú pálya
+     * nem létezik.
+     * @param id a pálya sorszáma
+     * @param time a pálya idejének kezdeti állapota
+     * @return a pálya
+     */
     public Level buildLevelIfNotExists(int id, int time) {
         Level level = null;
         for (Level l : levels) if (l.getId() == id) level = l;
@@ -71,6 +82,12 @@ public final class Model implements ActionListener {
         return level;
     }
     
+    /**
+     * Újrarendezi a pályát a pálya kezdetekori állapotra; visszaállítja az életerőt,
+     * meg nem találttá teszi a pokémonokat, és visszarakja a játékost a kezdőpozícióba.
+     * @param id a pálya sorszáma
+     * @return a pálya
+     */
     public Level rebuildLevel(int id) {
         stopGame();
         Level level = null;
@@ -91,6 +108,12 @@ public final class Model implements ActionListener {
         }
     }
     
+    /**
+     * Beállítja az felső panalen a pályához tartozó információkat, és elindítja 
+     * az adott pályát.
+     * @param level a pálya
+     * @param start a játékos indításkori pozíciója
+     */
     public void startGame(Level level, Position start) {
 
         this.actualLevel = level; 
@@ -127,6 +150,13 @@ public final class Model implements ActionListener {
         resumeGame();
     }
     
+    /**
+     * Visszaadja, hogy a játékos tud-e egy bizonyos irányba mozogni.
+     * @param from a játékos jelenlegi pozíciója
+     * @param nextDirection a kívánt irány
+     * @param speed a mozgási sebesség
+     * @return true, ha arra tud mozogni
+     */
     public boolean canMoveTo(Position from, Direction nextDirection, double speed){
         if (nextDirection == Direction.STOP) return false;
         Position targetPosition = new Position(from.x + nextDirection.x * speed, from.y + nextDirection.y * speed);
@@ -148,18 +178,34 @@ public final class Model implements ActionListener {
         return Collision.canMoveToCollisions(collisions);
     }
     
+    /**
+     * Egy pokélabdát dob egy NPC
+     * @param from honnan
+     * @param speed milyen sebességgel
+     * @param owner a pokélabdát eldobó NPC
+     */
     public void ballThrow(Position from, double speed, NPC owner){
         PokeBall ball = new PokeBall(from.x, from.y, speed, this, owner);
         actualLevel.getThrownBalls().add(ball);
         ball.startLooping();
     }
     
+    /**
+     * A pokélabda elérte a játékost
+     * @param ball a labda
+     */
     public void ballReachedPlayer(PokeBall ball) {
         actualLevel.addCleanUp(ball);
         player.playerCaught();
         writeInfo(String.format("<font color=black>%s</font> caught you!",ball.getOwner().getName()));
     }
 
+    /**
+     * A játékos SPACE-t nyomott és ez által interakcióba akar lépni a pályán 
+     * található valamilyen objektummal. Ha pálya vége előtt áll és tovább tud
+     * menni, akkor elindítja az új pályát. Ha szállítóeszköz előtt áll, vagy le
+     * akar szállni akkor azzal lép interakcióba.
+     */
     public void playerInteraction(){
         if (player.isAtSign()){
             if (actualLevel.getId() == 10) {
@@ -203,6 +249,11 @@ public final class Model implements ActionListener {
         timer.restart();
     }
 
+    /**
+     * Megvizsgálja, hogy a játékos egy tábla előtt áll-e.
+     * @param pos a játékos pozíciója
+     * @return true, ha ott áll
+     */
     public boolean checkSign(Position pos) {
         for (MapLayer l : layers){
             if (l instanceof TileLayer){
@@ -213,6 +264,11 @@ public final class Model implements ActionListener {
         return false;
     }
     
+    /**
+     * Megvizsgálja, hogy a játékos egy szállítóeszköz előtt áll-e.
+     * @param pos a játékos pozíciója
+     * @return a szállítóeszköz. null, ha nincs a közelben
+     */
     public NPC checkCarry(Position pos) {
         if (actualLevel.getId() != 8) return null; // only level 8 has carry
         for (NPC npc : actualLevel.getNpcs()){
@@ -221,6 +277,12 @@ public final class Model implements ActionListener {
         return null;
     }
     
+    /**
+     * Megvizsgálja, hogy a játékos egy olyan helyen áll-e ahol le tud szállni
+     * a szállítóeszközről
+     * @param pos a játékos pozíciója
+     * @return a legközelebbi leszállási ponthoz tartozó csempe középső koordinátája
+     */
     public Position checkCarryOff(Position pos) {
         int x = TilePosition.tileCoordFromMapCoord(pos.x);
         int y = TilePosition.tileCoordFromMapCoord(pos.y + 12);
@@ -239,8 +301,13 @@ public final class Model implements ActionListener {
         return null;
     }
     
+    /**
+     * Megvizsgálja hogy a játékos collisionbox-a érintkezik-e a pályán egy 
+     * pokélabdával. Ha igen akkor a játékos kiszabadítja a pokémont és a labda
+     * eltűnik a pályáról.
+     * @param target a játékos collisionbox-a
+     */
     public void checkBallPokemonAt(Rectangle target){
-        
         PathIterator pi = target.getPathIterator(null);
         
          while (!pi.isDone()) {
@@ -263,6 +330,11 @@ public final class Model implements ActionListener {
         }  
     }
     
+    /**
+     * Kiszámolja az összes eddit érintett pálya és a nehézségi szint alapján
+     * a játékos pontszámát
+     * @return a pontszám
+     */
     public int getScore() {
         int score = 0;
         for (Level l : levels) {
@@ -291,6 +363,10 @@ public final class Model implements ActionListener {
         }
     }    
     
+    /**
+     * Kiír a footerre
+     * @param str a kiírandó szöveg
+     */
     public void writeInfo(String str){
         mainWindow.getFooter().write(str);
     }   
@@ -321,6 +397,9 @@ public final class Model implements ActionListener {
     public void setDbId(int id) {this.dbId = id;}
     public boolean isSavedToDb() {return (dbId != 0 && fileName == null);}
     
+    /**
+     * A nehézségi szinteket tartalmazó beágyazott enum
+     */
     public enum Difficulty {
         HARDCORE(1, "90s challange"),
         CASUAL(0, "Casual");

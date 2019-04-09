@@ -15,6 +15,10 @@ import javax.swing.JLabel;
 import pikachusrevenge.gui.MainWindow;
 import pikachusrevenge.resources.Resource;
 
+/**
+ * A játék segítő információit tartalmazó dialógusablak.
+ * @author Csaba Foltin
+ */
 public final class HelpDialog extends GameDialog {
     
     public HelpDialog(MainWindow frame) {

@@ -7,6 +7,11 @@ import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 
+/**
+ * A térképen található, a játékos mozgását befolyásoló elemeket és a hozzájuk
+ * tartozó statikus metódusokat tartalmazó enum.
+ * @author Csaba Foltin
+ */
 public enum Collision {
     WATER,
     STAIRS,
@@ -14,10 +19,25 @@ public enum Collision {
     BRIDGE,
     EMPTY;
     
+    /**
+     * A {@link #collisionOnTileAt(List layers, Position pos) collisionOnTileAt} metódus túlterhelése.
+     * @param layers a térkép rétegeit tartalmazó lista
+     * @param pos a koordináta
+     * @return a megadott helyen található esetleges akadály vagy objektum
+     */
     public static Collision collisionOnTileAt(List<MapLayer> layers, Position pos) {
         return collisionOnTileAt(layers,TilePosition.tileCoordFromMapCoord(pos.x), TilePosition.tileCoordFromMapCoord(pos.y));
     }
     
+    /**
+     * Kiszámolja - a térkép rétegeit végignézve - hogy a megadott csempepozíción 
+     * található-e akadály. Ha igen, akkor leellenőrzi hogy nem található-e még
+     * ott egy olyan objektum, ami felülírja az akadályt.
+     * @param layers a térkép rétegeit tartalmazó lista
+     * @param tileX x csempe-koordináta
+     * @param tileY y csempe-koordináta
+     * @return a megadott helyen található esetleges akadály vagy objektum
+     */
     public static Collision collisionOnTileAt(List<MapLayer> layers, int tileX, int tileY) {                 
         boolean water = false;
         boolean collision = false;
@@ -47,6 +67,12 @@ public enum Collision {
         return EMPTY;
     }
     
+    /**
+     * Visszaadja, hogy a paraméterül megadott {@link Collision} lista alapján 
+     * lehet-e mozogni.
+     * @param collisions a collisionbox várt helyzetén felmerülő collision-ök listája
+     * @return true, ha lehet mozogni
+     */
     public static boolean canMoveToCollisions(ArrayList<Collision> collisions){
         boolean stairs = false;
         boolean bridge = false;
@@ -60,7 +86,7 @@ public enum Collision {
             if (c == STAIRS) stairs = true;
         }
         
-        if (stairs) return true; // stairs overwrites others
+        if (stairs) return true; // stairs felülír mindent
         if (collision) return false;
         if (water) return false;
         if (bridge) return true;

@@ -4,12 +4,16 @@ import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
 
+/**
+ * Az NPC-k által eldobott labdákat leíró osztály
+ * @author Csaba Foltin
+ */
 public final class PokeBall extends MovingSprite {
 
     public final static int BALLSIZE = 16;
     
-    private final NPC owner;
-    private Position targetPosition;
+    private final NPC owner;              // az NPC aki eldobta a labdát
+    private Position targetPosition;      // a labda célpontja (ami felé halad)
     
     public PokeBall(double x, double y, double speed, Model model, NPC owner) {
         super(model);
@@ -25,6 +29,11 @@ public final class PokeBall extends MovingSprite {
         this.nextDirection = Direction.getDirection(pos,targetPosition);
     }
 
+    /**
+     * Kiszámolja a ladba következő pozícióját. A labda folyamatoan a játékos
+     * felé halad. Ha elérte a játékost, meghívja a 
+     * {@link Model#ballReachedPlayer(pikachusrevenge.unit.PokeBall) ballReachedPlayer} metódust.
+     */
     @Override
     protected void loadNextPosition() {
         targetPosition = model.getPlayer().getPosition(); // homing ball

@@ -22,6 +22,10 @@ import pikachusrevenge.unit.NPC;
 import pikachusrevenge.unit.PokeBall;
 import pikachusrevenge.unit.Pokemon;
 
+/**
+ * A pályát leíró osztály
+ * @author Csaba Foltin
+ */
 public class Level {
     
     private final int id;
@@ -70,6 +74,12 @@ public class Level {
         }
     }
 
+    /**
+     * Megkeresi a térképen labdaként tárol pokémonokat, hozzáadja a modelhez és
+     * a felső panelhez. Ha már létezett a modelben a pokémon és már meg volt
+     * találva, akkor felfedi a felső panelen a képét, és eltávolítja a labdát
+     * tartalmazó csempét a térképről.
+     */
     private void findPokemonsOnMap() {
         for (MapLayer l : layers){
             if (l instanceof TileLayer){
@@ -98,6 +108,9 @@ public class Level {
         }
     }
     
+    /**
+     * Megkeresi a térképen található be- és kilépési pontontot, és az NPC-ket.
+     */
     private void findUnitsOnMap() {
         for (MapLayer l : layers){
             if (l instanceof ObjectGroup){
@@ -123,6 +136,14 @@ public class Level {
         }
     }
     
+    /**
+     * A 9. pályához használt metódus, ahol a játékban lévő line-of-sight szabályok
+     * kicsit másak, mert a falon nem látnak át az NPC-k. A metódus kiszámolja,
+     * hogy az NPC és a játékos között található-e fal.
+     * @param npcPosition az NPC pozíciója
+     * @param playerPosition a játékos pozíciója
+     * @return true, ha nem található fal köztük
+     */
     public boolean isInLineOfSight(Position npcPosition, Position playerPosition) {
         if (id != 9) return true; // csak a 9. pályán van LOS
         
@@ -152,6 +173,11 @@ public class Level {
         foundPokemonCount++;
     }
     
+    /**
+     * Visszaadja, hogy a játékos megtalált-e már annyi pokémont a pályán,
+     * hogy a következő pályára léphet.
+     * @return true, ha a következő pályára léphet
+     */
     public boolean canAdvanceToNextLevel() {
         if (foundPokemonCount >= minimumFoundPokemon()) return true;
         else return false;
@@ -161,10 +187,11 @@ public class Level {
         return (maxPokemonCount + 1) / 2;
     }
     
-    public void addCleanUp(MovingSprite sprite) {
-        cleanUp.add(sprite);
-    }
-    
+    /**
+     * Letörli a megadott pozícióban és tulajdonsággal rendelkező csempét a térképről
+     * @param prop a tulajdonság
+     * @param tpos a csempe pozíciója
+     */
     public void clearTileWithProperty(String prop, TilePosition tpos){
         for (MapLayer l : layers){
             if (l instanceof TileLayer){
@@ -176,6 +203,12 @@ public class Level {
         }
     }
     
+    /**
+     * Megmondja, hogy a csempe tartalmazza-e a megadott tulajdonságot
+     * @param t a csempe
+     * @param property a tulajdonság
+     * @return true, ha tartalmazza
+     */
     public static boolean hasProperty(Tile t, String property) {
         if (t != null) {
             Properties prop = t.getProperties();
@@ -186,22 +219,29 @@ public class Level {
         return false;
     }
     
+    /**
+     * A játék fő ciklusában meghívott metódus.
+     * Továbbítja a fő ciklushívást a pályán található egységekhez, ha ők mozognak,
+     * és eltávolítja az eltávolítandó listában található elemeket a térképről.
+     */
     public void loop(){
         for (NPC npc : npcs) if (npc.isLooping()) npc.loop();
         for (Pokemon p : pokemons) if (p.isLooping() && p.getTilePosition().getLevel() == id) p.loop();
         for (PokeBall pb : thrownBalls) if (pb.isLooping()) pb.loop();
-        cleanUp();
-    }    
-    
-    private void cleanUp() {
+        
+        //cleanUp
         for (MovingSprite m : cleanUp) {
             if (m instanceof PokeBall) thrownBalls.remove((PokeBall)m);
             else if (m instanceof NPC) npcs.remove((NPC)m);
             else if (m instanceof Pokemon) pokemons.remove((Pokemon)m);
         }
         cleanUp.clear();
+    }    
+    
+    public void addCleanUp(MovingSprite sprite) {
+        cleanUp.add(sprite);
     }
-
+    
     public int increaseTime() {return ++time;}
     
     public ArrayList<PokeBall> getThrownBalls() {return thrownBalls;}

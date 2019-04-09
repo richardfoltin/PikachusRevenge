@@ -3,6 +3,10 @@ package pikachusrevenge.model;
 import static java.lang.Math.floor;
 import static pikachusrevenge.gui.MapView.GRIDSIZE;
 
+/**
+ * A térkép csempepozícióját aggregáló osztály a Pokémonok helyének azonosítására.
+ * @author Csaba Foltin
+ */
 public class TilePosition {
     private final int x;
     private final int y;
@@ -14,6 +18,12 @@ public class TilePosition {
         this.level = level;
     }
     
+    /**
+     * Térkép-koordinátát átszámít csempe-koordinátává
+     * @param p a térkép koordináta pozíciója
+     * @param level a pálya sorszáma
+     * @return a csempe-koordináta
+     */
     public static TilePosition fromMapPosition(Position p, int level){
         return new TilePosition((int)floor((p.x) / GRIDSIZE),(int)floor((p.y) / GRIDSIZE), level);
     }

@@ -8,6 +8,10 @@ import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
 
+/**
+ * A játékost leíró osztály
+ * @author Csaba Foltin
+ */
 public class Player extends Unit {
     
     public static final String DEFAULTNAME = "Pikachu";
@@ -39,6 +43,11 @@ public class Player extends Unit {
         this.direction = Direction.STOP;
     }
     
+    /**
+     * A játékos billentyűlenyomásával meghívott metódus, mely beállítja az adott
+     * irányt ha a játékos éppen nem egy szállítóeszközön van.
+     * @param d a kívánt irány
+     */
     public void moveToDirection(Direction d){
         if (!isOnCarry()) {
             this.nextDirection = d;
@@ -48,6 +57,10 @@ public class Player extends Unit {
         }
     }
     
+    /**
+     * A játékost elkapta egy NPC. Csökken eggyel az életereje, elindul egy várakozás
+     * amíg újra nem éled.
+     */
     public void playerCaught() {
         if (!insideBall()) {
             lives--;
@@ -57,6 +70,10 @@ public class Player extends Unit {
         }
     }
     
+    /**
+     * A játékos újraéledésekor, ha már nincs több élete, akkor meghívja a játék
+     * vége dialogot, vagy visszarakja a játékost a kezdőpozícióba.
+     */
     private void restartOrGameOver() {
         if (lives  <= 0) {
             lives = 0;
@@ -71,7 +88,11 @@ public class Player extends Unit {
         caughtWait = 0;
     }
     
-    
+    /**
+     * A játék fő ciklusában meghívott metódus, mely beállítja a játékos pozícióját
+     * ha szállítóeszközön van, és leellenőrzi, hogy nem-e tud valamilyen interakcióba
+     * lépni a pályával az adott helyen.
+     */
     @Override
     public void loop() {
         if (insideBall()) {
@@ -87,7 +108,11 @@ public class Player extends Unit {
             atCarry = model.checkCarry(pos);
         }
     }
-       
+    
+    /**
+     * A következő pozíció betöltése előtt leellenőrzi, hogy tud-e egyáltalán oda
+     * esetleges collision miatt haladni a játékos.
+     */
     @Override
     protected void loadNextPosition() {
         if (nextDirection != Direction.STOP && model.canMoveTo(pos,nextDirection,speed)) {
@@ -108,10 +133,18 @@ public class Player extends Unit {
         if (level > availableLevels) availableLevels = level;
     }
     
+    /**
+     * A játékos felszáll a hordozóeszközre (level 8)
+     */
     public void putOnCarry() {
         onCarry = atCarry;
         atCarry = null;
     }
+    
+    /**
+     * A játékos leszáll a hordozóeszközről (level 8)
+     * @param shorePosition 
+     */
     public void getOffCarry(Position shorePosition) {
         pos.x = shorePosition.x;
         pos.y = shorePosition.y;

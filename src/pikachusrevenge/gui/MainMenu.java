@@ -24,6 +24,10 @@ import pikachusrevenge.model.Model;
 import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.resources.Resource;
 
+/**
+ * A játék főmenüjét tartalmazó panel.
+ * @author Csaba Foltin
+ */
 public final class MainMenu extends JPanel {
 
     private static final int BUTTON_WIDTH = 160;
@@ -94,6 +98,10 @@ public final class MainMenu extends JPanel {
             panel.add(this);
         }
         
+        /**
+         * A gomb fokószba kerülése esetén megváltoztatja a gomb hátterét
+         * @return FocusListener
+         */
         private final FocusListener focus() {
             return new FocusListener() {
                 @Override
@@ -110,6 +118,10 @@ public final class MainMenu extends JPanel {
         
     }
     
+    /**
+     * A játékot indító action
+     * @return ActionListener
+     */
     private ActionListener startAction() {
         return (ActionEvent e) -> {
             Difficulty d = window.showDifficultySelector();
@@ -117,18 +129,30 @@ public final class MainMenu extends JPanel {
         };
     }
     
-     private ActionListener highscoreAction() {
+    /**
+     * A dicsőségtáblát megjelnítő action
+     * @return ActionListener
+     */
+    private ActionListener highscoreAction() {
         return (ActionEvent e) -> {
             window.showHighscores();
         };
     }
-     
+    
+    /**
+     * A játékot file-ból betöltő panelt megjelenítő action
+     * @return ActionListener
+     */
     private ActionListener loadAction() {
         return (ActionEvent e) -> {
             MenuBar.load();
         };
     }
-        
+    
+    /**
+     * A játékot adatbázisból betöltő panelt megjelenítő action
+     * @return ActionListener
+     */
     private ActionListener loadDbAction() {
         return (ActionEvent e) -> {
             window.showLoadSelection();

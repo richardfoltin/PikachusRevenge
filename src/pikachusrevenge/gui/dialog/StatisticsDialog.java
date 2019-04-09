@@ -32,6 +32,10 @@ import pikachusrevenge.model.Level;
 import pikachusrevenge.model.TilePosition;
 import pikachusrevenge.unit.Pokemon;
 
+/**
+ * Az adott játék pályáin elért eléredményeket összefoglaló dialógusablak.
+ * @author Csaba Foltin
+ */
 public final class StatisticsDialog extends GameDialog {
         
     private JTable table;
@@ -86,6 +90,12 @@ public final class StatisticsDialog extends GameDialog {
         bottomPanel.add(okButton);
     }
     
+    /**
+     * Legenerál egy {@link TableCellRenderer}-t ami arra szolgál, hogy feltöltse
+     * a tábla egyik celláját az adott pályához tartozó megtalált és meg nem
+     * talált pokémonok ikonjaival.
+     * @return TableCellRenderer
+     */
     private TableCellRenderer pokemonRenderer() {
         return new DefaultTableCellRenderer(){
             @Override
@@ -106,6 +116,9 @@ public final class StatisticsDialog extends GameDialog {
         };
     }
 
+    /**
+     * A pályák állását megjelenítő tábla modelje
+     */
     public class StatisticsTableModel extends AbstractTableModel {
 
         private final HashMap<TilePosition,Pokemon> pokemons;

@@ -10,6 +10,10 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import static pikachusrevenge.unit.Unit.SPRITE_SIZE;
 
+/**
+ * A képek betöltéséért felelős osztál
+ * @author ELTE IK
+ */
 public class Resource {
     
     public static InputStream loadResource(String resName){

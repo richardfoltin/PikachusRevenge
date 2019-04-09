@@ -1,10 +1,13 @@
-
 package pikachusrevenge.model;
 
 import java.util.Date;
 import java.util.Objects;
 import pikachusrevenge.model.Model.Difficulty;
 
+/**
+ * Az adatbázisból betöltött adatokat tároló osztály
+ * @author Csaba Foltin
+ */
 public final class SaveData {
     public int id;
     public String name;
@@ -51,6 +54,5 @@ public final class SaveData {
         if (!Objects.equals(this.name, other.name)) return false;
         if (!Objects.equals(this.updated, other.updated)) return false;
         return true;
-    }
-    
+    }  
 }

@@ -10,6 +10,12 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import pikachusrevenge.gui.MainWindow;
 
+/**
+ * A játékban nagyobb mérető dialógusablakokhoz tartozó absztrakt osztály.
+ * A konstruktora meghívja a {@link #fillMainPanel() fillMainPanel} és a 
+ * {@link #fillBottomPanel() fillBottomPanel} absztarkt metódusokat.
+ * @author Csaba Foltin
+ */
 public abstract class GameDialog extends JDialog {
  
     protected final int DIALOG_WIDTH = 400;
@@ -49,10 +55,20 @@ public abstract class GameDialog extends JDialog {
         pack();
         setResizable(false);
     }
-    
+    /**
+     * Az ablak fő területén megjelenő elemeket generálja le.
+     */
     protected abstract void fillMainPanel();
+    
+    /**
+     * Az ablak alsó részén - valószínűleg gombokat tartalmazó - elemeket generálja
+     * le.
+     */
     protected abstract void fillBottomPanel();
     
+    /**
+     * Középre helyezi, és megjelníti a dialógusablakot.
+     */
     public void showDialog() {
         Point windowLocation = window.getLocation();
         setLocation(new Point(windowLocation.x + window.getWidth() / 2 - DIALOG_WIDTH/2, windowLocation.y + window.getWidth()/2 - DIALOG_HEIGHT/2 - 20)); 

@@ -30,6 +30,10 @@ import pikachusrevenge.model.Position;
 import pikachusrevenge.resources.Resource;
 import pikachusrevenge.unit.Player;
 
+/**
+ * A játék ablakait kezelő Singleton.
+ * @author Csaba Foltin
+ */
 public final class MainWindow extends JFrame {
 
     public static final int WINDOW_WIDTH = 448; // 28 tiles
@@ -74,6 +78,9 @@ public final class MainWindow extends JFrame {
         setVisible(true);
     }
     
+    /**
+     * Leállítja a játékot és megjeleníti a játék főmenüjét
+     */
     public void showMainMenu() {
         stopGameFrame();
         add(mainMenuPanel);
@@ -81,6 +88,10 @@ public final class MainWindow extends JFrame {
         centerWindow();
     }
     
+    /**
+     * Elrejti a játék főmenüjét, ha éppen aktív és felépíti a játékot futtató 
+     * panelt.
+     */
     public void startGameFrame() {
         remove(mainMenuPanel);
 
@@ -93,6 +104,9 @@ public final class MainWindow extends JFrame {
         addKeyListener(keyAdapter);
     }
     
+    /**
+     * Leállítja a játékot, és elrejti a játékot futtató panelt.
+     */
     public void stopGameFrame() {
         if (model != null) this.model.stopGame();
         if (gamePanel != null) remove(gamePanel);
@@ -102,6 +116,9 @@ public final class MainWindow extends JFrame {
         removeKeyListener(keyAdapter);     
     }
     
+    /**
+     * Újraindítja az éppen aktulális pályát
+     */
     public void restartLevel() {
         if (this.model != null) {
             int id = model.getActualLevelId();
@@ -109,6 +126,13 @@ public final class MainWindow extends JFrame {
             loadLevel(id);
         }
     }
+    
+    /**
+     * Leállítja az aktuális játékot, és betölt egy pályát a paraméterül megadott
+     * modellel.
+     * @param model az új játék modelje
+     * @param id az új pálya száma
+     */
     public void loadLevelWithNewModel(Model model, int id) {loadLevelWithNewModel(model,id,null);}
     public void loadLevelWithNewModel(Model model, int id, Position start){
         stopGameFrame();
@@ -117,6 +141,10 @@ public final class MainWindow extends JFrame {
         loadLevel(id, start);
     }
     
+    /**
+     * Betölt egy új pályát a kész játékpanelbe.
+     * @param id az új pálya száma
+     */
     public void loadLevel(int id) {loadLevel(id,null);} 
     public void loadLevel(int id, Position start) {
         boolean forward = (model.getActualLevelId() <= id);
@@ -143,6 +171,10 @@ public final class MainWindow extends JFrame {
         pack();
     }
     
+    /**
+     * Betölt egy ikont a megadott elérési útról
+     * @param filePath az ikon elérési útja
+     */
     private void loadIcon(String filePath){
         try {
             BufferedImage image = Resource.loadBufferedImage(filePath);
@@ -151,7 +183,10 @@ public final class MainWindow extends JFrame {
             System.err.println("Can't load file");
         }     
     }
-      
+    
+    /**
+     * Középre helyezi az ablakot
+     */
     private void centerWindow() {
         int x = (Toolkit.getDefaultToolkit().getScreenSize().width - this.getWidth()) / 2;  
         int y = (Toolkit.getDefaultToolkit().getScreenSize().height - this.getHeight()-60) / 2;  
@@ -159,6 +194,10 @@ public final class MainWindow extends JFrame {
         this.setLocation(x, y);  
     }
     
+    /**
+     * A pályát tartalmazó JScrollPane-t a megadott pozícióra állítja.
+     * @param position a beállítandó pozíciót
+     */
     public void scrollTo(Position position){
         JViewport visible = gamePanel.getViewport();
         int scrollX = scrollPostion(position.x, WINDOW_WIDTH, model.mapRectangle.width);
@@ -166,12 +205,26 @@ public final class MainWindow extends JFrame {
         visible.setViewPosition(new Point(scrollX,scrollY));
     }
     
+    /**
+     * Segítő metódus a {@link #scrollTo(Position position) scrollTo} metódushoz.
+     * A játéktér és a pálya nagyságából kiszámolja hogy ténylegesen milyen pozícióba
+     * kell állítani a panelt úgy, hogy ne legyen a pálya mellett üres hely a
+     * panelen.
+     * @param coord a kért beállítandó koordináta
+     * @param visibleSize a játéktér maximum nagysága
+     * @param mapSize a pálya maximum nagysága
+     * @return a ténylegesen beállítandó koordináta
+     */
     private int scrollPostion(double coord, int visibleSize, int mapSize){
         if (coord < visibleSize/2) return 0;
         else if (coord > mapSize - visibleSize/2) return mapSize - visibleSize;
         else return (int)coord - visibleSize/2;
     }
     
+    /**
+     * KeyAdapter ami figyeli a lenyomott és felengedett billentyűket és továbbítja
+     * a {@link KeyPressHandler} osztálynak
+     */
     private final KeyAdapter keyAdapter = new KeyAdapter() {
         @Override
         public void keyPressed(KeyEvent ke) {
@@ -189,6 +242,12 @@ public final class MainWindow extends JFrame {
         mapView.repaint();        
     }
     
+    /**
+     * Feldob egy InputDialog-ot ahol be lehet írni a játékos nevét.
+     * A dialog automatikusan ki lesz töltve aktuálisan futtatot játékos nevével,
+     * ha már egyszer megadta.
+     * @return a megadott név
+     */
     public String getSaveName() {
         String playerName = model.getPlayer().getName();
         String name = (String)JOptionPane.showInputDialog(this, "What is your name?", "Saving..",JOptionPane.QUESTION_MESSAGE,null,null,playerName);
@@ -197,6 +256,9 @@ public final class MainWindow extends JFrame {
         return name;
     }
 
+    /**
+     * Megjelníti a kilépést megerősítő dialogot.
+     */
     protected void showExitConfirmation() {
         if (model != null) model.stopGame();
         
@@ -211,18 +273,35 @@ public final class MainWindow extends JFrame {
         }
     }
     
+    /**
+     * Megjelenít egy adatbázishoz tartaozó hibaüzenetet.
+     * @param error a hibaüzenet szövege
+     */
     public void showDbError(String error) {
         JOptionPane.showMessageDialog(this,error,"Database Error",JOptionPane.ERROR_MESSAGE);
     }
     
+    /**
+     * Megjelenít egy általános hibaüzenetet
+     * @param error a hibaüzenet szövege
+     */
     public void showError(String error) {
         JOptionPane.showMessageDialog(this,error,"Error",JOptionPane.ERROR_MESSAGE);
     }
     
-    public void saveSuccessful(String msg) {
+    /**
+     * Megjelenít egy sikert visszajelző üzenetet
+     * @param msg az üzenet szövege
+     */
+    public void showSuccess(String msg) {
         JOptionPane.showMessageDialog(this,msg,"Success",JOptionPane.INFORMATION_MESSAGE);
     }
     
+    /**
+     * Megjeleníti a játék végét jelző dialogot.
+     * Három lehetséges opció van: Új játék kezdése, Az aktuáls pálya újrakezdése,
+     * Visszalépés a főmenübe.
+     */
     public void showGameOverPane() {     
         
         Object[] options = {"New Game","Restart Level","Main Menu"};
@@ -239,6 +318,10 @@ public final class MainWindow extends JFrame {
         }
     }
     
+    /**
+     * Megjeleníti a nehézséget kiválasztó dialogot
+     * @return a kiválasztott nehézségi fok
+     */
     public Difficulty showDifficultySelector() {     
         
         Object[] options = {Difficulty.HARDCORE,Difficulty.CASUAL};
@@ -250,6 +333,9 @@ public final class MainWindow extends JFrame {
         return (Difficulty)opt.getValue();
     }
     
+    /**
+     * Megjeleníti a főmenübe való visszalépést megerősítő dialogot.
+     */
     public void showBackToMainMenuConfirmation() {    
         model.stopGame();
         
@@ -264,10 +350,16 @@ public final class MainWindow extends JFrame {
         }
     }
     
+    /**
+     * Megjeleníti a segítség dialogot.
+     */
     public void showHelp() {
         helpDialog.showDialog();
     }
     
+    /**
+     * Megjeleníti a dicsőségtáblát.
+     */
     public void showHighscores() {
         HighscoreDialog dialog = new HighscoreDialog(this);
         String msg = dialog.getLoadMessage();
@@ -275,6 +367,9 @@ public final class MainWindow extends JFrame {
         else dialog.showDialog();
     }
     
+    /**
+     * Megjeleníti az aktuális játék statisztikáit tartalmazó dialogot.
+     */
     public void showStatistics() {
         if (model != null) {
             String name = "Game Statistics - " + model.getPlayer().getName() + " [" + model.getDifficulty() + "] - Score: " + model.getScore();
@@ -285,6 +380,11 @@ public final class MainWindow extends JFrame {
         }
     }
         
+    /**
+     * Megjeleníti az adatbázisból választható elmentett állásokat tartalmazó
+     * dialogot.
+     * @return true ha sikerült a betöltés
+     */
     public boolean showLoadSelection() {
         LoadDialog dialog = new LoadDialog(this);
         String msg = dialog.getLoadMessage();

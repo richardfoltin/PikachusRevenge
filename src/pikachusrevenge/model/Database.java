@@ -16,6 +16,10 @@ import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.Pokemon;
 
+/**
+ * Az adatbáziskezeléshez kapcsolatos statikus metódusokat tartalmazó osztály.
+ * @author Csaba Foltin
+ */
 public class Database {
     private static MysqlConnectionPoolDataSource connPool;
     private static boolean tableCreated = false;
@@ -51,6 +55,13 @@ public class Database {
         return conn;
     }
     
+    /**
+     * Lefuttat egy ;-vel elválasztot SQL utasításokat tartalmazó .sql file-t
+     * @param fileName a file neve és elérési útja
+     * @param conn a kapcsolat
+     * @throws ClassNotFoundException ClassNotFoundException
+     * @throws SQLException SQLException
+     */
     public static void runBatchFile(String fileName, Connection conn) throws ClassNotFoundException, SQLException {
         Statement stmt = conn.createStatement();
         StringBuilder contentBuilder = new StringBuilder();
@@ -73,6 +84,13 @@ public class Database {
         stmt.executeBatch();
     }
     
+    /**
+     * Betölti a dialógusablakok megjelenítéséhez szükséges adatbázisban tárolt
+     * adatokat
+     * @return az {@link SaveData} adatokat tartalmazó lista
+     * @throws pikachusrevenge.model.Database.NoResultException nincs adat az adatbázisban
+     * @throws SQLException SQLException
+     */
     public static ArrayList<SaveData> loadAllSaveData() throws NoResultException, SQLException {
         ArrayList<SaveData> data = new ArrayList<>();
         
@@ -119,6 +137,12 @@ public class Database {
         return data;
     }
     
+    /**
+     * Betölti a kiválasztott id-jű mentést az adatbázisból
+     * @param id a kiválasztott adat id-je
+     * @param difficulty a kiválasztott nehézségi fok
+     * @return true, ha sikeres a betöltés
+     */
     public static boolean load(int id, Difficulty difficulty) {
         if (id == 0) return false;
         Model model = new Model(id, difficulty);
@@ -180,7 +204,15 @@ public class Database {
         MainWindow.getInstance().loadLevelWithNewModel(model, actualLevel, start);
         return true;
     }
-      
+    
+    /**
+     * Elmenti a megadott {@link Model} által leírt játék minden eddig megjelenített
+     * pályáját az adatbázisba. Amennyiben nincs megadva mentési id, akkor bekéri 
+     * a játékos neevét, és új mentést hoz létre, egyébként felülírja az előzőt.
+     * @param id a mentés id-je
+     * @param model a játék modelje
+     * @return true, ha sikeres a mentés
+     */
     public static boolean save(int id, Model model) {
         String query;
         String name = null;

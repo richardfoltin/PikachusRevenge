@@ -14,6 +14,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import pikachusrevenge.resources.Resource;
 
+/**
+ * A pálya felett elhelyezkedő panel.
+ * Megjelníti a játékos életerejét, az aktuális pályán megtalált, és meg nem
+ * talált pokémonokat és a pálya kezdete óta eltelt időt.
+ * @author Csaba Foltin
+ */
 public final class StatsPanel extends JPanel {
 
     private static final int STATS_HEIGHT = 30;
@@ -45,8 +51,10 @@ public final class StatsPanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
     }
     
+    /**
+     * Egy élet-ikont ad hozzá a panelhez.
+     */
     public void addLife() {
-        
         Image image = null;
         try {image = Resource.loadImage("heart.png");} 
         catch (IOException e) {System.err.println("Can't load file");} 
@@ -58,6 +66,9 @@ public final class StatsPanel extends JPanel {
         livesPane.add(label);
     }
     
+    /**
+     * Egy élet-ikont eltávolít a panelről.
+     */
     public void removeLife() {
         if (lives.size() > 0) {
             JLabel label = lives.get(lives.size()-1);
@@ -70,11 +81,19 @@ public final class StatsPanel extends JPanel {
         }
     }
     
+    /**
+     * Frissíti a megjelnített időt a panelen.
+     * @param time a frissítendő idő
+     */
     public void updateTimeLabel(int time) {
         Date date = new Date(time * 1000);
         timerLabel.setText(TIMEFORMAT.format(date));
     }
     
+    /**
+     * Egy, a pályán meg nem talált pokémont szimbolizáló pokélabdát ad a panelhez.
+     * @return a hozzáadott JLabel
+     */
     public JLabel addBall() {
         JLabel label = getBallLabel();
         pokemons.add(label);
@@ -83,6 +102,10 @@ public final class StatsPanel extends JPanel {
         return label;
     }
     
+    /**
+     * Legenerálja a pokélabdát mutató JLabelt.
+     * @return a legenerált JLabel
+     */
     public static JLabel getBallLabel() {
         Image image = null;
         try {image = Resource.loadImage("ball.png");} 
@@ -94,8 +117,12 @@ public final class StatsPanel extends JPanel {
         return label;
     }
     
+    /**
+     * Eltávolítja a panelről az játékos életerejét és a pályán megtalált és
+     * meg nem talált pokémonokat.
+     * Új pálya betöltésekor hívandó.
+     */
     public void clearPane() {
-        
         for (JLabel label : pokemons){
             pokemonPane.remove(label);
         }

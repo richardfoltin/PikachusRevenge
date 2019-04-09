@@ -25,6 +25,10 @@ import pikachusrevenge.model.Database;
 import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.model.SaveData;
 
+/**
+ * Az adatbázisból való betöltést megjelenítő dialógusablak.
+ * @author Csaba Foltin
+ */
 public final class LoadDialog extends GameDialog {
         
     private JTable table;
@@ -105,6 +109,13 @@ public final class LoadDialog extends GameDialog {
         super.showDialog();
     }
     
+    /**
+     * A betöltéskor meghívott ActionListener.
+     * Beállítja a {@link selectedId} és a {@link selectedDifficulty} adattagokat
+     * a táblán kiválasztott sor elrejtett oszlopainak megfelelő értékére, és
+     * elrejti az ablakot
+     * @return ActionListener
+     */
     private final ActionListener loadAction() {
         return (ActionEvent e) -> {
             int modelRow = table.convertRowIndexToModel(table.getSelectedRow());
@@ -117,6 +128,9 @@ public final class LoadDialog extends GameDialog {
     public int getSelectedId() {return selectedId;}
     public Difficulty getSelectedDifficulty() {return selectedDifficulty;}
     
+    /**
+     * Az adatbázisból betöltő tábla modelje
+     */
     public class LoadTableModel extends AbstractTableModel  {
 
         private final ArrayList<SaveData> data;

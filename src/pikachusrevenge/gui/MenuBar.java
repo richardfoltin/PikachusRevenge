@@ -36,6 +36,10 @@ import pikachusrevenge.resources.Resource;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.Pokemon;
 
+/**
+ * A játékoz tartozó menüsor
+ * @author Csaba Foltin
+ */
 public final class MenuBar extends JMenuBar {
     
     public static class IllegalFileException extends Exception {}
@@ -237,7 +241,7 @@ public final class MenuBar extends JMenuBar {
         public void actionPerformed(ActionEvent e) {
             pause();
             int dbId = window.getModel().getDbId();
-            if (Database.save(dbId,window.getModel())) window.saveSuccessful("Game saved sucessfully to database.");
+            if (Database.save(dbId,window.getModel())) window.showSuccess("Game saved sucessfully to database.");
             resume();
         }
     };
@@ -247,7 +251,7 @@ public final class MenuBar extends JMenuBar {
         public void actionPerformed(ActionEvent e) {
             pause();
             if (Database.save(0,window.getModel())) {
-                window.saveSuccessful("Game saved sucessfully to database.");
+                window.showSuccess("Game saved sucessfully to database.");
                 saveToDb.setEnabled(true);
             }
             resume();
@@ -345,7 +349,7 @@ public final class MenuBar extends JMenuBar {
         };
     } 
     
-    private final ActionListener openPokemon(int id) {
+    private final ActionListener openPokemonUrl(int id) {
         return (ActionEvent e) -> {
             try {
                 Desktop.getDesktop().browse(new URI("https://pokedex.org/#/pokemon/" + id));
@@ -355,6 +359,13 @@ public final class MenuBar extends JMenuBar {
         };
     }
     
+    /**
+     * Megnyitja egy file-böngésző ablakot, ahol ki lehet választani az elmentett 
+     * játékot, amit be akarunk tölteni. Ebből az elmentett file-ból felépíti a 
+     * játék modeljét, és betölti az aktuális pályát ha lehetséges.
+     * Ha nem lehet, akkor hibaüzenet dialógust dob fel.
+     * @return true ha sikeres a betöltés
+     */
     public static boolean load() {
         MainWindow window = MainWindow.getInstance();
         JFileChooser chooser = new JFileChooser();
@@ -411,6 +422,14 @@ public final class MenuBar extends JMenuBar {
         else throw new IllegalFileException();    
     }
     
+    /**
+     * Elmenti az aktuális modelt egy file-ba, amit egy megjelenített file-
+     * böngésző ablakban lehet kiválasztani, ha nincs a függvény hivásakor megadva
+     * alapértelmezett file-név.
+     * Ha nem sikeres a mentés, hibaüzenetet dialógust dob fel.
+     * @param fileName a kívánt file neve és elérési útja
+     * @return true, ha sikeres a mentés
+     */
     private boolean save(String fileName){
         File file;
         if (fileName == null) {
@@ -455,7 +474,7 @@ public final class MenuBar extends JMenuBar {
                                level.getTime());
                 }
                 
-                window.saveSuccessful("Game saved sucessfully to " + file.getName());
+                window.showSuccess("Game saved sucessfully to " + file.getName());
                 model.setFileName(fileName);
             } catch (FileNotFoundException ex) {
                 JOptionPane.showMessageDialog(window, "File not found!");
@@ -465,6 +484,13 @@ public final class MenuBar extends JMenuBar {
         return true;
     }
     
+    /**
+     * Felépíti a megtalált pokémonokat tartalmazó menüt.
+     * Amennyiben több mint 20 pokémont tartalmazna a menü, akkor további almenükre
+     * bontja a pokémonok id-je szerint úgy hogy azok se tartalmazhassanak több
+     * mint 20 pokémont
+     * @param model a játék modelje
+     */
     public void buildPokedexMenu(Model model) {
         ArrayList<Integer> pokemonIds = (ArrayList<Integer>) model.getAllFoundIds();
         Collections.sort(pokemonIds);
@@ -497,21 +523,28 @@ public final class MenuBar extends JMenuBar {
                 image = Resource.getScaledImage(image, MENUITEM_HEIGHT, MENUITEM_HEIGHT);
                 JMenuItem item = new JMenuItem(Pokemon.POKEMON_NAME[id-1], new ImageIcon(image));
                 item.setPreferredSize(new Dimension(MENUITEM_WIDTH,MENUITEM_HEIGHT));
-                item.addActionListener(openPokemon(id));
+                item.addActionListener(openPokemonUrl(id));
                 
                 menus.get(id / ((max / clusters) + 1)).add(item);
             }
         }
     }
     
+    /**
+     * Beállítja a pályaválasztó menüben, a elérhető menüpontokat
+     * @param maxLevel a maximálasan elért pálya kódja
+     */
     public void setAvailableLevels(int maxLevel){
         for (int i = 0; i < levelSelect.getItemCount(); ++i){
             levelSelect.getItem(i).setEnabled(i < maxLevel || MainWindow.TESTING);
         }
     }
     
-    private void addLevels(JMenu menu){
-        
+    /**
+     * Felépíti a pályaválasztó menüt
+     * @param menu a pályaválasztó menü
+     */
+    private void addLevels(JMenu menu){  
         for (int i = 1; i <= 10; ++i){
             JMenuItem menuItem = new JMenuItem();
             menuItem.addActionListener(startLevelAction(i));

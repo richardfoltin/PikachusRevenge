@@ -21,6 +21,10 @@ import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.PokeBall;
 import pikachusrevenge.unit.Pokemon;
 
+/**
+ * A játékteret megjelenítő panel.
+ * @author Csaba Foltin
+ */
 public final class MapView extends JPanel {
     
     private final Map map;
@@ -39,6 +43,12 @@ public final class MapView extends JPanel {
         setOpaque(true);
     }
 
+    /**
+     * Kirajzolja a játkost, azt őt követő pokémonokat, az NPC-ket és az általuk
+     * eldobott pokélabdákat.
+     * A pályán, az egyégek felett lévő sprite-ok kirajzolása előtt hívandó.
+     * @param g 
+     */
     private void paintUnits(Graphics2D g){     
         for (PokeBall ball : model.getThrownBalls()){
             Position pos = ball.getPosition();
@@ -66,8 +76,13 @@ public final class MapView extends JPanel {
         g.drawImage(player.getImg(),(int)pos.x - size/2, (int)pos.y - size/2, size , size,null);
     }
     
-    
-    private void paintBubbles(Graphics2D g){  
+    /**
+     * Kirajzolja az NPC-khez tartozó látöszögüket jelző ívet, és a fejük felett
+     * megjelnő esetleges buborékot.
+     * A pályán, az egyégek felett lévő sprite-ok kirajzolása után hívandó.
+     * @param g 
+     */
+    private void paintOverAll(Graphics2D g){  
         for (NPC npc : model.getNpcs()){
             
             // no line of sight at level 9
@@ -106,7 +121,7 @@ public final class MapView extends JPanel {
             if (layer instanceof TileLayer) renderer.paintTileLayer(g2d, (TileLayer) layer);
             //else if (layer instanceof ObjectGroup) renderer.paintObjectGroup(g2d, (ObjectGroup) layer);      
         } 
-        paintBubbles(g2d);
+        paintOverAll(g2d);
     }
 
 }

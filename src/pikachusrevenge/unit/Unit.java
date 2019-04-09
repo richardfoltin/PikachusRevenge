@@ -7,8 +7,11 @@ import pikachusrevenge.model.Direction;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.resources.Resource;
 
-
-public class Unit extends MovingSprite {
+/**
+ * A játékban animált egységeket leíró absztrakt osztály.
+ * @author Csaba Foltin
+ */
+public abstract class Unit extends MovingSprite {
 
     protected String name;
     
@@ -29,6 +32,10 @@ public class Unit extends MovingSprite {
         nextCollisionBox.setSize((int)(C_BOX_WIDTH*ZOOM), (int)(C_BOX_HEIGHT*ZOOM));
     }
     
+    /**
+     * Beállítja az egységhez 4x4 sprite-ot tartalmazó animációt
+     * @param filePath a kép elérési útja
+     */
     @Override
     protected final void setImg(String filePath){
         super.setImg(filePath);
@@ -45,6 +52,10 @@ public class Unit extends MovingSprite {
         }
     }
 
+    /**
+     * A játék fő ciklusában az egység nézési iránya szerint kiválasztja, hogy
+     * melyik animációt kell használni az egység megjelenítéséhez.
+     */
     @Override
     public void loop() { 
         switch (getFacingDirection()) {
@@ -62,9 +73,8 @@ public class Unit extends MovingSprite {
     }
     
     public Direction getFacingDirection(){
-        //return (nextDirection == direction) ? nextDirection : direction;
         return direction;
-   }
+    }
     
     public void startWalking(){
         animation.start();
@@ -81,6 +91,10 @@ public class Unit extends MovingSprite {
         return animation.getFrame();
     }
     
+    /**
+     * Visszaállítja az egységet a kezdő pozícióra, minden akkori beállításával
+     * együtt.
+     */
     public void restartFromStratingPoint() {
         this.pos.x = startPosition.x;
         this.pos.y = startPosition.y;

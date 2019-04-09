@@ -7,6 +7,11 @@ import javax.swing.JPanel;
 import static pikachusrevenge.gui.MainWindow.WINDOW_WIDTH;
 import pikachusrevenge.model.Model;
 
+/**
+ * A játékablak alján lévő panel, ahol a játékosnak szóló információkat lehet
+ * megjeleníteni
+ * @author Csaba Foltin
+ */
 public final class FooterPanel extends JPanel {
 
     private Model model;
@@ -23,6 +28,9 @@ public final class FooterPanel extends JPanel {
         label.setForeground(Color.GRAY);
     }
 
+    /**
+     * A játékost segítő alapüzenetet megjelenítő metódus
+     */
     public void setHelpText() {
         if (model.getActualLevelId() == 10) {
             label.setText("Interact with the fountain to finish the game!");
@@ -32,6 +40,13 @@ public final class FooterPanel extends JPanel {
         }
     }
     
+    /**
+     * A játék fő frissítő ciklusában meghívott metódus.
+     * A játékos pozíciójától függően üzeneteket jelenít meg, hogy mit tud ott a
+     * játékos csinálni
+     * 
+     * Ezen kívül a rövid ideig megjelenített információk elrejtéséért felelős
+     */
     public void loop() {
         if (!info) {
             if (model.getPlayer().isAtSign()) {
@@ -56,6 +71,10 @@ public final class FooterPanel extends JPanel {
         }
     }
     
+    /**
+     * Kiír a címkére a rövid ideig megjelenített információkat
+     * @param str az infromáció szövege
+     */
     public void write(String str) {
         infoCounter = 0;
         info = true;

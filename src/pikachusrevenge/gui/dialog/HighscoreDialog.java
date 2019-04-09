@@ -22,6 +22,10 @@ import pikachusrevenge.model.Database;
 import pikachusrevenge.model.Model;
 import pikachusrevenge.model.SaveData;
 
+/**
+ * A dicsőségtábált tartalmazó dialógusablak.
+ * @author Csaba Foltin
+ */
 public final class HighscoreDialog extends GameDialog {
         
     private JTable table;
@@ -80,6 +84,9 @@ public final class HighscoreDialog extends GameDialog {
         bottomPanel.add(okButton);
     }
 
+    /**
+     * A dicsőségtábla absztrakt modelje.
+     */
     public class HighscoreTableModel extends AbstractTableModel {
 
         private final ArrayList<SaveData> data;

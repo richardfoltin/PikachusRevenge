@@ -12,6 +12,10 @@ import pikachusrevenge.model.Position;
 import pikachusrevenge.model.TilePosition;
 import pikachusrevenge.resources.Resource;
 
+/**
+ * A játékost követő pokémonokat leíró osztály
+ * @author Csaba Foltin
+ */
 public class Pokemon extends Unit {
      
     private static final int FOLLOW_DISTANCE = 45;
@@ -40,6 +44,11 @@ public class Pokemon extends Unit {
         setIdImg();
     }
     
+    /**
+     * A játékos megtalálta a térképen a pokémont szimbolizáló labdát. Ilyenkor
+     * megjelenik a pokémon a pályán és a felső panelen, és elkezdi követni a
+     * játékost.
+     */
     public void found() {
         this.found = true;
         revealLabel(this.label);
@@ -47,6 +56,10 @@ public class Pokemon extends Unit {
         startLooping();
     }
     
+    /**
+     * Felfedi a pokémonhoz tartozó címkét a felső panelen.
+     * @param label a címke
+     */
     public void revealLabel(JLabel label){
         if (label != null) {
             BufferedImage image = null;
@@ -63,6 +76,14 @@ public class Pokemon extends Unit {
         setImg(String.format("pokemons\\%03d.png",this.id));
     }
 
+    /**
+     * Betölti a pokémon következő pozícióját az alapján hogy milyen messze és
+     * milyen irányban található a játékos. Ha a játékos nagyon messze van, akkor
+     * (a látóterületen kívül) áthaladhat akadályokon. Ha közel van, akkor mindig
+     * a játékos irányába próbál haladni. Ha ez nem sikerül meghívja a
+     * {@link Direction#getSecondDirection(pikachusrevenge.model.Position, pikachusrevenge.model.Position) getSecondDirection}
+     * metódust.
+     */
     @Override
     protected void loadNextPosition(){
         Position playerPosition = model.getPlayer().getPosition();
@@ -84,6 +105,11 @@ public class Pokemon extends Unit {
         }  
     }
     
+    /**
+     * Kiszámol egy olyan random pokémon id-t (1-151) ami még nem szerepel az 
+     * aktuális modelben, és nem Pikachu (25)
+     * @return 
+     */
     private int newRandomId() {
         int maxPokemonCount = POKEMON_NAME.length;
         int randomId = new Random().nextInt(maxPokemonCount-1) + 1;
