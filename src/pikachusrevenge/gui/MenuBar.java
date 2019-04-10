@@ -286,8 +286,8 @@ public final class MenuBar extends JMenuBar {
     private final Action newGameAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Difficulty d = window.showDifficultySelector();
-            if (d != null) window.loadLevelWithNewModel(new Model(d),1);
+            Difficulty difficulty = window.showDifficultySelector();
+            if (difficulty != null) window.loadFirstLevelWithNewModel(new Model(difficulty));
         }
     };
     
@@ -345,7 +345,7 @@ public final class MenuBar extends JMenuBar {
         return (ActionEvent e) -> {
             Model model = window.getModel();
             if (model != null) model.stopGame();
-            window.loadLevel(level);
+            window.loadLevel(level, true);
         };
     } 
     
@@ -361,10 +361,8 @@ public final class MenuBar extends JMenuBar {
     
     /**
      * Megnyitja egy file-böngésző ablakot, ahol ki lehet választani az elmentett 
-     * játékot, amit be akarunk tölteni. Ebből az elmentett file-ból felépíti a 
-     * játék modeljét, és betölti az aktuális pályát ha lehetséges.
-     * Ha nem lehet, akkor hibaüzenet dialógust dob fel.
-     * @return true ha sikeres a betöltés
+     * játékot, amit be akarunk tölteni, és betölti azt.
+     * @return true, ha sikeres a betöltés
      */
     public static boolean load() {
         MainWindow window = MainWindow.getInstance();
@@ -376,45 +374,60 @@ public final class MenuBar extends JMenuBar {
         chooser.setApproveButtonText("Load");
         chooser.setApproveButtonMnemonic('L');
         File chosenFile = (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFile() : null;
-        if (chosenFile != null) {
-            try (final Scanner sc = new Scanner(chosenFile)) {
-                Difficulty difficulty = Difficulty.fromId(loadInt(sc));
-                Model model = new Model(chosenFile.getAbsolutePath(), difficulty);
-                Player player = model.getPlayer();
-                HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
-                int actualLevel = loadInt(sc);
-                player.setLives(loadInt(sc));
-                double x = (double)loadInt(sc);
-                double y = (double)loadInt(sc);
-                
-                int pokemonCount = loadInt(sc);
-                for (int i = 0; i < pokemonCount; i++) {
-                    int level = loadInt(sc);
-                    int x1 = loadInt(sc);
-                    int y1 = loadInt(sc);
-                    int id = loadInt(sc);
-                    boolean found = sc.nextBoolean();
-                    TilePosition tpos = new TilePosition(x1, y1, level);
-                    Pokemon p = new Pokemon(model,tpos,id,found);
-                    pokemons.put(tpos,p);
-                }
-                int levelCount = loadInt(sc);
-                player.increaseAvailableLevels(levelCount);
-                for (int i = 0; i < levelCount; i++){
-                    int id = loadInt(sc);
-                    int time = loadInt(sc);
-                    model.buildLevelIfNotExists(id,time);
-                }
-                window.loadLevelWithNewModel(model, actualLevel, new Position(x,y));
-            }catch (IllegalFileException ex) {
-                JOptionPane.showMessageDialog(window, "Not proper Pikachu's Revenge saved file.");
-                return false;
-            }catch (FileNotFoundException ex) {
-                JOptionPane.showMessageDialog(window, "File not found!");
-                return false;
-            }
-        }  
-        return true;
+        try {
+            Model model = load(chosenFile);
+            MainWindow.getInstance().loadActualLevelWithNewModel(model, false);
+            return true;
+        }catch (IllegalFileException ex) {
+            JOptionPane.showMessageDialog(window, "Not proper Pikachu's Revenge saved file.");
+            return false;
+        }catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(window, "File not found!");
+            return false;
+        }
+    }
+    
+    /**
+     * A megkapott fileból felépíti játék modeljét, és betölti az aktuális pályát ha lehetséges.
+     * Ha nem lehet, akkor hibaüzenet dialógust dob fel.
+     * @param file a file, amit be kell tölteni
+     * @return Model a felépített model ha sikeres a betöltés, egyébként null
+     * @throws java.io.FileNotFoundException
+     * @throws pikachusrevenge.gui.MenuBar.IllegalFileException
+     */
+    public static Model load(File file) throws FileNotFoundException, IllegalFileException {
+        Scanner sc = new Scanner(file);
+        Difficulty difficulty = Difficulty.fromId(loadInt(sc));
+        Model model = new Model(file.getAbsolutePath(), difficulty);
+        Player player = model.getPlayer();
+        HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
+        int actualLevel = loadInt(sc);
+        player.setLives(loadInt(sc));
+        double x = (double)loadInt(sc);
+        double y = (double)loadInt(sc);
+        player.putToPosition(new Position(x,y));
+        
+        int pokemonCount = loadInt(sc);
+        for (int i = 0; i < pokemonCount; i++) {
+            int level = loadInt(sc);
+            int x1 = loadInt(sc);
+            int y1 = loadInt(sc);
+            int id = loadInt(sc);
+            boolean found = sc.nextBoolean();
+            TilePosition tpos = new TilePosition(x1, y1, level);
+            Pokemon p = new Pokemon(model,tpos,id,found);
+            pokemons.put(tpos,p);
+        }
+        int levelCount = loadInt(sc);
+        player.increaseAvailableLevels(levelCount);
+        for (int i = 0; i < levelCount; i++){
+            int id = loadInt(sc);
+            int time = loadInt(sc);
+            model.buildLevelIfNotExists(id,time);
+        }
+        
+        model.setActualLevel(actualLevel);
+        return model;
     }
     
     private static int loadInt(Scanner sc) throws IllegalFileException {

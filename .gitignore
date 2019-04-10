@@ -22,6 +22,7 @@ $RECYCLE.BIN/
 /build
 /dist
 /nbproject
+~*.*
 
 # =========================
 # Operating System Files

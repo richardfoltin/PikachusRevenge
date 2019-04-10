@@ -125,7 +125,7 @@ public final class MainMenu extends JPanel {
     private ActionListener startAction() {
         return (ActionEvent e) -> {
             Difficulty d = window.showDifficultySelector();
-            if (d != null) window.loadLevelWithNewModel(new Model(d),1);
+            if (d != null) window.loadFirstLevelWithNewModel(new Model(d));
         };
     }
     

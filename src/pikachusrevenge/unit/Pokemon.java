@@ -92,11 +92,13 @@ public class Pokemon extends Unit {
             nextDirection = Direction.getDirection(pos, playerPosition);
             startWalking();
             super.loadNextPosition();
-        } else if (playerDistance > distance && model.canMoveTo(pos,Direction.getDirection(pos, playerPosition),speed)) {
+        } else if (playerDistance > distance && 
+                   model.canMoveTo(pos,Direction.getDirection(pos, playerPosition),speed)) {
             nextDirection = Direction.getDirection(pos, playerPosition);
             startWalking();
             super.loadNextPosition();
-        } else if (playerDistance > distance && model.canMoveTo(pos,Direction.getSecondDirection(pos, playerPosition),speed)) {
+        } else if (playerDistance > distance && 
+                   model.canMoveTo(pos,Direction.getSecondDirection(pos, playerPosition),speed)) {
             nextDirection = Direction.getSecondDirection(pos, playerPosition);
             startWalking();
             super.loadNextPosition();

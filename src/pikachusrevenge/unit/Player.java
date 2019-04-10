@@ -15,6 +15,7 @@ import pikachusrevenge.resources.Resource;
 public class Player extends Unit {
     
     public static final String DEFAULTNAME = "Pikachu";
+    public static final double PLAYERSPEED = 3.0;
     
     private BufferedImage caughtImage;
     private NPC atCarry;
@@ -29,9 +30,9 @@ public class Player extends Unit {
     public Player(Model model){
         super(model);
         
-        this.lives = (MainWindow.getInstance().TESTING) ? 1 : 3;
+        this.lives = 3;
         this.availableLevels = 1;
-        this.speed = 3.0;
+        this.speed = PLAYERSPEED;
         this.name = DEFAULTNAME;
         this.caughtWaitMax = 30;
         
@@ -75,10 +76,10 @@ public class Player extends Unit {
      * vége dialogot, vagy visszarakja a játékost a kezdőpozícióba.
      */
     private void restartOrGameOver() {
+        if (MainWindow.getInstance().TESTING) MainWindow.getInstance().restartLevel();
         if (lives  <= 0) {
             lives = 0;
-            if (MainWindow.getInstance().TESTING) MainWindow.getInstance().restartLevel();
-            else model.gameOver();
+            model.gameOver();
         } else {
             restartFromStratingPoint();
             for (Pokemon p : model.getMapPokemons()) {

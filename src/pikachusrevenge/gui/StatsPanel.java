@@ -61,7 +61,7 @@ public final class StatsPanel extends JPanel {
         image = Resource.getScaledImage(image, 15, 15);
         
         JLabel label = new JLabel(new ImageIcon(image),JLabel.CENTER);
-        label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));    
+        label.setPreferredSize(new Dimension(STATS_HEIGHT-5,STATS_HEIGHT));    
         lives.add(label);
         livesPane.add(label);
     }
@@ -113,7 +113,7 @@ public final class StatsPanel extends JPanel {
         image = Resource.getScaledImage(image, 15, 15);
         
         JLabel label = new JLabel(new ImageIcon(image),JLabel.CENTER);
-        label.setPreferredSize(new Dimension(STATS_HEIGHT,STATS_HEIGHT));  
+        label.setPreferredSize(new Dimension(STATS_HEIGHT-5,STATS_HEIGHT));  
         return label;
     }
     

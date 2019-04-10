@@ -39,7 +39,7 @@ public class NPC extends Unit {
     private Arc2D los;
     private Arc2D instantLos;
     private Direction facingDirection;
-    
+     
     public static final int EXCLAMATION_SIZE = 40;
     public static final double INSTANT_THROW_DISTANCE = 0.6;
     
@@ -129,7 +129,6 @@ public class NPC extends Unit {
             }
         }
         
-        
         //System.out.println(String.format("%s\n%s\n%s",nextDirection,pos,targetPosition));
         super.loadNextPosition();
     }
@@ -184,7 +183,6 @@ public class NPC extends Unit {
                 states.get(NPC_STATE.STOP_EXCLAMATION).active = true;
                 if (playerDistance < throwDistance*INSTANT_THROW_DISTANCE) throwBall();
             }
-            
        }
         super.loop();
     }

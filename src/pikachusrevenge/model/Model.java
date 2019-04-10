@@ -61,6 +61,8 @@ public final class Model implements ActionListener {
         this.clock = new Timer(1000, (ActionEvent e) -> {
             mainWindow.getStats().updateTimeLabel(actualLevel.increaseTime());
         });
+        
+        if (difficulty == Difficulty.CASUAL) player.setLives(5);
     }
     
     /**
@@ -114,7 +116,7 @@ public final class Model implements ActionListener {
      * @param level a pálya
      * @param start a játékos indításkori pozíciója
      */
-    public void startGame(Level level, Position start) {
+    public void startGame(Level level, boolean fromStart) {
 
         this.actualLevel = level; 
         Map map = level.getMap();
@@ -142,11 +144,11 @@ public final class Model implements ActionListener {
         for (Pokemon p : actualLevel.getPokemons()) {
             if (p.isFound()) {
                 p.setStartingPostion(player.getStartPosition());
-                p.putToPosition((start == null) ? p.getStartPosition() : start);
+                p.putToPosition((fromStart) ? player.getStartPosition() : player.getPosition());
                 p.startLooping();
             }
         }
-        player.putToPosition((start == null) ? player.getStartPosition() : start);
+        if (fromStart) player.putToPosition(player.getStartPosition());
         resumeGame();
     }
     
@@ -213,7 +215,7 @@ public final class Model implements ActionListener {
             } else {
                 if (canMoveToNextLevel()) {
                     stopGame();
-                    mainWindow.loadLevel(actualLevel.getId() + 1);
+                    mainWindow.loadLevel(actualLevel.getId() + 1, true);
                 }else {
                     writeInfo("<font color=black>Can't</font> move to next level yet!");
                 }
@@ -390,12 +392,13 @@ public final class Model implements ActionListener {
     public int getActualLevelId() {return (actualLevel == null) ? 0 :actualLevel.getId();}
     public Level getActualLevel() {return actualLevel;}
     public Difficulty getDifficulty() {return difficulty;}
-    
     public String getFileName() {return fileName;}
     public int getDbId() {return dbId;}
+    public boolean isSavedToDb() {return (dbId != 0 && fileName == null);}
+    
     public void setFileName(String fileName) {this.fileName = fileName;}
     public void setDbId(int id) {this.dbId = id;}
-    public boolean isSavedToDb() {return (dbId != 0 && fileName == null);}
+    public void setActualLevel(int id) {for (Level l : levels) if (l.getId() == id) actualLevel = l;}
     
     /**
      * A nehézségi szinteket tartalmazó beágyazott enum

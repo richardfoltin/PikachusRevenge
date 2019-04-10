@@ -1,9 +1,10 @@
 package pikachusrevenge.model;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static java.lang.Math.signum;
 import java.util.Arrays;
-import java.util.Random;
+import pikachusrevenge.unit.Player;
 
 /**
  * A játékban a játékos és az egységek által használt irányvektorokat, és a 
@@ -51,7 +52,7 @@ public enum Direction {
     public static Direction getDirection(Position from, Position to){
         double dx = to.x - from.x;
         double dy = to.y - from.y;
-        int eighth = (int)floor(Math.abs(Math.atan(dy/dx)) / (Math.PI / 8));
+        int eighth = (int)floor(abs(Math.atan(dy/dx)) / (Math.PI / 8));
         switch (eighth) {
             case 0 : return getDirection(signum(dx),0);
             case 1 : 
@@ -74,7 +75,8 @@ public enum Direction {
     public static Direction getSecondDirection(Position from, Position to){
         double dx = to.x - from.x;
         double dy = to.y - from.y;
-        int fouth = (int)floor(Math.abs(Math.atan(dy/dx)) / (Math.PI / 4));
+        if (abs(dx) < Player.PLAYERSPEED || abs(dy) < Player.PLAYERSPEED) return Direction.STOP;
+        int fouth = (int)floor(abs(Math.atan(dy/dx)) / (Math.PI / 4));
         switch (fouth) {
             case 0 : return getDirection(0,signum(dy));
             case 1 : 
@@ -94,7 +96,7 @@ public enum Direction {
     public static boolean isInDirectionOfSight(Direction from, Direction to) {
         if (from == to) return true;
         if (from == STOP || to == STOP) return false;
-        if (Math.abs(from.x - to.x) + Math.abs(from.y - to.y) <= 1) return true;
+        if (abs(from.x - to.x) + abs(from.y - to.y) <= 1) return true;
         return false;
     }
     

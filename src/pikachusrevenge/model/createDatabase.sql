@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS pikachusrevenge;
 
 CREATE TABLE IF NOT EXISTS pikachusrevenge.player (
-    id          INT NOT NULL, 
+    id          INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
     name        VARCHAR(50),
     life        INT,
     x           INT,
@@ -10,26 +10,25 @@ CREATE TABLE IF NOT EXISTS pikachusrevenge.player (
     maxLevel    INT,
     score       INT,
     difficulty  INT,
-    updated     DATETIME,
-    PRIMARY KEY(id)
+    updated     DATETIME
 );
 
 CREATE TABLE IF NOT EXISTS pikachusrevenge.pokemon (
-    player_id  INT NOT NULL,
-    pokemon_id INT NOT NULL,
-    level_id   INT NOT NULL,
-    name       VARCHAR(50),
-    found      BIT,
-    x          INT,
-    y          INT,
-    updated     DATETIME,
-    PRIMARY KEY(player_id,pokemon_id,level_id)
+    id            INT NOT NULL,
+    player_id     INT NOT NULL REFERENCES player(id),
+    level_id      INT NOT NULL REFERENCES level(id),
+    name          VARCHAR(50),
+    found         BIT,
+    x             INT,
+    y             INT,
+    updated       DATETIME,
+    PRIMARY KEY (id,player_id,level_id)
 );
 
 CREATE TABLE IF NOT EXISTS pikachusrevenge.level (
-    player_id   INT NOT NULL,
-    level_id    INT NOT NULL,
-    time        INT,
-    updated     DATETIME,
-    PRIMARY KEY(player_id,level_id)
+    id              INT NOT NULL,
+    player_id       INT NOT NULL REFERENCES player(id),
+    time            INT,
+    updated         DATETIME,
+    PRIMARY KEY (id,player_id)
 );

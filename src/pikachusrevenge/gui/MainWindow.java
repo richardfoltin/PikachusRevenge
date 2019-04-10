@@ -123,7 +123,7 @@ public final class MainWindow extends JFrame {
         if (this.model != null) {
             int id = model.getActualLevelId();
             model.rebuildLevel(id);
-            loadLevel(id);
+            loadLevel(id, true);
         }
     }
     
@@ -131,22 +131,33 @@ public final class MainWindow extends JFrame {
      * Leállítja az aktuális játékot, és betölt egy pályát a paraméterül megadott
      * modellel.
      * @param model az új játék modelje
-     * @param id az új pálya száma
+     * @param fromStart true, ha a pálya a kezdő (vagy vég) pozícióból induljon
      */
-    public void loadLevelWithNewModel(Model model, int id) {loadLevelWithNewModel(model,id,null);}
-    public void loadLevelWithNewModel(Model model, int id, Position start){
+    public void loadActualLevelWithNewModel(Model model, boolean fromStart){
         stopGameFrame();
         this.model = model;
         startGameFrame();
-        loadLevel(id, start);
+        loadLevel(model.getActualLevelId(), fromStart);
+    }
+      
+    /**
+     * Leállítja az aktuális játékot, és betölti az első pályát a paraméterül megadott
+     * modellel.
+     * @param model az új játék modelje
+     */
+    public void loadFirstLevelWithNewModel(Model model){
+        stopGameFrame();
+        this.model = model;
+        startGameFrame();
+        loadLevel(1, true);
     }
     
     /**
      * Betölt egy új pályát a kész játékpanelbe.
      * @param id az új pálya száma
+     * @param fromStart true, ha a pálya a kezdő (vagy vég) pozícióból induljon
      */
-    public void loadLevel(int id) {loadLevel(id,null);} 
-    public void loadLevel(int id, Position start) {
+    public void loadLevel(int id, boolean fromStart) {
         boolean forward = (model.getActualLevelId() <= id);
         Level level = model.buildLevelIfNotExists(id,0); 
         model.getPlayer().setStartingPostion(level.getPlayerStartingPosition(forward));
@@ -166,7 +177,7 @@ public final class MainWindow extends JFrame {
         model.getPlayer().increaseAvailableLevels(id);
         menu.setAvailableLevels(model.getPlayer().getAvailableLevels());
         
-        model.startGame(level,start);   
+        model.startGame(level,fromStart);   
         scrollTo(model.getPlayer().getPosition());  
         pack();
     }
@@ -312,7 +323,7 @@ public final class MainWindow extends JFrame {
         Difficulty difficulty = model.getDifficulty();
         
         switch ((String)opt.getValue()) {
-            case "New Game": loadLevelWithNewModel(new Model(difficulty),1); break;
+            case "New Game": loadFirstLevelWithNewModel(new Model(difficulty)); break;
             case "Restart Level": restartLevel(); break;
             default: showMainMenu(); break;
         }

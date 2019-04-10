@@ -2,16 +2,20 @@ package pikachusrevenge.model;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import pikachusrevenge.gui.MainWindow;
+import pikachusrevenge.gui.MenuBar;
 import pikachusrevenge.model.Model.Difficulty;
 import pikachusrevenge.unit.Player;
 import pikachusrevenge.unit.Pokemon;
@@ -38,7 +42,6 @@ public class Database {
             connPool = new MysqlConnectionPoolDataSource();
             connPool.setServerName("localhost");
             connPool.setPort(3306);
-            connPool.setDatabaseName(DB);
             connPool.setUser(USER);
             connPool.setPassword(PASSWORD);
         }
@@ -51,6 +54,7 @@ public class Database {
                 window.showDbError("Cannot create database");
                 System.err.println("Cannot create database\n" + e);
             }
+            putSaveIntoDb("csaba_hc.pikasave", "Csaba", 1);
         }
         return conn;
     }
@@ -105,7 +109,7 @@ public class Database {
                             "    p.updated as 'updated',\n" +
                             "    p.difficulty as 'difficulty',\n" +
                             "    count(case pok.found when 1 then 1 else NULL end) as 'foundPokemon',\n" +
-                            "    count(pok.pokemon_id) as 'maxPokemon'\n" +
+                            "    count(pok.id) as 'maxPokemon'\n" +
                             "FROM pikachusrevenge.player p\n" +
                             "LEFT JOIN pikachusrevenge.pokemon pok ON p.id = pok.player_id\n" +
                             "GROUP BY\n" +
@@ -146,63 +150,80 @@ public class Database {
     public static boolean load(int id, Difficulty difficulty) {
         if (id == 0) return false;
         Model model = new Model(id, difficulty);
-        String query;
-        int actualLevel = 0;
-        Position start = null;
         
-        //player
-        Player player = model.getPlayer();
-        try (Statement stmt = getConnection().createStatement()){
-            query = String.format("SELECT life,name,actualLevel,maxLevel,x,y FROM %s.player WHERE id = %d",DB,id);
+        try (Connection conn = getConnection()) {
+        
+            //player
+            Player player = model.getPlayer();
+            Statement stmt = conn.createStatement();
+            String query = String.format("SELECT life,name,actualLevel,maxLevel,x,y FROM %s.player WHERE id = %d",DB,id);
             ResultSet rs = stmt.executeQuery(query);
+            int actualLevel = 0;
             while (rs.next()){
                 player.setLives(rs.getInt("life"));
                 player.setName(rs.getString("name"));
                 actualLevel = rs.getInt("actualLevel");
                 player.increaseAvailableLevels(rs.getInt("maxLevel"));
-                start = new Position(rs.getInt("x"),rs.getInt("y"));
+                player.putToPosition(new Position(rs.getInt("x"),rs.getInt("y")));
             }
-        } catch (Exception e) {
-            MainWindow.getInstance().showDbError("Cannot load saved game!");
-            System.err.println("Cannot load saved game!\n" + e);
-            return false;
-        }
-        
-        //pokémon
-        HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
-        try (Statement stmt = getConnection().createStatement()){
-            query = String.format("SELECT pokemon_id,level_id,x,y,found FROM %s.pokemon WHERE player_id = %d",DB,id);
-            ResultSet rs = stmt.executeQuery(query);
+            
+            //pokémon
+            HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
+            stmt = conn.createStatement();
+            query = String.format("SELECT id,level_id,x,y,found FROM %s.pokemon WHERE player_id = %d",DB,id);
+            rs = stmt.executeQuery(query);
             while (rs.next()){
                 TilePosition tpos = new TilePosition(rs.getInt("x"), rs.getInt("y"), rs.getInt("level_id"));
                 boolean found = (rs.getInt("found") == 1);
-                int pokemonId = rs.getInt("pokemon_id");
+                int pokemonId = rs.getInt("id");
                 Pokemon p = new Pokemon(model,tpos,pokemonId,found);
                 pokemons.put(tpos,p);
             }
-        } catch (Exception e) {
-            MainWindow.getInstance().showDbError("Cannot load saved game!");
-            System.err.println("Cannot load saved game!\n" + e);
-            return false;
-        }
-        
-        //level
-        try (Statement stmt = getConnection().createStatement()){
-            query = String.format("SELECT level_id,time FROM %s.level WHERE player_id = %d",DB,id);
-            ResultSet rs = stmt.executeQuery(query);
+            
+            //level
+            stmt = conn.createStatement();
+            query = String.format("SELECT id,time FROM %s.level WHERE player_id = %d",DB,id);
+            rs = stmt.executeQuery(query);
             while (rs.next()){
-                int levelId = rs.getInt("level_id");
+                int levelId = rs.getInt("id");
                 int time = rs.getInt("time");
                 model.buildLevelIfNotExists(levelId,time);
             }
+            
+            model.setActualLevel(actualLevel);
+            MainWindow.getInstance().loadActualLevelWithNewModel(model, false);
+            return true;
         } catch (Exception e) {
             MainWindow.getInstance().showDbError("Cannot load saved game!");
             System.err.println("Cannot load saved game!\n" + e);
             return false;
         }
-        
-        MainWindow.getInstance().loadLevelWithNewModel(model, actualLevel, start);
-        return true;
+    }
+    
+    /**
+     * Elmenti a megadott {@link Model} által leírt játék minden eddig megjelenített
+     * pályáját az adatbázisba. Amennyiben nincs megadva mentési id, akkor bekéri 
+     * a játékos neevét, és új mentést hoz létre, egyébként felülírja az előzőt.
+     * Ha nem tud menteni hibaüzenetet dob fel.
+     * @param id a mentés id-je
+     * @param model a játék modelje
+     * @return true, ha sikeres a mentés
+     */ 
+    public static boolean save(int id, Model model) {
+        try {
+            String name = null;
+            if (id == 0) {
+                name = MainWindow.getInstance().getSaveName();
+                if (name == null || name.equals("")) return false;
+                model.getPlayer().setName(name);
+            }
+            saveSilently(id, name, model);
+            return true;
+        } catch (ClassNotFoundException | SQLException e) {
+            MainWindow.getInstance().showDbError("Cannot save game to database!");
+            System.err.println("Cannot save to database!");
+            return false; 
+        } 
     }
     
     /**
@@ -210,115 +231,104 @@ public class Database {
      * pályáját az adatbázisba. Amennyiben nincs megadva mentési id, akkor bekéri 
      * a játékos neevét, és új mentést hoz létre, egyébként felülírja az előzőt.
      * @param id a mentés id-je
+     * @param name a játékos neve. Ha null, akkor nem lesz átírva
      * @param model a játék modelje
-     * @return true, ha sikeres a mentés
+     * @throws java.sql.SQLException
+     * @throws java.lang.ClassNotFoundException
      */
-    public static boolean save(int id, Model model) {
-        String query;
-        String name = null;
-        if (id == 0) {
-            name = MainWindow.getInstance().getSaveName();
-            if (name == null) return false;
-            try (Statement stmt = getConnection().createStatement()){
-                int maxId = 0;
-                query = String.format("SELECT max(id) as 'id' FROM %s.player",DB);
-                ResultSet rs = stmt.executeQuery(query);
-                while (rs.next()){
-                    maxId = rs.getInt("id");
-                }
-                id = maxId + 1;
-            } catch (Exception e) {
-                MainWindow.getInstance().showDbError("Database error!");
-                System.err.println("Cannot make new ID!\n" + e);
-                return false;
-            }
-        } else {
-            try (Statement stmt = getConnection().createStatement()){
-                query = String.format("SELECT name FROM %s.player WHERE id = %d",DB,id);
-                ResultSet rs = stmt.executeQuery(query);
-                while (rs.next()){
-                    name = rs.getString("name");
-                }
-                if (name == null || name.equals("")) return false;
-            } catch (Exception e) {
-                MainWindow.getInstance().showDbError("Database error!");
-                System.err.println("Cannot get player name!\n" + e);
-                return false;
-            }
-        }
-        
-        Player player = model.getPlayer();
-        HashMap<TilePosition,Pokemon> pokemons = model.getAllPokemonsWithPosition();
-        ArrayList<Level> levels = model.getLevels();
-        int actualLevel = model.getActualLevelId();
-        int score = model.getScore();   
-        int difficulty = model.getDifficulty().id;
-        StringBuilder queryBuilder;
-        String comma;
+    public static void saveSilently(int id, String name, Model model) throws SQLException, ClassNotFoundException {
+        Connection conn = getConnection();
+        conn.setAutoCommit(false);
+        String stmt = null;
+        PreparedStatement pstmt = null;
         
         //player
-        query = String.format("REPLACE INTO %s.player (id,name,life,x,y,actualLevel,maxLevel,score,difficulty,updated)\n" + 
-                                     "VALUES (%d,'%s',%d,%d,%d,%d,%d,%d,%d,now())", 
-                                     DB,
-                                     id,
-                                     name,
-                                     player.getLives(),
-                                     (int)player.getPosition().x,
-                                     (int)player.getPosition().y,
-                                     actualLevel,
-                                     levels.size(),
-                                     score,
-                                     difficulty);
-        if (!sqlQuery(query,"Cannot save to player table!")) return false;   
+        Player player = model.getPlayer();
+        if (id == 0) {
+            stmt = String.format("INSERT INTO %s.player (life,x,y,actualLevel,maxLevel,score,difficulty,updated,name)\n" +
+                    "VALUES (?,?,?,?,?,?,?,now(),?)",DB);
+            if (name == null) throw new SQLException();
+            pstmt = conn.prepareStatement(stmt,Statement.RETURN_GENERATED_KEYS);
+            pstmt.setString(8, name);
+        } else {
+            stmt = String.format("UPDATE %s.player SET life=?, x=?, y=?, actualLevel=?, maxLevel=?, score=?, difficulty=?, updated=now()\n" +
+                    "WHERE id = %d",DB,id);
+            pstmt = conn.prepareStatement(stmt);
+        }
+        
+        pstmt.setInt(1, player.getLives());
+        pstmt.setInt(2, (int)player.getPosition().x);
+        pstmt.setInt(3, (int)player.getPosition().y);
+        pstmt.setInt(4, model.getActualLevelId());
+        pstmt.setInt(5, model.getLevels().size());
+        pstmt.setInt(6, model.getScore());
+        pstmt.setInt(7, model.getDifficulty().id);
+        pstmt.addBatch();
+        pstmt.executeBatch();
+        
+        if (id == 0) {
+            conn.commit();
+            ResultSet generatedKeys = pstmt.getGeneratedKeys();
+            if (generatedKeys.next()) id = generatedKeys.getInt(1);
+            else throw new SQLException();
+        }
         
         //pokémon
-        queryBuilder = new StringBuilder();
-        comma = "";
-        queryBuilder.append(String.format("REPLACE INTO %s.pokemon (player_id,pokemon_id,level_id,name,found,x,y,updated)\nVALUES\n",DB));
-        for (HashMap.Entry<TilePosition,Pokemon> p : pokemons.entrySet()) {
-            queryBuilder.append(String.format("%s(%d,%d,%d,'%s',%d,%d,%d,now())\n",
-                                              comma,
-                                              id,
-                                              p.getValue().getId(),
-                                              p.getKey().getLevel(),
-                                              p.getValue().getName(),
-                                              (p.getValue().isFound()) ? 1 : 0,
-                                              p.getKey().getX(),
-                                              p.getKey().getY()));
-            comma = ",";
+        stmt = String.format("REPLACE INTO %s.pokemon (player_id,id,level_id,name,found,x,y,updated)\n" +
+                "VALUES (?,?,?,?,?,?,?,now())",DB);
+        pstmt = conn.prepareStatement(stmt);
+        for (HashMap.Entry<TilePosition,Pokemon> p : model.getAllPokemonsWithPosition().entrySet()) {
+            pstmt.setInt(1, id);
+            pstmt.setInt(2, p.getValue().getId());
+            pstmt.setInt(3, p.getKey().getLevel());
+            pstmt.setString(4, p.getValue().getName());
+            pstmt.setInt(5, (p.getValue().isFound()) ? 1 : 0);
+            pstmt.setInt(6, p.getKey().getX());
+            pstmt.setInt(7, p.getKey().getY());
+            pstmt.addBatch();
         }
-        if (!sqlQuery(queryBuilder.toString(),"Cannot save to pokemon table!")) return false;   
-
-        //levels
-        queryBuilder = new StringBuilder();
-        comma = "";
-        queryBuilder.append(String.format("REPLACE INTO %s.level (player_id,level_id,time,updated)\nVALUES\n",DB));
-        for (Level level : levels){
-            queryBuilder.append(String.format("%s(%d,%d,%d,now())\n",
-                                              comma,
-                                              id,
-                                              level.getId(),
-                                              level.getTime()));
-            comma = ",";
-        }
-        if (!sqlQuery(queryBuilder.toString(),"Cannot save to level table!")) return false;
+        pstmt.executeBatch();
         
-        player.setName(name);
+        //level
+        stmt = String.format("REPLACE INTO %s.level (player_id,id,time,updated)\n" +
+                "VALUES (?,?,?,now())",DB);
+        pstmt = conn.prepareStatement(stmt);
+        for (Level level : model.getLevels()){
+            pstmt.setInt(1, id);
+            pstmt.setInt(2, level.getId());
+            pstmt.setInt(3, level.getTime());
+            pstmt.addBatch();
+        }
+        pstmt.executeBatch();
+        conn.commit();
+        System.out.println("Save successful!");
+        
         model.setDbId(id);
-        return true;
     }
     
-    public static boolean sqlQuery(String query, String error) {
-        MainWindow window = MainWindow.getInstance();
-        try (Statement stmt = getConnection().createStatement()){
-            int i = stmt.executeUpdate(query);
-            System.out.println(query);
-            return true;
-        } catch (Exception e){
-            window.showDbError(error);
-            System.err.println(error + "\n" + e + "\n" + query);
-            return false;
-        }    
+    /**
+     * Egy file-ban elmentett játékot az adatbázisba rak, ha a megkapott id-n
+     * még nem szerepel semmi.
+     * @param fileName az elmentett játék fileneve
+     * @param name a játékos neve
+     */
+    private static void putSaveIntoDb(String fileName, String name, int id) {
+        try (Connection conn = getConnection()) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(String.format("SELECT id FROM %s.player WHERE id = %d", DB,id));
+            if (!rs.isBeforeFirst()) throw new NoResultException();
+        } catch (NoResultException e) {
+            try {
+                File file = new File(System.getProperty("user.dir") + "/" + fileName);
+                Model model = MenuBar.load(file);
+                saveSilently(0, name, model);
+            } catch (FileNotFoundException | MenuBar.IllegalFileException ex) {
+                System.err.println("Cannot put save game into db! Wrong save game file!");
+            } catch (ClassNotFoundException | SQLException ex) {
+                System.err.println("Cannot put save game into db!");
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            System.err.println("Cannot put save game into db!");
+        }
     }
-
 }
