@@ -278,7 +278,8 @@ public final class MainWindow extends JFrame {
         dialog.setModal(true);
         dialog.setVisible(true);
         
-        switch ((Integer) opt.getValue()) {
+        int value = (opt.getValue() == null) ? JOptionPane.CANCEL_OPTION : (Integer)opt.getValue();
+        switch (value) {
             case JOptionPane.YES_OPTION: System.exit(0); break;
             default: if (model != null) model.resumeGame(); break;
         }
@@ -322,7 +323,8 @@ public final class MainWindow extends JFrame {
         dialog.setVisible(true);
         Difficulty difficulty = model.getDifficulty();
         
-        switch ((String)opt.getValue()) {
+        String value = (opt.getValue() == null) ? "" : (String)opt.getValue();
+        switch (value) {
             case "New Game": loadFirstLevelWithNewModel(new Model(difficulty)); break;
             case "Restart Level": restartLevel(); break;
             default: showMainMenu(); break;
@@ -350,12 +352,13 @@ public final class MainWindow extends JFrame {
     public void showBackToMainMenuConfirmation() {    
         model.stopGame();
         
-        JOptionPane opt = new JOptionPane(new JLabel("Are you sure you want to go back to Main Menu?",JLabel.CENTER),JOptionPane.PLAIN_MESSAGE,JOptionPane.YES_NO_OPTION);
+        JOptionPane opt = new JOptionPane(new JLabel("<html>Are you sure you want to go back to Main Menu?</html>",JLabel.CENTER),JOptionPane.PLAIN_MESSAGE,JOptionPane.YES_NO_OPTION);
         Dialog dialog = opt.createDialog(this, "Confirmation");
         dialog.setModal(true);
         dialog.setVisible(true);
         
-        switch ((Integer) opt.getValue()) {
+        int value = (opt.getValue() == null) ? JOptionPane.CANCEL_OPTION : (Integer)opt.getValue();
+        switch (value) {
             case JOptionPane.YES_OPTION: showMainMenu();; break;
             default: model.resumeGame();; break;
         }

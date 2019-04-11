@@ -95,7 +95,7 @@ public final class MapView extends JPanel {
                 g.fill(arc);
 
                 Arc2D instantArc = npc.getInstantLos();
-                g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 30));
+                g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 45));
                 g.fill(instantArc);
             }
             

@@ -282,7 +282,7 @@ public class NPC extends Unit {
          states.put(NPC_STATE.STOP_LOOKOUT,new NpcState(0));
          states.put(NPC_STATE.STOP_EXCLAMATION,new NpcState(0));
          states.put(NPC_STATE.STOP_THROW,new NpcState(50));
-         states.put(NPC_STATE.WALKING_CAUTIOUS,new NpcState(100));
+         states.put(NPC_STATE.WALKING_CAUTIOUS,new NpcState(250));
          return states;
     }
     

@@ -83,7 +83,7 @@ public class Player extends Unit {
         } else {
             restartFromStratingPoint();
             for (Pokemon p : model.getMapPokemons()) {
-                if (p.isFound()) p.restartFromStratingPoint();
+                if (p.isFound()) p.putToPosition(startPosition);
             }
         }   
         caughtWait = 0;
