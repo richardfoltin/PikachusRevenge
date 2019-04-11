@@ -21,7 +21,8 @@ $RECYCLE.BIN/
 *.class
 /build
 /dist
-/nbproject
+/nbproject/private
+/nbproject/*tmx
 ~*.*
 
 # =========================
