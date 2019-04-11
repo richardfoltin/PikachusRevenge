@@ -368,21 +368,25 @@ public final class MenuBar extends JMenuBar {
         MainWindow window = MainWindow.getInstance();
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(SAVEFILE_DESCRIPTION,SAVEFILE_EXTENSION);
-        chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        chooser.setCurrentDirectory(new File(System.getProperty("user.dir") + "/save"));
         chooser.setFileFilter(filter);
         chooser.setDialogTitle("Load Game");
         chooser.setApproveButtonText("Load");
         chooser.setApproveButtonMnemonic('L');
         File chosenFile = (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFile() : null;
-        try {
-            Model model = load(chosenFile);
-            MainWindow.getInstance().loadActualLevelWithNewModel(model, false);
-            return true;
-        }catch (IllegalFileException ex) {
-            JOptionPane.showMessageDialog(window, "Not proper Pikachu's Revenge saved file.");
-            return false;
-        }catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(window, "File not found!");
+        if (chosenFile != null) {
+            try {
+                Model model = load(chosenFile);
+                MainWindow.getInstance().loadActualLevelWithNewModel(model, false);
+                return true;
+            }catch (IllegalFileException ex) {
+                JOptionPane.showMessageDialog(window, "Not proper Pikachu's Revenge saved file.");
+                return false;
+            }catch (FileNotFoundException ex) {
+                JOptionPane.showMessageDialog(window, "File not found!");
+                return false;
+            }
+        } else {
             return false;
         }
     }
@@ -448,7 +452,7 @@ public final class MenuBar extends JMenuBar {
         if (fileName == null) {
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter(SAVEFILE_DESCRIPTION,SAVEFILE_EXTENSION);
-            chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+            chooser.setCurrentDirectory(new File(System.getProperty("user.dir") + "/save"));
             chooser.setFileFilter(filter);
             chooser.setDialogTitle("Save Game");
             chooser.setApproveButtonText("Save");

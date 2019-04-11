@@ -53,7 +53,7 @@ public class Pokemon extends Unit {
         this.found = true;
         revealLabel(this.label);
         Position appearPosition = TilePosition.tileCenter(tpos);
-        appearPosition.y -= C_BOX_OFFSET_Y;
+        appearPosition.y -= 8;
         putToPosition(appearPosition);
         startLooping();
     }

@@ -54,7 +54,7 @@ public class Database {
                 window.showDbError("Cannot create database");
                 System.err.println("Cannot create database\n" + e);
             }
-            putSaveIntoDb("csaba_hc.pikasave", "Csaba", 1);
+            putSaveIntoDb("save/csaba_hc.pikasave", "Csaba", 1);
         }
         return conn;
     }
