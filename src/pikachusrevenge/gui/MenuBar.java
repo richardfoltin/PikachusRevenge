@@ -396,8 +396,8 @@ public final class MenuBar extends JMenuBar {
      * Ha nem lehet, akkor hibaüzenet dialógust dob fel.
      * @param file a file, amit be kell tölteni
      * @return Model a felépített model ha sikeres a betöltés, egyébként null
-     * @throws java.io.FileNotFoundException
-     * @throws pikachusrevenge.gui.MenuBar.IllegalFileException
+     * @throws java.io.FileNotFoundException nem található a file
+     * @throws pikachusrevenge.gui.MenuBar.IllegalFileException nem megfelelő savefile
      */
     public static Model load(File file) throws FileNotFoundException, IllegalFileException {
         Scanner sc = new Scanner(file);

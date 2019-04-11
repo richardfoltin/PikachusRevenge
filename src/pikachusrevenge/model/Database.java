@@ -233,8 +233,8 @@ public class Database {
      * @param id a mentés id-je
      * @param name a játékos neve. Ha null, akkor nem lesz átírva
      * @param model a játék modelje
-     * @throws java.sql.SQLException
-     * @throws java.lang.ClassNotFoundException
+     * @throws java.sql.SQLException SQL hiba
+     * @throws java.lang.ClassNotFoundException SQL hiba
      */
     public static void saveSilently(int id, String name, Model model) throws SQLException, ClassNotFoundException {
         Connection conn = getConnection();

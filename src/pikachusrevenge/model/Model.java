@@ -114,7 +114,7 @@ public final class Model implements ActionListener {
      * Beállítja az felső panalen a pályához tartozó információkat, és elindítja 
      * az adott pályát.
      * @param level a pálya
-     * @param start a játékos indításkori pozíciója
+     * @param fromStart a startpozícióból kezdődik-e a játék
      */
     public void startGame(Level level, boolean fromStart) {
 

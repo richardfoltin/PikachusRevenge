@@ -144,7 +144,7 @@ public class Player extends Unit {
     
     /**
      * A játékos leszáll a hordozóeszközről (level 8)
-     * @param shorePosition 
+     * @param shorePosition amelyik pozícióba le kell szállni
      */
     public void getOffCarry(Position shorePosition) {
         pos.x = shorePosition.x;
