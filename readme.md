@@ -1,8 +1,8 @@
 Description
 ---------------------------------------------
 
-Small java based game project. You have to control Pikachu to free the pokémon on a tile based 2D map.
-But you have to avoid the vicious trainers, who patrol on the different levels. You will be caught, if you get into line of sight.
+Small java based game project. You control Pikachu to free the pokémon on different tile based 2D maps.
+You have to avoid the vicious trainers, who patrol on the different levels. You will be caught, if you get into line of sight.
 
 
 Contents
@@ -12,7 +12,7 @@ Contents
 - Unit line of sight example
 - Unit collision box example
 - JDialog examples (with tables)
-- JScrollFrame example
+- JScrollPane example
 - Controlling game with arrow keys example
 - JMenu examples
 - JDBC connection example
